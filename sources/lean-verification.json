@@ -1,0 +1,92 @@
+{
+  "toolchain": "leanprover/lean4:v4.35.0",
+  "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "theorems_audited": [
+    "TreewidthHom.paddedAdvance_iff",
+    "TreewidthHom.commonSubsequence_iff_embedding",
+    "TreewidthHom.commonSubsequence_iff_paddedSelection",
+    "TreewidthHom.cycleHom_dvd",
+    "TreewidthHom.prime_cycleHom_eq",
+    "TreewidthHom.cycleHom_rotation",
+    "TreewidthHom.markerPrimes_length",
+    "TreewidthHom.markerPrimes_nodup",
+    "TreewidthHom.markerPrimes_prime",
+    "TreewidthHom.Arrow.adj_iff_edges",
+    "TreewidthHom.Arrow.assignments_complete",
+    "TreewidthHom.Arrow.assignments_thirteen",
+    "TreewidthHom.Arrow.rigid_hom",
+    "TreewidthHom.Arrow.ports_separated",
+    "TreewidthHom.Decomposition.addApices",
+    "TreewidthHom.Decomposition.two_apex_width"
+  ],
+  "axioms": {
+    "TreewidthHom.paddedAdvance_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.commonSubsequence_iff_embedding": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.commonSubsequence_iff_paddedSelection": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.cycleHom_dvd": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.prime_cycleHom_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.cycleHom_rotation": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.markerPrimes_prime": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.adj_iff_edges": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.assignments_complete": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.assignments_thirteen": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.rigid_hom": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.ports_separated": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.addApices": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.two_apex_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.markerPrimes_length": [],
+    "TreewidthHom.markerPrimes_nodup": []
+  },
+  "build_passed": true,
+  "scope": "LCS padded constraints, prime-cycle arithmetic, finite gadget rigidity, apex decomposition; not the composed reduction or full W[1]-hardness theorem."
+}
