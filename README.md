@@ -10,11 +10,12 @@ treewidth at most `12`, where `k` is the number of input strings.
 equivalence, both width bounds, all input cases, and polynomial size for its
 actual integer-numbered edge-list output. The earlier mathematical statement is
 [`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean).
-All 78 principal-declaration axiom audits pass without proof admissions.
+All 99 principal-declaration axiom audits pass without proof admissions.
 
-Sparse direction-gadget serialization also has a checked quadratic cost bound
-in an explicit traversal/comparison model. Costs of the entire constructor and
-primitive bit operations have **not yet been composed or verified**;
+The complete measured constructor now returns provably identical graph data and
+has a fixed polynomial bound in an explicit traversal/comparison model. This
+includes preprocessing, relation tests, all enumeration stages, and sparse
+serialization. Primitive bit costs remain unverified;
 [COST_MODEL.md](COST_MODEL.md) specifies the boundary.
 
 A formal machine-level running-time proof and parameterized-complexity framework
@@ -50,6 +51,7 @@ lake build
 python3 scripts/check_formalization.py
 python3 scripts/check_executable.py
 lake env lean --run WorkChecks.lean
+lake env lean --run MeasuredChecks.lean
 python3 scripts/regenerate_quotient_certificates.py --check
 python3 scripts/run_bounded_width_hom_checks.py
 ```

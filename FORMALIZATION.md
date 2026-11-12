@@ -59,6 +59,23 @@ looplessness, duplicate edges, and raw-output symmetry. General decision
 correctness follows from Lean, not these tests. The original Python reduction
 is still a separate implementation without a formal refinement theorem.
 
+## Complete abstract cost composition
+
+[`compileMeasured_value`](TreewidthHom/MeasuredReduction.lean) proves that the
+complete instrumented constructor returns exactly `compile`'s graph data.
+`compileMeasured_polynomial` bounds its cost by a single polynomial in
+`100 + encodedInputSize xs ell + q`, with `q` the assigned primitive charge.
+Preprocessing, finite relation searches, domain/fact/incidence/marker enumeration,
+sparse arcs, and integer serialization are all included. The input size includes
+the binary length of the requested subsequence length.
+
+This closes the previous whole-constructor cost-composition obligation in the
+stated abstract model. It does not certify primitive bit costs, compile the
+program to a machine model, or bound the ordinary Lean CLI's runtime.
+[COST_MODEL.md](COST_MODEL.md) describes the charged operations precisely.
+`MeasuredChecks.lean` compares the two executable outputs on both preprocessing
+branches and full constructions; the general equality is proved in Lean.
+
 ## Checked components
 
 | File | Principal result | Meaning |
@@ -129,16 +146,12 @@ The combinatorial reduction has no remaining correctness, width, finiteness,
 or polynomial-output-size assumptions. The following are outside the current
 formal theorem:
 
-1. Compose the instrumented preparation, relation-testing, and serialization
-   costs into a bound for the whole constructor, then justify the primitive
-   bit costs. The executable constructor and its semantic refinement are now
-   checked. `indexedAssemblyMeasured_value` verifies the instrumented sparse
-   serialization output, and `indexedAssemblyMeasured_quadratic` bounds that
-   stage's traversal/comparison cost. Generic enumeration, filtering, and
-   finite-decision cost lemmas are available, but are not yet connected into
-   an end-to-end time theorem. [COST_MODEL.md](COST_MODEL.md) states exactly what
-   is charged and what is still outside the model. Polynomial output size alone
-   does not close this obligation.
+1. Justify primitive bit costs and refine the complete measured program to an
+   explicit bit-cost or machine model. The abstract cost composition is checked,
+   but arithmetic and mapping callbacks still have assigned unit costs, while
+   comparisons and word access have an assigned charge `q`. No theorem bounds
+   these implementations' physical costs yet. Polynomial output size and
+   abstract operation counts do not by themselves close this obligation.
 2. Instantiate a formal parameterized-reduction framework and derive the
    W[1]-hardness conclusion. Pietrzak's binary-LCS hardness theorem remains an
    explicitly external published input, not a project axiom.
@@ -156,7 +169,7 @@ instance in this package is bookkeeping for finite sets, not a graph assumption.
 ## Reproduction and trust
 
 Run `python3 scripts/check_formalization.py`. It builds the library and audits
-78 principal declarations in
+99 principal declarations in
 [AxiomAudit.lean](AxiomAudit.lean), allowing only `propext`, `Classical.choice`,
 and `Quot.sound`. It also scans project modules for proof admissions. Both finite
 searches use kernel reduction, without `native_decide` or project axioms.

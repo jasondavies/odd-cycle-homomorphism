@@ -81,3 +81,25 @@ import TreewidthHom
 #print axioms TreewidthHom.Executable.EnumRun.bounded_subtype
 #print axioms TreewidthHom.Executable.EnumRun.budget_polynomial
 #print axioms TreewidthHom.Executable.Decision.existsFin_cost
+
+#print axioms TreewidthHom.Executable.EnumRun.output_eq
+#print axioms TreewidthHom.Executable.EnumRun.functions_level
+#print axioms TreewidthHom.Executable.SchemaRun.facts_level
+#print axioms TreewidthHom.Executable.SchemaRun.incidence_level
+#print axioms TreewidthHom.Executable.SchemaRun.cycles_level
+#print axioms TreewidthHom.Executable.SchemaRun.arcs_level
+#print axioms TreewidthHom.Executable.relationalMeasured_value
+#print axioms TreewidthHom.Executable.relationalMeasured_cost
+#print axioms TreewidthHom.Executable.queryTest_level
+#print axioms TreewidthHom.Executable.targetTest_level
+#print axioms TreewidthHom.Executable.queryHoldsTest_level
+#print axioms TreewidthHom.Executable.targetHoldsTest_level
+#print axioms TreewidthHom.Executable.EnumRun.queryVertices_level
+#print axioms TreewidthHom.Executable.EnumRun.targetVertices_level
+#print axioms TreewidthHom.Executable.statsMeasured_spec
+#print axioms TreewidthHom.Executable.statsMeasured_short
+#print axioms TreewidthHom.Executable.rawMeasured_value
+#print axioms TreewidthHom.Executable.rawMeasured_cost
+#print axioms TreewidthHom.Executable.compileMeasured_value
+#print axioms TreewidthHom.Executable.compileMeasured_cost
+#print axioms TreewidthHom.Executable.compileMeasured_polynomial

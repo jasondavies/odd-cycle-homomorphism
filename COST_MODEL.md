@@ -1,71 +1,96 @@
 # Cost-model boundary
 
-The verified executable constructor is complete. **The polynomial running-time
-proof for the entire constructor is not complete.** The current cost library
-proves properties of explicit instrumented traversals; it does not certify the
-running time of arbitrary Lean code or of the CLI.
+**The complete measured constructor now has a checked polynomial bound in an
+explicit traversal/comparison model.** Its output is proved equal to the
+verified executable constructor. A bit-time or machine-runtime theorem is
+still missing: some operations have assigned primitive costs whose physical
+implementation has not been formalised.
 
-## Completed serialization theorem
+## Complete constructor
 
-`indexedAssemblyMeasured` in
-[IndexedAssemblyCost.lean](TreewidthHom/IndexedAssemblyCost.lean) executes sparse
-integer numbering and edge generation from supplied lists of base vertices and
-arcs. `indexedAssemblyMeasured_value` proves that its output is exactly
-`indexedAssembly.data`, the encoding used by the verified constructor.
+[MeasuredReduction.lean](TreewidthHom/MeasuredReduction.lean) defines
+`compileMeasured xs ell q`. It performs preprocessing, constructs both LCS
+relational structures, enumerates their facts and incidence vertices, adds
+marker cycles, generates sparse arcs, and serializes the direction gadgets.
 
-Write `n` for the base-list length, `m` for the arc-list length, and `q` for the
-cost assigned to one base-vertex equality comparison. The checked bound is
+`compileMeasured_value` proves, for every input and assigned primitive charge
+`q`, that the result is exactly `(compile xs ell).data`. Therefore the existing
+decision-equivalence, width, and size theorems apply to the graph data it returns.
+The measured vertex and arc lists themselves feed serialization; they are not
+replaced by separately recomputed ordinary enumerations.
+
+`compileMeasured_polynomial` proves that a single polynomial `p : Polynomial Nat`
+satisfies, for every `xs`, `ell`, and `q`,
+
+```
+(compileMeasured xs ell q).cost ≤ p.eval (100 + encodedInputSize xs ell + q).
+```
+
+Here `encodedInputSize = number_of_words + total_word_length + ell.size + 1`:
+words are explicit bit lists, word delimiters have unit size, and the requested
+length is binary. The proof uses the very loose composition bounds
+`B_0(s)=s+1` and `B_(j+1)(s)=100*(B_j(s)+1)^3`, with a fixed depth of 31.
+This is an existence proof of a polynomial bound, not a useful performance
+estimate. Do not expand or numerically evaluate that bound in regression tests.
+
+Preprocessing has exact modeled cost
+`total_word_length + (q+6)*number_of_words + 1`. It explicitly traverses word
+lengths and computes the count, total, and short-word flag in one pass. These
+computed results control the branches and supply the padding bound. A requested
+length of `2^256` is handled without a loop over its numeric value. Zero words
+or zero requested length produce the fixed yes-instance; a short word produces
+the fixed no-instance. All other inputs execute the full graph construction.
+
+## Charged operations and primitive boundary
+
+- `MeasuredPreprocessing` charges each visited input/word cell and assigns `q`
+  to requested-length comparisons.
+- `MeasuredDomains` charges finite-domain generation, sums, products, and
+  dependent sums. Each target word lookup plus length operation receives `q`.
+- `MeasuredLCS` expands the query and target relation tests into explicit finite
+  existential searches. Their atomic equalities, comparisons, and accesses
+  receive `q`; Boolean combinations and schema dispatch are charged as well.
+- `MeasuredSchema` composes fact filtering, incidence vertices, marker cycles,
+  and sparse arc generation. The schema has arity at most two and 18 marker
+  types, with marker lengths at most 67.
+- `MeasuredRelational` composes these lists with `IndexedAssemblyCost`.
+  The serializer charges arc lookup, repeated list-length traversals, endpoint
+  searches, finite ranges, and construction of the integer edge list. Its
+  assigned base-vertex comparison charge is `q`.
+
+Generic enumeration mapping callbacks still receive a one-step charge. Their
+concrete uses include constructor/equivalence maps, bounded tuple operations,
+marker lookup, and arc endpoint calculation. Arithmetic is currently unit cost.
+Structured equality and word access are assigned `q`; there is no theorem yet
+showing that a specific polynomial `q(input_length)` bounds their bit cost.
+The extra `q` in the raw constructor covers recovering the input word count.
+
+These are precise definitions of an abstract model, not automatic certificates
+for arbitrary Lean expressions. Instrumentation overhead, parsing, and JSON
+libraries are outside the model. In particular, equality of the measured and
+ordinary outputs does not establish a bound on the ordinary Lean CLI's runtime.
+
+## Serialization bound
+
+For supplied base-vertex and arc lists of lengths `n` and `m`, respectively,
+`indexedAssemblyMeasured_cost` proves the bound
 
 ```
 (m + 60*(q+2)*n + 3094)*m + (m+1)^2 + n + 2*m + 7.
 ```
 
-If both lists have length at most `b`, the bound is at most
-`10000*(q+2)*(b+1)^2`. In particular, `b` can be the final graph order `n+11m`.
-This is a quadratic traversal/comparison-model bound for this stage, with the
-equality cost explicit. It is not yet a polynomial bit-time theorem for LCS
-reduction.
+If `n,m ≤ b`, this is at most `10000*(q+2)*(b+1)^2`.
+`indexedAssemblyMeasured_value` proves output equality with the production
+indexed serializer. This stage is now included in the complete bound above.
 
-The model charges for visited cells in list lookup and length computation,
-base-vertex searches, finite-range generation, mapping, concatenation, and
-output construction. The instrumented finite-range routine explicitly visits
-and shifts its existing indices, yielding the checked `(m+1)^2` bound. The
-serializer pays for each arc lookup and repeated base-list length computation;
-preparing the supplied lists is outside this stage. Fixed-size gadget-coordinate
-operations are primitives of constant cost, and arithmetic currently has unit
-cost. Instrumentation overhead itself is not included in the modeled cost.
+## Remaining closure
 
-## Generic components
-
-- `SerializationCost` checks linear search and a simple general endpoint
-  serializer. The production constructor uses the faster indexed serializer.
-- `MeasuredLists` checks explicitly recursive list operations and their costs.
-- `MeasuredEnumeration` connects instrumented enumerators to their ordinary
-  enumerations. Mapping callbacks are treated as supplied one-step primitives;
-  their internal computation is not certified by the generic map theorem.
-- `EnumerationBounds` supplies composition bounds and proves that any fixed
-  number of iterations of its bound is polynomial.
-- `MeasuredDecision` checks exhaustive finite existential tests with explicit
-  costs for their supplied atomic predicates.
-
-These theorems are genuine checked statements about the given algorithms and
-counters. Their generic callback contracts must be instantiated and justified;
-placing an expensive computation inside `Measured.step` would not prove that
-it runs in one physical step.
-
-## Work still needed for full closure
-
-1. Instantiate the instrumented enumerators and finite decisions for the full
-   LCS front end, typed incidence, and marker cycles, including preprocessing.
-   Prove that the resulting full measured program returns `compile`'s output.
-2. Compose their costs with the checked sparse serializer into one polynomial
-   bound in the encoded input length. No complete cost theorem is present yet.
-3. Establish costs of equality, arithmetic, marker lookup, bounded tuple
-   operations, and word access in an explicit bit-cost or machine model. Include
-   the bit length of the requested subsequence length; it may be huge even
-   when preprocessing immediately rejects it.
-4. Instantiate a parameterized-reduction framework and derive hardness with
+1. Implement and justify primitive equality, arithmetic, marker/tuple operations,
+   and word access in an explicit bit-cost or machine model. Prove the necessary
+   representation-size invariants and refine the measured program into that
+   model. The binary length of `ell` must remain included.
+2. Instantiate a parameterized-reduction framework and derive hardness with
    Pietrzak's published binary-LCS hardness theorem explicitly external.
 
-No project axiom asserts any of these remaining obligations. They must not be
-inferred from the finite execution timings or from the output-size theorem.
+No project axiom asserts these obligations. Output size, execution timings, and
+the completed abstract cost composition do not replace them.
