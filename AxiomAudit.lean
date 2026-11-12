@@ -33,3 +33,26 @@ import TreewidthHom
 #print axioms TreewidthHom.Relational.relationalReduction_iff
 #print axioms TreewidthHom.Relational.schema_tags_card
 #print axioms TreewidthHom.standardMarkers_bound
+
+#print axioms TreewidthHom.UnaryBinary.hom_iff_relational
+#print axioms TreewidthHom.LCSInstance.lcs_relational_iff
+#print axioms TreewidthHom.LCSInstance.lcs_graph_iff
+#print axioms TreewidthHom.Graft.isTree
+#print axioms TreewidthHom.RootedGraft.decomposition
+#print axioms TreewidthHom.RootedGraft.width
+#print axioms TreewidthHom.Relational.incidence_width
+#print axioms TreewidthHom.TypedDag.colorEncoding_width
+#print axioms TreewidthHom.LCSInstance.query_width
+#print axioms TreewidthHom.LCSInstance.target_width
+#print axioms TreewidthHom.UnaryBinary.untyped_width
+#print axioms TreewidthHom.LCSInstance.lcs_bounded_graph_reduction
+#print axioms TreewidthHom.schema_graph_card_le
+#print axioms TreewidthHom.LCSInstance.query_card
+#print axioms TreewidthHom.LCSInstance.target_card
+#print axioms TreewidthHom.LCSInstance.query_domain_bound
+#print axioms TreewidthHom.LCSInstance.target_domain_bound
+#print axioms TreewidthHom.LCSInstance.graph_bound_of_domain
+#print axioms TreewidthHom.LCSInstance.reduce_correct
+#print axioms TreewidthHom.LCSInstance.reduce_width
+#print axioms TreewidthHom.LCSInstance.reduce_size
+#print axioms TreewidthHom.LCSInstance.full_reduction

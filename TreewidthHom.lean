@@ -16,3 +16,4 @@ public import TreewidthHom.CycleRank
 public import TreewidthHom.ColorEncoding
 public import TreewidthHom.RelationalReduction
 public import TreewidthHom.Schema
+public import TreewidthHom.FullReduction

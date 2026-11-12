@@ -1,5 +1,12 @@
 # Homomorphism is W[1]-hard when both treewidths are bounded by the parameter
 
+**Lean status, 2026-11-12:** the complete combinatorial reduction is now checked,
+including all input cases, both width bounds, and polynomial output size.
+The formal proof uses the sufficient source bound `max(2k,12)`, intermediate
+target width four, and a coarse degree-12 size bound. This written argument
+retains its sharper bounds. The formal machine-time and W[1]-hardness conclusion
+remain outside the library; see [FORMALIZATION.md](FORMALIZATION.md).
+
 **Public-status check, 2026-11-12:** Still in the main source list and the
 [Stack Exchange question](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth)
 has zero answers, confirmed through the live API. However,

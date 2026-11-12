@@ -1,18 +1,21 @@
 # Graph homomorphism parameterized by both treewidths
 
-A written reduction from binary longest common subsequence to simple undirected
-graph homomorphism, with a Lean 4 formalisation of several proof components.
-The reduction has source treewidth at most `max(k+1,12)` and target treewidth at
-most `12`, where `k` is the number of input strings. Together with Pietrzak's
-LCS hardness theorem, the written argument gives W[1]-hardness.
+A reduction from binary longest common subsequence to simple undirected graph
+homomorphism, with a Lean 4 proof of the complete combinatorial reduction.
+The checked construction has source treewidth at most `max(2k,12)` and target
+treewidth at most `12`, where `k` is the number of input strings.
 
-**Status: the written proof is complete; the Lean formalisation is partial.**
-Lean now verifies the complete relational-to-simple-graph homomorphism
-correspondence: typed incidence, prime-cycle colour erasure, and undirected
-gadget replacement. This includes confinement for arbitrary assemblies and the
-last stage's `max(k,12)` width bound and exact vertex count. The LCS relational
-front end, some earlier width/size bounds, and an end-to-end W[1]-hardness theorem
-are **not yet formalised**. [FORMALIZATION.md](FORMALIZATION.md) records the boundary.
+**Status: Lean checks decision equivalence, both width bounds, all trivial input
+cases, and polynomial finite output size.** The main theorem is
+[`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean).
+All 54 principal-declaration axiom audits pass without proof admissions.
+
+A formal machine-level running-time proof and parameterized-complexity framework
+are still absent. The written polynomial-time argument and Pietrzak's published
+LCS hardness theorem yield W[1]-hardness; that complexity conclusion is **not a
+Lean theorem in this repository**. The written proof also gives the sharper
+source bound `max(k+1,12)` and a sharper size bound than the checked construction.
+[FORMALIZATION.md](FORMALIZATION.md) records the exact boundary.
 
 **Prior work:** W[1]-hardness was already announced in
 [Amarilli's comment of 2025-05-30](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).

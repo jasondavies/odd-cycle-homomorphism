@@ -31,7 +31,7 @@ report = {
     "axioms": {name: [s.strip() for s in axioms.split(",") if s.strip()]
                for name, axioms in entries} | {name: [] for name in empty},
     "build_passed": True,
-    "scope": "LCS padded constraints; complete relational-to-simple-graph homomorphism equivalence; arbitrary gadget confinement and direction-stage width/cardinality bounds. LCS front end, remaining width bounds and full parameterized complexity theorem pending.",
+    "scope": "Full combinatorial binary-LCS-to-simple-graph reduction, including all preprocessing cases, decision equivalence, source width max(2k,12), target width 12, and polynomial finite output size. Machine-level polynomial running time and parameterized complexity framework remain external, as does Pietrzak's LCS hardness theorem.",
 }
 (ROOT / "sources").mkdir(exist_ok=True)
 (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")

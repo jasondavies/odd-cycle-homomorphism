@@ -33,7 +33,29 @@
     "TreewidthHom.TypedDag.encoded_noIsolated",
     "TreewidthHom.Relational.relationalReduction_iff",
     "TreewidthHom.Relational.schema_tags_card",
-    "TreewidthHom.standardMarkers_bound"
+    "TreewidthHom.standardMarkers_bound",
+    "TreewidthHom.UnaryBinary.hom_iff_relational",
+    "TreewidthHom.LCSInstance.lcs_relational_iff",
+    "TreewidthHom.LCSInstance.lcs_graph_iff",
+    "TreewidthHom.Graft.isTree",
+    "TreewidthHom.RootedGraft.decomposition",
+    "TreewidthHom.RootedGraft.width",
+    "TreewidthHom.Relational.incidence_width",
+    "TreewidthHom.TypedDag.colorEncoding_width",
+    "TreewidthHom.LCSInstance.query_width",
+    "TreewidthHom.LCSInstance.target_width",
+    "TreewidthHom.UnaryBinary.untyped_width",
+    "TreewidthHom.LCSInstance.lcs_bounded_graph_reduction",
+    "TreewidthHom.schema_graph_card_le",
+    "TreewidthHom.LCSInstance.query_card",
+    "TreewidthHom.LCSInstance.target_card",
+    "TreewidthHom.LCSInstance.query_domain_bound",
+    "TreewidthHom.LCSInstance.target_domain_bound",
+    "TreewidthHom.LCSInstance.graph_bound_of_domain",
+    "TreewidthHom.LCSInstance.reduce_correct",
+    "TreewidthHom.LCSInstance.reduce_width",
+    "TreewidthHom.LCSInstance.reduce_size",
+    "TreewidthHom.LCSInstance.full_reduction"
   ],
   "axioms": {
     "TreewidthHom.paddedAdvance_iff": [
@@ -177,9 +199,119 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.UnaryBinary.hom_iff_relational": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.lcs_relational_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.lcs_graph_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.isTree": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.RootedGraft.decomposition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.RootedGraft.width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Relational.incidence_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.TypedDag.colorEncoding_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.query_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.target_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.UnaryBinary.untyped_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.lcs_bounded_graph_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.schema_graph_card_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.query_card": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.target_card": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.query_domain_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.target_domain_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.graph_bound_of_domain": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.reduce_correct": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.reduce_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.reduce_size": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.LCSInstance.full_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.markerPrimes_length": [],
     "TreewidthHom.markerPrimes_nodup": []
   },
   "build_passed": true,
-  "scope": "LCS padded constraints; complete relational-to-simple-graph homomorphism equivalence; arbitrary gadget confinement and direction-stage width/cardinality bounds. LCS front end, remaining width bounds and full parameterized complexity theorem pending."
+  "scope": "Full combinatorial binary-LCS-to-simple-graph reduction, including all preprocessing cases, decision equivalence, source width max(2k,12), target width 12, and polynomial finite output size. Machine-level polynomial running time and parameterized complexity framework remain external, as does Pietrzak's LCS hardness theorem."
 }

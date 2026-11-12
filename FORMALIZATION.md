@@ -1,33 +1,60 @@
 # Formalisation boundary
 
-The complete W[1]-hardness theorem is **not yet formalised**. The library now
-checks the entire relational-to-simple-graph homomorphism equivalence, including
-arbitrary gadget gluing. The remaining gap starts with the LCS relational front
-end and includes some width and size bounds.
+The **complete combinatorial reduction is checked**. The machine-level
+polynomial-time reduction and the W[1]-hardness conclusion are not yet formal
+complexity theorems. These are distinct claims.
+
+## Main checked statement
+
+For any `words : Fin k → List Bool` and natural requested length `ell`,
+[`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean) proves that
+`reduce words ell` is a finite ordinary simple graph pair `(G,H)` satisfying:
+
+- `Nonempty (G →g H)` if and only if there is a list of length `ell` that is a
+  `List.Sublist` of every input word (the standard common-subsequence definition).
+- `G` has a tree-decomposition certificate of width at most `max(2k,12)`.
+- `H` has a tree-decomposition certificate of width at most `12`.
+- Each graph has at most `10^12 * (s+1)^12` vertices, where
+  `s = k + sum_i length(words i) + 1`.
+
+The size bound is deliberately coarse. It is independent of the requested
+length, so it also handles a huge binary-encoded length. Preprocessing maps
+zero words or zero requested length to a fixed yes-instance, and any requested
+length exceeding an input word's length to a fixed no-instance. All remaining
+inputs use the actual padded-path, incidence, prime-cycle, and direction-gadget
+construction with padding bound `N = sum_i length(words i)`.
+Preprocessing examines lengths only; it does not invoke an LCS solver.
+
+There are no unproved reduction contracts in this statement. It refers to the
+actual constructed graph types and mathlib graph homomorphisms. The proof has
+only the standard Lean/mathlib dependencies `propext`, `Classical.choice`, and
+`Quot.sound`; Pietrzak's theorem is not used or assumed in this combinatorial
+statement.
 
 ## Checked components
 
 | File | Principal result | Meaning |
 | --- | --- | --- |
-| [PaddedSteps.lean](TreewidthHom/PaddedSteps.lean) | `paddedAdvance_iff` | N steps that stay or advance by one, followed by a strict advance, connect a to b exactly when `a < b ≤ a+N+1`. |
-| [LCS.lean](TreewidthHom/LCS.lean) | `commonSubsequence_iff_paddedSelection` | Standard list common subsequences are equivalent to the padded position constraints. |
-| [Incidence.lean](TreewidthHom/Incidence.lean) | `incidence_iff` | For arbitrary finite-arity relational structures, structural homomorphisms are equivalent to type-preserving incidence homomorphisms. |
-| [ColorEncoding.lean](TreewidthHom/ColorEncoding.lean) | `colorEncoding_iff` | Attaching distinct prime cycles to a typed acyclic digraph preserves homomorphism existence after erasing types. |
-| [RelationalReduction.lean](TreewidthHom/RelationalReduction.lean) | `relationalReduction_iff` | All three schema-erasure stages compose: relational homomorphisms are equivalent to homomorphisms of the final simple undirected graphs. |
-| [Schema.lean](TreewidthHom/Schema.lean) | `schema_tags_card`, `standardMarkers_bound` | The one-unary/five-binary schema has exactly 18 incidence types, instantiated by distinct primes at most 67. |
-| [ArrowSearch.lean](TreewidthHom/ArrowSearch.lean) | `rigid_hom` | Every endomorphism of the concrete 13-vertex gadget is the identity. |
-| [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean) | `Assembly.confinement` | Every map from the gadget into an arbitrary assembly of copies is the coordinate-preserving inclusion of a single copy. |
-| [DirectionReduction.lean](TreewidthHom/DirectionReduction.lean) | `directionReduction_iff`, `directionReduction_card` | Direction removal preserves homomorphism existence and has exactly `|V| + 11|E|` vertices. |
-| [DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) | `directionReduction_width` | Any width-k decomposition extends to the undirected gadget replacement with width at most `max(k,12)`. |
-| [LeafTree.lean](TreewidthHom/LeafTree.lean) | `leafTree.isTree` | Adding arbitrary families of leaves preserves the tree property. |
-| [TreeDecomposition.lean](TreewidthHom/TreeDecomposition.lean) | `addApices`, `two_apex_width` | Adding two apices increases a supplied decomposition's width by at most two. |
+| [LCS.lean](TreewidthHom/LCS.lean) | `commonSubsequence_iff_embedding` | Standard list subsequences equal shared letters selected by increasing position embeddings. |
+| [LCSInstance.lean](TreewidthHom/LCSInstance.lean) | `query`, `target` | The concrete anchored one-unary/five-binary relational construction. |
+| [LCSEncode.lean](TreewidthHom/LCSEncode.lean), [LCSDecode.lean](TreewidthHom/LCSDecode.lean) | `commonSubsequence_hom`, `Decode.commonSubsequence` | Both directions of the relational front end. |
+| [LCSReduction.lean](TreewidthHom/LCSReduction.lean) | `lcs_graph_iff` | Decision equivalence for the actual final simple graphs, including zero words and empty subsequences. |
+| [LCSQueryWidth.lean](TreewidthHom/LCSQueryWidth.lean) | `query_width` | Source path-decomposition bags have size at most `2k+1`. |
+| [LCSTargetWidth.lean](TreewidthHom/LCSTargetWidth.lean) | `target_width` | Target Gaifman bags have size at most five. |
+| [Incidence.lean](TreewidthHom/Incidence.lean), [IncidenceWidth.lean](TreewidthHom/IncidenceWidth.lean) | `incidence_iff`, `incidence_width` | Typed incidence preserves homomorphisms; unary/binary facts extend width to at most `max(w,4)`. |
+| [ColorEncoding.lean](TreewidthHom/ColorEncoding.lean), [ColorWidth.lean](TreewidthHom/ColorWidth.lean) | `colorEncoding_iff`, `colorEncoding_width` | Prime-cycle type erasure preserves homomorphisms and extends width to at most `max(w,2)`. |
+| [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean) | `Assembly.confinement` | Every gadget map into an arbitrary assembly is the coordinate-preserving inclusion of one copy. |
+| [DirectionReduction.lean](TreewidthHom/DirectionReduction.lean), [DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) | `directionReduction_iff`, `directionReduction_width` | Direction erasure preserves homomorphisms and extends width to at most `max(w,12)`; exact count is `|V|+11|E|`. |
+| [Schema.lean](TreewidthHom/Schema.lean) | `schema_tags_card`, `standardMarkers_bound` | The 18 incidence types use distinct primes at most 67. |
+| [ReductionWidth.lean](TreewidthHom/ReductionWidth.lean) | `lcs_bounded_graph_reduction` | Composed correctness with final source and target width certificates. |
+| [FiniteEncoding.lean](TreewidthHom/FiniteEncoding.lean), [ReductionSize.lean](TreewidthHom/ReductionSize.lean) | `schema_graph_card_le`, `graph_bound_of_domain` | Finite graph types and polynomial vertex counts. |
+| [FullReduction.lean](TreewidthHom/FullReduction.lean) | `full_reduction` | All input cases, decision equivalence, widths, and polynomial size in one theorem. |
 
-The theorem `relationalReduction_iff` constructs the actual incidence vertices,
-prime-cycle vertices and gadget vertices. Its conclusion concerns mathlib
-homomorphisms of ordinary simple graphs; it is not an assumed equivalence or
-an abstract contract for an unspecified encoding. Its inputs include a marker
-assignment with distinct prime lengths. `schemaMarkers` supplies one for the
-fixed six-relation schema used in the written proof.
+Reusable infrastructure includes arbitrary leaf attachment (`LeafTree`,
+`LeafExtension`), well-founded tree grafting (`GraftTree`), fan decompositions
+(`ConeDecomposition`, `ChainGraft`), relabeling and edge deletion
+(`DecompositionMaps`), and interval/path decompositions (`IntervalDecomposition`).
+The earlier `PaddedSteps` and `PrimeCycles` lemmas remain checked as well.
 
 ## General confinement from a finite quotient certificate
 
@@ -68,26 +95,35 @@ A cross-type source arc must therefore map to a cross-component target arc.
 Projecting images to their components recovers a typed homomorphism. This even
 works for isolated vertices of the original typed graph.
 
-## Remaining obligations
+## Remaining complexity obligations
 
-1. Define the full LCS relational source and target, and identify their
-   homomorphisms with the already formalised padded-position constraints.
-2. Construct their width bounds: source pathwidth at most `k+1` and target
-   treewidth at most three.
-3. Extend decompositions through incidence and prime-cycle attachment. The
-   final direction-removal width bound **is already checked**.
-4. Prove all finite size/construction-time bounds and handle the full reduction's
-   trivial yes/no input cases. The direction stage's exact vertex count is checked.
-5. State the parameterized-reduction conclusion in a complexity framework,
-   with Pietrzak's LCS W[1]-hardness theorem kept explicitly external or formalised.
+The combinatorial reduction has no remaining correctness, width, finiteness,
+or polynomial-output-size assumptions. The following are outside the current
+formal theorem:
+
+1. Implement and verify an encoded constructor in a machine or bit-cost model,
+   and prove its polynomial running time. The Lean graph definitions use
+   noncomputable finite enumerations; the separately tested Python program is
+   not formally proved to implement them. Polynomial output size by itself is
+   not a running-time proof.
+2. Instantiate a formal parameterized-reduction framework and derive the
+   W[1]-hardness conclusion. Pietrzak's binary-LCS hardness theorem remains an
+   explicitly external published input, not a project axiom.
+3. Optionally sharpen the checked source bound from `2k` to the written `k+1`,
+   the intermediate target bound from four to three, and the coarse size bound
+   to the written sparse quadratic bound. None of these improvements changes
+   the intended parameterized-hardness conclusion or final target width 12.
 
 The tree-decomposition certificates use mathlib trees and walks, require vertex
 and edge coverage and connected occurrence bags, and bound every finite bag by
-width plus one. A minimization-based graph treewidth function is not defined.
+width plus one. `HasWidth` packages such a certificate; a minimization-based
+graph treewidth function is not defined. Existence of a decidable-equality
+instance in this package is bookkeeping for finite sets, not a graph assumption.
 
 ## Reproduction and trust
 
 Run `python3 scripts/check_formalization.py`. It builds the library and audits
+54 principal declarations in
 [AxiomAudit.lean](AxiomAudit.lean), allowing only `propext`, `Classical.choice`,
 and `Quot.sound`. It also scans project modules for proof admissions. Both finite
 searches use kernel reduction, without `native_decide` or project axioms.
