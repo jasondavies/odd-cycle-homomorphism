@@ -7,11 +7,12 @@ most `12`, where `k` is the number of input strings. Together with Pietrzak's
 LCS hardness theorem, the written argument gives W[1]-hardness.
 
 **Status: the written proof is complete; the Lean formalisation is partial.**
-Lean checks the common-subsequence position constraints, prime-cycle arithmetic,
-the rigidity of the concrete 13-vertex gadget, and the addition of apices to a
-tree decomposition. It does **not** yet check the composed graph reduction or
-an end-to-end W[1]-hardness theorem. [FORMALIZATION.md](FORMALIZATION.md) records
-the exact boundary.
+Lean now verifies the complete relational-to-simple-graph homomorphism
+correspondence: typed incidence, prime-cycle colour erasure, and undirected
+gadget replacement. This includes confinement for arbitrary assemblies and the
+last stage's `max(k,12)` width bound and exact vertex count. The LCS relational
+front end, some earlier width/size bounds, and an end-to-end W[1]-hardness theorem
+are **not yet formalised**. [FORMALIZATION.md](FORMALIZATION.md) records the boundary.
 
 **Prior work:** W[1]-hardness was already announced in
 [Amarilli's comment of 2025-05-30](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
@@ -37,6 +38,7 @@ and mathlib **v4.35.0** are pinned, including exact dependency revisions.
 lake exe cache get
 lake build
 python3 scripts/check_formalization.py
+python3 scripts/regenerate_quotient_certificates.py --check
 python3 scripts/run_bounded_width_hom_checks.py
 ```
 

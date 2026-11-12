@@ -17,7 +17,23 @@
     "TreewidthHom.Arrow.rigid_hom",
     "TreewidthHom.Arrow.ports_separated",
     "TreewidthHom.Decomposition.addApices",
-    "TreewidthHom.Decomposition.two_apex_width"
+    "TreewidthHom.Decomposition.two_apex_width",
+    "TreewidthHom.Arrow.Quotient.connectivity_certificate",
+    "TreewidthHom.Arrow.Assembly.embed_adj_iff",
+    "TreewidthHom.Arrow.Assembly.confinement",
+    "TreewidthHom.Digraph.directionReduction_iff",
+    "TreewidthHom.Digraph.directionReduction_card",
+    "TreewidthHom.leafTree.isTree",
+    "TreewidthHom.Digraph.directionReduction_width",
+    "TreewidthHom.Relational.incidence_iff",
+    "TreewidthHom.cycle_rank_constant",
+    "TreewidthHom.TypedDag.EncodedHom.component",
+    "TreewidthHom.TypedDag.EncodedHom.colors",
+    "TreewidthHom.TypedDag.colorEncoding_iff",
+    "TreewidthHom.TypedDag.encoded_noIsolated",
+    "TreewidthHom.Relational.relationalReduction_iff",
+    "TreewidthHom.Relational.schema_tags_card",
+    "TreewidthHom.standardMarkers_bound"
   ],
   "axioms": {
     "TreewidthHom.paddedAdvance_iff": [
@@ -84,9 +100,86 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.Arrow.Quotient.connectivity_certificate": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.Assembly.embed_adj_iff": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.Assembly.confinement": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Digraph.directionReduction_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Digraph.directionReduction_card": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.leafTree.isTree": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Digraph.directionReduction_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Relational.incidence_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.cycle_rank_constant": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.TypedDag.EncodedHom.component": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.TypedDag.EncodedHom.colors": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.TypedDag.colorEncoding_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.TypedDag.encoded_noIsolated": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Relational.relationalReduction_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Relational.schema_tags_card": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.standardMarkers_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.markerPrimes_length": [],
     "TreewidthHom.markerPrimes_nodup": []
   },
   "build_passed": true,
-  "scope": "LCS padded constraints, prime-cycle arithmetic, finite gadget rigidity, apex decomposition; not the composed reduction or full W[1]-hardness theorem."
+  "scope": "LCS padded constraints; complete relational-to-simple-graph homomorphism equivalence; arbitrary gadget confinement and direction-stage width/cardinality bounds. LCS front end, remaining width bounds and full parameterized complexity theorem pending."
 }

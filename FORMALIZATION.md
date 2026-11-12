@@ -1,85 +1,102 @@
 # Formalisation boundary
 
-The Lean development is a **partial formalisation of the written reduction**.
-There is no Lean theorem asserting W[1]-hardness or the equivalence of the two
-final graph-homomorphism and LCS instances. The results below are fully proved
-under their displayed hypotheses, without admissions or project-defined axioms.
+The complete W[1]-hardness theorem is **not yet formalised**. The library now
+checks the entire relational-to-simple-graph homomorphism equivalence, including
+arbitrary gadget gluing. The remaining gap starts with the LCS relational front
+end and includes some width and size bounds.
 
 ## Checked components
 
 | File | Principal result | Meaning |
 | --- | --- | --- |
 | [PaddedSteps.lean](TreewidthHom/PaddedSteps.lean) | `paddedAdvance_iff` | N steps that stay or advance by one, followed by a strict advance, connect a to b exactly when `a < b ≤ a+N+1`. |
-| [LCS.lean](TreewidthHom/LCS.lean) | `commonSubsequence_iff_paddedSelection` | Standard `List.Sublist` common subsequences of length ℓ are equivalent to shared letters and the padded position constraints, when every input length is at most N. |
-| [PrimeCycles.lean](TreewidthHom/PrimeCycles.lean) | `cycleHom_dvd`, `prime_cycleHom_eq`, `cycleHom_rotation` | A successor-preserving map on cyclic groups forces divisibility of cycle lengths; prime lengths coincide, and equal nonzero lengths permit only rotations. The actual 18 marker primes are also checked. |
-| [ArrowSearch.lean](TreewidthHom/ArrowSearch.lean) | `rigid_hom` | Every mathlib graph endomorphism of the concrete 13-vertex gadget is the identity. |
-| [TreeDecomposition.lean](TreewidthHom/TreeDecomposition.lean) | `addApices`, `two_apex_width` | Adding arbitrary edges incident with at most two new vertices preserves a tree-decomposition certificate after adding those vertices to every bag, increasing width by at most two. |
+| [LCS.lean](TreewidthHom/LCS.lean) | `commonSubsequence_iff_paddedSelection` | Standard list common subsequences are equivalent to the padded position constraints. |
+| [Incidence.lean](TreewidthHom/Incidence.lean) | `incidence_iff` | For arbitrary finite-arity relational structures, structural homomorphisms are equivalent to type-preserving incidence homomorphisms. |
+| [ColorEncoding.lean](TreewidthHom/ColorEncoding.lean) | `colorEncoding_iff` | Attaching distinct prime cycles to a typed acyclic digraph preserves homomorphism existence after erasing types. |
+| [RelationalReduction.lean](TreewidthHom/RelationalReduction.lean) | `relationalReduction_iff` | All three schema-erasure stages compose: relational homomorphisms are equivalent to homomorphisms of the final simple undirected graphs. |
+| [Schema.lean](TreewidthHom/Schema.lean) | `schema_tags_card`, `standardMarkers_bound` | The one-unary/five-binary schema has exactly 18 incidence types, instantiated by distinct primes at most 67. |
+| [ArrowSearch.lean](TreewidthHom/ArrowSearch.lean) | `rigid_hom` | Every endomorphism of the concrete 13-vertex gadget is the identity. |
+| [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean) | `Assembly.confinement` | Every map from the gadget into an arbitrary assembly of copies is the coordinate-preserving inclusion of a single copy. |
+| [DirectionReduction.lean](TreewidthHom/DirectionReduction.lean) | `directionReduction_iff`, `directionReduction_card` | Direction removal preserves homomorphism existence and has exactly `|V| + 11|E|` vertices. |
+| [DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) | `directionReduction_width` | Any width-k decomposition extends to the undirected gadget replacement with width at most `max(k,12)`. |
+| [LeafTree.lean](TreewidthHom/LeafTree.lean) | `leafTree.isTree` | Adding arbitrary families of leaves preserves the tree property. |
+| [TreeDecomposition.lean](TreewidthHom/TreeDecomposition.lean) | `addApices`, `two_apex_width` | Adding two apices increases a supplied decomposition's width by at most two. |
 
-The LCS theorem includes zero length and empty words. Its intermediate statement
-is about position constraints, not a definition of the full relational instance.
-Identifying those constraints with all Root, Next, Begin, Step, Advance, and
-Letter facts remains a separate obligation.
+The theorem `relationalReduction_iff` constructs the actual incidence vertices,
+prime-cycle vertices and gadget vertices. Its conclusion concerns mathlib
+homomorphisms of ordinary simple graphs; it is not an assumed equivalence or
+an abstract contract for an unspecified encoding. Its inputs include a marker
+assignment with distinct prime lengths. `schemaMarkers` supplies one for the
+fixed six-relation schema used in the written proof.
 
-The cycle results use `ZMod` and successor preservation. They do not assert
-that a map between the complete cycle-decorated incidence graphs maps each
-attached cycle into a single component or sends its root to a root. Those
-arguments use the acyclic base and cross-type incidence edges in the prose proof.
+## General confinement from a finite quotient certificate
 
-The tree-decomposition definition uses mathlib `SimpleGraph.IsTree` and walks.
-It requires coverage of vertices and edges and a connected set of occurrence
-bags for each vertex. Bags are finite. A width bound is expressed by bounding
-every bag's cardinality by width plus one; we have not defined a separate
-minimization-based graph treewidth function.
+Vertices are numbered `B,A,x,z,y,D,C,t,a,u,b,v,w`; ports a,b are 8,10. Collapsing
+both ports to 8 gives a finite quotient graph (with unused vertex 10 isolated).
+There are exactly eight homomorphisms from the gadget into this quotient.
+[ArrowQuotient.lean](TreewidthHom/ArrowQuotient.lean) checks a complete search
+and a decreasing-distance certificate for every resulting map. Each certificate
+proves that vertex 7 has a non-port image, that all non-port preimages connect
+to it, and that every port preimage has a non-port neighbor.
 
-## Finite rigidity certificate
+For an arbitrary assembly, collapse all base vertices to 8 and retain private
+coordinates. Composing an arbitrary gadget map with this projection gives one
+of the certified quotient maps. Adjacent private vertices have the same copy
+index, so the decreasing-distance certificate places all private images in a
+single copy. Every other image has a private neighbor and belongs to that copy
+too. Its inclusion is an induced embedding; the previously proved rigidity
+then fixes all coordinates and preserves the ordered ports.
 
-Vertices are numbered in the order
-`B,A,x,z,y,D,C,t,a,u,b,v,w`; ports a,b are 8,10. The graph has exactly the edges
-of the subdivided K₄ in the written solution. This numbering differs from the
-Python implementation and is chosen to prune the search early.
+This is a general proof for assemblies of **any size, including infinite ones**.
+The assembly may contain parallel directed arcs, but each copy must have
+ distinct endpoints. `directionReduction_iff` applies it to loopless digraphs;
+only its source needs to have no isolated vertices. Prime-cycle decoration
+automatically supplies that property in the composed relational reduction.
 
-`assignments_complete` proves that **every** edge-preserving bounded map appears
-in the backtracking enumeration. The concrete 13-level search is then evaluated
-in Lean's kernel and contains only the identity. Concrete intermediate lists
-are computation checkpoints, not axioms: each checkpoint's equality with the
-preceding search step is kernel-checked. Finally `rigid_hom` applies completeness
-to arbitrary mathlib homomorphisms of the gadget.
+The quotient argument provides a checked alternative to the prose solution's
+odd-cycle confinement proof. No separate formalisation of that longer proof
+is needed for the checked equivalence.
 
-This certifies all endomorphisms of this one graph. It does **not** certify the
-separate confinement theorem for maps into arbitrary graphs formed by gluing
-copies of the gadget. Finite Python tests of glued graphs do not replace that
-missing general Lean proof.
+## Prime-cycle confinement
 
-## Remaining obligations for the complete reduction
+[CycleRank.lean](TreewidthHom/CycleRank.lean) proves that a natural-valued rank
+which never decreases around a finite cycle is constant. In the encoded target,
+base arcs strictly increase rank, so an image cycle stays in one component.
+Its coordinate map preserves successor, and the divisibility theorem from
+[PrimeCycles.lean](TreewidthHom/PrimeCycles.lean) forces equal prime types.
+A cross-type source arc must therefore map to a cross-component target arc.
+Projecting images to their components recovers a typed homomorphism. This even
+works for isolated vertices of the original typed graph.
 
-1. Define the full relational source and target, and prove their homomorphism
-   equivalence with the formalised LCS position constraints.
-2. Define typed incidence digraphs and prove both directions of the structural
-   homomorphism correspondence.
-3. Formalise prime-cycle attachment, component confinement, and root forcing.
-4. Formalise the gadget's cycle and port-path properties, arbitrary gluing,
-   confinement to one copy, and preservation of the ordered ports.
-5. Construct all source and target decompositions, including the pathwidth
-   bound `k+1`, incidence and cycle attachments, and gadget attachment bound 12.
-6. Compose the constructions; handle the trivial yes/no input cases; prove
-   size and running-time bounds, and parameterized-reduction correctness.
-7. Supply a formal complexity framework and a formalised or explicitly external
-   binary-LCS W[1]-hardness theorem (Pietrzak).
+## Remaining obligations
 
-These obligations are not smuggled into Lean as assumed axioms or as a theorem
-hypothesis saying that the desired reduction already exists. The current
-library simply stops before them. The complete mathematical argument and the
-external theorem citations are in [SOLUTION.md](SOLUTION.md).
+1. Define the full LCS relational source and target, and identify their
+   homomorphisms with the already formalised padded-position constraints.
+2. Construct their width bounds: source pathwidth at most `k+1` and target
+   treewidth at most three.
+3. Extend decompositions through incidence and prime-cycle attachment. The
+   final direction-removal width bound **is already checked**.
+4. Prove all finite size/construction-time bounds and handle the full reduction's
+   trivial yes/no input cases. The direction stage's exact vertex count is checked.
+5. State the parameterized-reduction conclusion in a complexity framework,
+   with Pietrzak's LCS W[1]-hardness theorem kept explicitly external or formalised.
+
+The tree-decomposition certificates use mathlib trees and walks, require vertex
+and edge coverage and connected occurrence bags, and bound every finite bag by
+width plus one. A minimization-based graph treewidth function is not defined.
 
 ## Reproduction and trust
 
 Run `python3 scripts/check_formalization.py`. It builds the library and audits
 [AxiomAudit.lean](AxiomAudit.lean), allowing only `propext`, `Classical.choice`,
-and `Quot.sound`. It also scans the project modules for proof admissions.
-The gadget's computation uses `decide +kernel`, not `native_decide`.
+and `Quot.sound`. It also scans project modules for proof admissions. Both finite
+searches use kernel reduction, without `native_decide` or project axioms.
 
-The toolchain and mathlib revision are pinned. The audit report is saved as
-[sources/lean-verification.json](sources/lean-verification.json). Separately,
-`python3 scripts/run_bounded_width_hom_checks.py` verifies finite instances of
-the executable reduction and writes
+Run `python3 scripts/regenerate_quotient_certificates.py --check` to reproduce
+the eight quotient maps and their distance certificates. The generator is
+outside the proof's trusted base: Lean checks each generated certificate.
+
+The pinned versions and audit report are recorded in
+[sources/lean-verification.json](sources/lean-verification.json). Separate finite
+checks of the executable reduction remain in
 [sources/bounded-width-hom-results.json](sources/bounded-width-hom-results.json).

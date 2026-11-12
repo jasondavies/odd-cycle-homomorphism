@@ -40,10 +40,11 @@ The 13-vertex direction gadget below is G_1 from
 (2024), which credits Hell–Nešetřil. We give the needed gadget proof here.
 Neither the hardness theorem nor the gadget is claimed as new.
 
-**Formalisation boundary:** the Lean development checks selected lemmas, not this
-entire argument. In particular, the typed-incidence and gadget-gluing converses,
-the complete width construction, and the parameterized complexity conclusion
-remain outside Lean. See [FORMALIZATION.md](FORMALIZATION.md).
+**Formalisation boundary:** Lean now verifies the complete composition from
+relational homomorphisms to simple undirected graph homomorphisms, plus the
+last stage's width and vertex-count bounds. The LCS relational front end,
+earlier width bounds, and full complexity conclusion remain outside Lean.
+See [FORMALIZATION.md](FORMALIZATION.md).
 
 ## 1. The reduction and parameter bounds
 
@@ -313,3 +314,23 @@ from workshop discussions. We did not locate that reduction or establish
 whether it is the same one. This write-up provides a complete locally
 checked argument, with established ingredients credited. It does not
 establish publication priority. Independent external review remains pending.
+
+## 8. A kernel-checked alternative confinement argument
+
+The Lean proof uses a shorter route to confinement than Section 5. Identify the
+two ports in F, obtaining a quotient Q. A complete kernel-checked enumeration
+finds eight maps F → Q. For every such map, the preimage of Q's non-port vertices
+is nonempty and connected, and every remaining vertex has a neighbor in it.
+
+In any assembly of copies, project all glued endpoints to Q's identified port
+and every private vertex to its gadget coordinate. For any map from F into the
+assembly, its composition with this projection is one of the eight checked
+maps. Adjacency between private vertices forces equality of their copy indices.
+Connectivity therefore places every private image in a single copy. The neighbor
+property places every other image in that copy as well. Each copy is an induced
+embedding, so rigidity gives its coordinate-preserving inclusion.
+
+This proves confinement for arbitrary assemblies, without a size bound. It is
+formalised in [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean), using
+[the finite quotient certificate](TreewidthHom/ArrowQuotient.lean). It does not
+change the graph construction or the width constants in the written reduction.
