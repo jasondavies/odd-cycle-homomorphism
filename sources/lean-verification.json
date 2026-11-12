@@ -55,7 +55,31 @@
     "TreewidthHom.LCSInstance.reduce_correct",
     "TreewidthHom.LCSInstance.reduce_width",
     "TreewidthHom.LCSInstance.reduce_size",
-    "TreewidthHom.LCSInstance.full_reduction"
+    "TreewidthHom.LCSInstance.full_reduction",
+    "TreewidthHom.Executable.markers_bound",
+    "TreewidthHom.Executable.Presentation.iso",
+    "TreewidthHom.Executable.arcOfCode_injective",
+    "TreewidthHom.Executable.arcOfCode_surjective",
+    "TreewidthHom.Executable.indexedAssemblyIso",
+    "TreewidthHom.Executable.relationalGraphIso",
+    "TreewidthHom.Executable.compile_correct",
+    "TreewidthHom.Executable.compile_width",
+    "TreewidthHom.Executable.compile_size",
+    "TreewidthHom.Executable.compile_spec",
+    "TreewidthHom.Executable.indexMeasured_value",
+    "TreewidthHom.Executable.indexMeasured_cost",
+    "TreewidthHom.Executable.serializeMeasured_value",
+    "TreewidthHom.Executable.serializeMeasured_cost",
+    "TreewidthHom.Executable.indexedAssemblyMeasured_value",
+    "TreewidthHom.Executable.indexedAssemblyMeasured_cost",
+    "TreewidthHom.Executable.indexedAssemblyMeasured_quadratic",
+    "TreewidthHom.Executable.indexedAssemblyMeasured_order_bound",
+    "TreewidthHom.Executable.Measured.finRange_value",
+    "TreewidthHom.Executable.Measured.finRange_cost",
+    "TreewidthHom.Executable.EnumRun.bounded_sigma",
+    "TreewidthHom.Executable.EnumRun.bounded_subtype",
+    "TreewidthHom.Executable.EnumRun.budget_polynomial",
+    "TreewidthHom.Executable.Decision.existsFin_cost"
   ],
   "axioms": {
     "TreewidthHom.paddedAdvance_iff": [
@@ -309,9 +333,128 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.Executable.markers_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.Presentation.iso": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.arcOfCode_injective": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.arcOfCode_surjective": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexedAssemblyIso": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.relationalGraphIso": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.compile_correct": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.compile_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.compile_size": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.compile_spec": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexMeasured_value": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexMeasured_cost": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.serializeMeasured_value": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.serializeMeasured_cost": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexedAssemblyMeasured_value": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexedAssemblyMeasured_cost": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexedAssemblyMeasured_quadratic": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.indexedAssemblyMeasured_order_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.Measured.finRange_value": [
+      "propext",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.Measured.finRange_cost": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.EnumRun.bounded_sigma": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.EnumRun.bounded_subtype": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.EnumRun.budget_polynomial": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Executable.Decision.existsFin_cost": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.markerPrimes_length": [],
     "TreewidthHom.markerPrimes_nodup": []
   },
   "build_passed": true,
-  "scope": "Full combinatorial binary-LCS-to-simple-graph reduction, including all preprocessing cases, decision equivalence, source width max(2k,12), target width 12, and polynomial finite output size. Machine-level polynomial running time and parameterized complexity framework remain external, as does Pietrzak's LCS hardness theorem."
+  "scope": "Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,12), target width 12, and polynomial output size. Instrumented serialization has a quadratic bound in a stated traversal/comparison model; generic enumeration and finite-decision cost lemmas are checked. Whole-constructor cost composition, primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result."
 }

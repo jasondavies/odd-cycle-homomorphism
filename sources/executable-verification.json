@@ -1,0 +1,114 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "words": [],
+      "length": "3",
+      "counts": {
+        "source": [
+          1,
+          0
+        ],
+        "target": [
+          1,
+          0
+        ]
+      },
+      "seconds": 2.782,
+      "output_sha256": "16eae5ae361f0169472426e6c05057d4cabe913497d5b1b061b27e281833c73d"
+    },
+    {
+      "words": [
+        ""
+      ],
+      "length": "0",
+      "counts": {
+        "source": [
+          1,
+          0
+        ],
+        "target": [
+          1,
+          0
+        ]
+      },
+      "seconds": 2.769,
+      "output_sha256": "16eae5ae361f0169472426e6c05057d4cabe913497d5b1b061b27e281833c73d"
+    },
+    {
+      "words": [
+        ""
+      ],
+      "length": "1",
+      "counts": {
+        "source": [
+          2,
+          1
+        ],
+        "target": [
+          1,
+          0
+        ]
+      },
+      "seconds": 2.763,
+      "output_sha256": "6328ce65dc85c35a8ba01a14804212099e16c4fa8e3a2852f6f1f0443564ec5a"
+    },
+    {
+      "words": [
+        "0"
+      ],
+      "length": "115792089237316195423570985008687907853269984665640564039457584007913129639936",
+      "counts": {
+        "source": [
+          2,
+          1
+        ],
+        "target": [
+          1,
+          0
+        ]
+      },
+      "seconds": 2.734,
+      "output_sha256": "6328ce65dc85c35a8ba01a14804212099e16c4fa8e3a2852f6f1f0443564ec5a"
+    },
+    {
+      "words": [
+        "0"
+      ],
+      "length": "1",
+      "counts": {
+        "source": [
+          7214,
+          18090
+        ],
+        "target": [
+          9918,
+          24870
+        ]
+      },
+      "seconds": 11.177,
+      "output_sha256": "0709b3ecc1e02c52afea7d4273a710718b992c8cb7d9ebab3df0383f73946310"
+    },
+    {
+      "words": [
+        "0",
+        "1"
+      ],
+      "length": "1",
+      "counts": {
+        "source": [
+          16966,
+          42540
+        ],
+        "target": [
+          19562,
+          49050
+        ]
+      },
+      "seconds": 34.758,
+      "output_sha256": "0cdc98b15d39bfcda3b1cf1e33e44518494c472ad4613fa209bcc9ae65d60e54"
+    }
+  ],
+  "invalid_input_rejected": true,
+  "scope": "Executable and encoding regressions, not a runtime-complexity proof."
+}

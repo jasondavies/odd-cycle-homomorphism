@@ -17,3 +17,5 @@ public import TreewidthHom.ColorEncoding
 public import TreewidthHom.RelationalReduction
 public import TreewidthHom.Schema
 public import TreewidthHom.FullReduction
+public import TreewidthHom.IndexedAssemblyCost
+public import TreewidthHom.MeasuredDecision

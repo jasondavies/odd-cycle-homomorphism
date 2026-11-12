@@ -31,7 +31,7 @@ report = {
     "axioms": {name: [s.strip() for s in axioms.split(",") if s.strip()]
                for name, axioms in entries} | {name: [] for name in empty},
     "build_passed": True,
-    "scope": "Full combinatorial binary-LCS-to-simple-graph reduction, including all preprocessing cases, decision equivalence, source width max(2k,12), target width 12, and polynomial finite output size. Machine-level polynomial running time and parameterized complexity framework remain external, as does Pietrzak's LCS hardness theorem.",
+    "scope": "Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,12), target width 12, and polynomial output size. Instrumented serialization has a quadratic bound in a stated traversal/comparison model; generic enumeration and finite-decision cost lemmas are checked. Whole-constructor cost composition, primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result.",
 }
 (ROOT / "sources").mkdir(exist_ok=True)
 (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")

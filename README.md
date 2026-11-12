@@ -5,10 +5,17 @@ homomorphism, with a Lean 4 proof of the complete combinatorial reduction.
 The checked construction has source treewidth at most `max(2k,12)` and target
 treewidth at most `12`, where `k` is the number of input strings.
 
-**Status: Lean checks decision equivalence, both width bounds, all trivial input
-cases, and polynomial finite output size.** The main theorem is
+**Status: the Lean constructor is executable and verified.**
+[`Executable.compile_spec`](TreewidthHom/ExecutableReduction.lean) proves decision
+equivalence, both width bounds, all input cases, and polynomial size for its
+actual integer-numbered edge-list output. The earlier mathematical statement is
 [`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean).
-All 54 principal-declaration axiom audits pass without proof admissions.
+All 78 principal-declaration axiom audits pass without proof admissions.
+
+Sparse direction-gadget serialization also has a checked quadratic cost bound
+in an explicit traversal/comparison model. Costs of the entire constructor and
+primitive bit operations have **not yet been composed or verified**;
+[COST_MODEL.md](COST_MODEL.md) specifies the boundary.
 
 A formal machine-level running-time proof and parameterized-complexity framework
 are still absent. The written polynomial-time argument and Pietrzak's published
@@ -41,6 +48,8 @@ and mathlib **v4.35.0** are pinned, including exact dependency revisions.
 lake exe cache get
 lake build
 python3 scripts/check_formalization.py
+python3 scripts/check_executable.py
+lake env lean --run WorkChecks.lean
 python3 scripts/regenerate_quotient_certificates.py --check
 python3 scripts/run_bounded_width_hom_checks.py
 ```
@@ -50,6 +59,22 @@ The gadget certificate is evaluated by Lean's kernel; it does not use
 `native_decide`. The Python checks independently exercise the executable
 construction, but finite tests are not proofs of the general reduction.
 Recorded reports are in [sources](sources/).
+
+## Run the verified constructor
+
+```sh
+# Summary counts for requested length 1 and the single word 0:
+lake env lean --run ReduceLCS.lean 1 0
+# Export both graphs as JSON with integer endpoints:
+lake env lean --run ReduceLCS.lean --json 1 0 1
+```
+
+`LENGTH` is a nonnegative decimal integer. Subsequent arguments are binary words;
+use `""` for an empty word and no word arguments for zero words. Raw outputs list
+both orientations of each undirected edge. The fixed no-instance uses one edge;
+the interpretation of every edge list is undirected. This is a reduction
+constructor, not a graph-homomorphism solver. The implementation favors a clear
+proof over speed and produces thousands of vertices even for tiny raw inputs.
 
 ## Provenance
 

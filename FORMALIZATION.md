@@ -31,6 +31,34 @@ only the standard Lean/mathlib dependencies `propext`, `Classical.choice`, and
 `Quot.sound`; Pietrzak's theorem is not used or assumed in this combinatorial
 statement.
 
+## Verified executable output
+
+[`Executable.compile_spec`](TreewidthHom/ExecutableReduction.lean) establishes
+the same decision, width and size specification for an executable function
+`compile : List (List Bool) → Nat → Pair`. Each `Pair` contains two `EdgeList`
+records with an order and a list of bounded integer endpoint pairs.
+
+Explicit duplicate-free enumerations replace classical finite-set choices.
+The 18 prime markers are assigned in explicit tag-enumeration order; they need
+not coincide with the earlier noncomputable assignment. The general marker
+correctness and width lemmas apply to this assignment as well. Typed incidence
+arcs and marker-cycle arcs are generated directly, with injectivity and
+surjectivity proofs. Private gadget vertices use arithmetic offsets, so their
+numbering does not search the final vertex list. `indexedAssemblyIso` and
+`relationalGraphIso` verify the graph interpretation of the integer encoding.
+
+The Lean compiler accepts all constructor definitions as computable; none is
+marked `noncomputable`. Proofs may use the usual standard logical axioms, which
+are erased during execution. The CLI in [ReduceLCS.lean](ReduceLCS.lean) exports
+this constructor's actual output. Parsing/JSON-library implementation costs are
+not part of the graph-construction theorem.
+
+The regression runner checks six graph pairs, including a requested length of
+`2^256`, against independent formula counts, and checks endpoint validity,
+looplessness, duplicate edges, and raw-output symmetry. General decision
+correctness follows from Lean, not these tests. The original Python reduction
+is still a separate implementation without a formal refinement theorem.
+
 ## Checked components
 
 | File | Principal result | Meaning |
@@ -101,11 +129,16 @@ The combinatorial reduction has no remaining correctness, width, finiteness,
 or polynomial-output-size assumptions. The following are outside the current
 formal theorem:
 
-1. Implement and verify an encoded constructor in a machine or bit-cost model,
-   and prove its polynomial running time. The Lean graph definitions use
-   noncomputable finite enumerations; the separately tested Python program is
-   not formally proved to implement them. Polynomial output size by itself is
-   not a running-time proof.
+1. Compose the instrumented preparation, relation-testing, and serialization
+   costs into a bound for the whole constructor, then justify the primitive
+   bit costs. The executable constructor and its semantic refinement are now
+   checked. `indexedAssemblyMeasured_value` verifies the instrumented sparse
+   serialization output, and `indexedAssemblyMeasured_quadratic` bounds that
+   stage's traversal/comparison cost. Generic enumeration, filtering, and
+   finite-decision cost lemmas are available, but are not yet connected into
+   an end-to-end time theorem. [COST_MODEL.md](COST_MODEL.md) states exactly what
+   is charged and what is still outside the model. Polynomial output size alone
+   does not close this obligation.
 2. Instantiate a formal parameterized-reduction framework and derive the
    W[1]-hardness conclusion. Pietrzak's binary-LCS hardness theorem remains an
    explicitly external published input, not a project axiom.
@@ -123,7 +156,7 @@ instance in this package is bookkeeping for finite sets, not a graph assumption.
 ## Reproduction and trust
 
 Run `python3 scripts/check_formalization.py`. It builds the library and audits
-54 principal declarations in
+78 principal declarations in
 [AxiomAudit.lean](AxiomAudit.lean), allowing only `propext`, `Classical.choice`,
 and `Quot.sound`. It also scans project modules for proof admissions. Both finite
 searches use kernel reduction, without `native_decide` or project axioms.
