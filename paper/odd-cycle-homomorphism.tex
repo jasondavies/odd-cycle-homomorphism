@@ -317,8 +317,8 @@ these extensions independent.
 
 \subsection{Treewidth}\label{sec:treewidth}
 Deleting $A,B$ from $G$ exposes a subdivision of $F$, trees attached
-at single hubs, and separate tree components. Subdivision and such tree
-attachments raise treewidth only to at most one, giving
+at single hubs, and separate tree components. Subdivision preserves treewidth,
+and adding these trees raises it to at most $\max\{\tw(F),1\}$, giving
 $\tw(G-\{A,B\})\leq\max\{\tw(F),1\}$. Adding the two anchors yields
 $\tw(G)\leq\max\{\tw(F)+2,3\}$. We give an explicit certificate construction
 so the same bound holds for supplied decompositions within the claimed resources.
@@ -446,7 +446,8 @@ bits. Nested counters enumerate the vertices and edges. List membership
 and original adjacency are decided by rescanning the input; original
 edges are emitted once, in increasing endpoint order. If consecutive
 integer identifiers are required, the rank of a tuple can be recomputed
-by enumerating its predecessors. The target $C_n$ is emitted explicitly.
+by enumerating its predecessors. Output $n$ in binary; the corresponding
+cycle can also be enumerated explicitly.
 Neither an adjacency table nor a list of output vertices is stored.
 
 \paragraph{Emitting a tree decomposition.}
@@ -756,10 +757,11 @@ The central theorem is
 It combines decision equivalence, transfer of tree and path decomposition
 certificates, target pathwidth two, feedback vertex set transfer with
 exact cardinality $|S|+2$, and the polynomial bound in~\eqref{eq:size}.
-The companion theorem \lean{parameter_reduction} defines treewidth, pathwidth,
-and feedback vertex number as minima, restates the transfer as the
-upper bounds of Theorem~\ref{thm:transfer}, and adds the properties of
-Proposition~\ref{prop:sparse}.
+Using treewidth, pathwidth, and feedback vertex number defined as minima,
+the companion theorem \lean{parameter_reduction} restates the transfer as the
+numerical upper bounds of Theorem~\ref{thm:transfer} and adds 2-degeneracy and
+the girth lower bound. Exact girth for nonempty inputs is proved separately
+by \lean{source_egirth}.
 The following names are in the namespace
 \lean{TreewidthHom.OddCycle.ListReduction}.
 
