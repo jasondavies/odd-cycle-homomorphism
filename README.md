@@ -42,8 +42,14 @@ checks that a list colouring exists exactly when `G → C_n`, together with:
 - a feedback vertex set of size `|S|+2` for an input feedback vertex set `S`;
 - polynomial source size and target pathwidth at most two.
 
-Complexity classifications, machine resource bounds, degeneracy, girth, and
-connectedness are proved or cited in the paper, outside Lean.
+[`ListReduction.parameter_reduction`](TreewidthHom/Parameters.lean) states the
+same bounds for treewidth, pathwidth, and feedback vertex number as numbers,
+and adds that the source is 2-degenerate, has girth at least `n`, and is
+connected when every list omits a colour. Lean also checks the correctness
+arguments behind the three membership algorithms, but not their resource bounds.
+
+Complexity classifications and machine resource bounds are proved or cited in
+the paper, outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
 explains the verification boundary.
 
@@ -60,7 +66,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 37 declarations. The finite suite
+The Lean audit builds the library and checks 57 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not

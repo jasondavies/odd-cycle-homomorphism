@@ -1,22 +1,17 @@
 {
-  "project_commit": "af4b974bc4b66d3c4f1eb41b3112aa4b7d5dbdff",
+  "project_commit": "0c678380fd8939fcf57b4081a7d305f3cc0e4662",
   "working_tree_dirty": true,
   "working_tree_status": [
+    " M AxiomAudit.lean",
     " M FORMALIZATION.md",
-    " D ODD_CYCLE.md",
-    " D PROBLEM.md",
     " M README.md",
-    " M paper/README.md",
+    " M TreewidthHom.lean",
     " M paper/odd-cycle-homomorphism.pdf",
     " M paper/odd-cycle-homomorphism.tex",
-    " M scripts/check_formalization.py",
-    " M scripts/list_cycle_hom.py",
-    " M scripts/run_list_cycle_checks.py",
-    " D sources/lean-verification.json",
-    " D sources/list-cycle-results.json",
-    "?? CONSTRUCTION.md",
-    "?? reports/lean-verification.json",
-    "?? reports/list-cycle-results.json"
+    " M reports/lean-verification.json",
+    "?? TreewidthHom/FeedbackHomomorphism.lean",
+    "?? TreewidthHom/ListSparse.lean",
+    "?? TreewidthHom/Parameters.lean"
   ],
   "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
   "toolchain": "leanprover/lean4:v4.35.0",
@@ -52,13 +47,33 @@
     "TreewidthHom.OddCycle.ListReduction.removed_card",
     "TreewidthHom.OddCycle.ListReduction.source_card_le",
     "TreewidthHom.OddCycle.ListReduction.reduction",
+    "TreewidthHom.IsDegenerate.card_edgeSet_le",
+    "TreewidthHom.linked_cycle_link",
+    "TreewidthHom.linked_cycle_length",
+    "TreewidthHom.OddCycle.ListReduction.source_cycle_length",
+    "TreewidthHom.OddCycle.ListReduction.source_egirth",
+    "TreewidthHom.OddCycle.ListReduction.source_degenerate",
+    "TreewidthHom.OddCycle.ListReduction.source_connected",
+    "TreewidthHom.OddCycle.ListReduction.source_edges_le",
+    "TreewidthHom.hasWidth_treewidth",
+    "TreewidthHom.hasPathWidth_pathwidth",
+    "TreewidthHom.exists_fvs",
+    "TreewidthHom.OddCycle.ListReduction.treewidth_source_le",
+    "TreewidthHom.OddCycle.ListReduction.pathwidth_source_le",
+    "TreewidthHom.OddCycle.ListReduction.fvs_source_le",
+    "TreewidthHom.OddCycle.ListReduction.parameter_reduction",
     "TreewidthHom.Decomposition.agree_on_walk",
     "TreewidthHom.Decomposition.agree_on_bags",
     "TreewidthHom.Decomposition.hom_iff_bagAssignments",
     "TreewidthHom.Decomposition.compatible_path_iff",
     "TreewidthHom.Decomposition.hom_iff_pathBagAssignments",
     "TreewidthHom.Decomposition.two_bag_records_le",
-    "TreewidthHom.Decomposition.bag_domain_card"
+    "TreewidthHom.Decomposition.bag_domain_card",
+    "TreewidthHom.Feedback.feasible_iff",
+    "TreewidthHom.Feedback.feasible_of_hom",
+    "TreewidthHom.Feedback.exists_assignment",
+    "TreewidthHom.Feedback.extends_iff",
+    "TreewidthHom.Feedback.exists_orientation_extends"
   ],
   "axioms": {
     "TreewidthHom.Decomposition.addApices": [
@@ -211,6 +226,81 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.IsDegenerate.card_edgeSet_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.linked_cycle_link": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.linked_cycle_length": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_cycle_length": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_egirth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_degenerate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_connected": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_edges_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.hasWidth_treewidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.hasPathWidth_pathwidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.exists_fvs": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.treewidth_source_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.pathwidth_source_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.fvs_source_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.parameter_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.Decomposition.agree_on_walk": [
       "propext",
       "Classical.choice",
@@ -242,6 +332,31 @@
       "Quot.sound"
     ],
     "TreewidthHom.Decomposition.bag_domain_card": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Feedback.feasible_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Feedback.feasible_of_hom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Feedback.exists_assignment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Feedback.extends_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Feedback.exists_orientation_extends": [
       "propext",
       "Classical.choice",
       "Quot.sound"

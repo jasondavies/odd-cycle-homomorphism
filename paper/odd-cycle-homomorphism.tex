@@ -47,7 +47,7 @@ $n-2$, which enforce unequal images in the target $C_n$.
 The reduction's decision equivalence, all three structural bounds, target
 pathwidth two, and a polynomial size bound are checked in Lean~4.
 The source can additionally be restricted to be 2-degenerate and to have
-arbitrarily large prescribed constant girth.
+arbitrarily large prescribed constant girth; both properties are also checked.
 \end{abstract}
 
 \noindent\textbf{AI assistance.}
@@ -596,6 +596,10 @@ The central theorem is
 It combines decision equivalence, transfer of tree and path decomposition
 certificates, target pathwidth two, feedback vertex set transfer with
 exact cardinality $|S|+2$, and the polynomial bound in~\eqref{eq:size}.
+The companion theorem \lean{parameter_reduction} defines treewidth, pathwidth,
+and feedback vertex number as minima, restates the transfer as the
+inequalities of Theorem~\ref{thm:transfer}, and adds the properties of
+Proposition~\ref{prop:sparse}.
 The following names are in the namespace
 \lean{TreewidthHom.OddCycle.ListReduction}.
 
@@ -611,6 +615,11 @@ Deleting the transferred set leaves a forest & \lean{source_feedback} \\
 Transferred set has size $|S|+2$ & \lean{removed_card} \\
 Polynomial source size & \lean{source_card_le} \\
 Combined reduction certificate & \lean{reduction} \\
+2-degeneracy & \lean{source_degenerate} \\
+Girth exactly $n$ for nonempty $F$ & \lean{source_egirth} \\
+Connectedness when every list omits a residue & \lean{source_connected} \\
+At most $2|V(G)|$ edges & \lean{source_edges_le} \\
+Bounds on the parameters themselves & \lean{parameter_reduction} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -621,13 +630,15 @@ reference or link vertex. The decomposition infrastructure checks vertex
 coverage, edge coverage, connected occurrence sets, and bag cardinalities.
 The generic \lean{BagHomomorphism} module proves the local-to-global
 consistency argument of Lemma~\ref{lem:bags}, including its path
-specialisation.
+specialisation. The \lean{FeedbackHomomorphism} module proves the criterion
+used for W[P] membership: a guess on a feedback vertex set extends to a
+homomorphism exactly when it preserves the edges inside the set and every
+root of the remaining forest has a feasible pair.
 
 The formal statements do not encode Turing machines or complexity classes.
 The published hardness of List Colouring, the reduction's time and space
 bounds, the membership algorithms' resource analysis, and the complexity
-conclusions are mathematical arguments in the text. The degeneracy, girth,
-and connectedness statements are also proved in the text, not in Lean.
+conclusions are mathematical arguments in the text.
 Noncomputable choices used to select bags or roots in structural proofs
 do not stand in for a verified implementation of the logspace transducer.
 
