@@ -5,7 +5,7 @@ public import Mathlib
 @[expose] public section
 
 /-!
-# Two facts about homomorphisms into an odd cycle
+# Homomorphisms and walks into an odd cycle
 
 The cycle on `ZMod n` is mathlib's circulant graph with jump set `{1}`.
 For odd `n`, a map of the cycle to itself is a rotation or a reflection, and two
@@ -155,6 +155,47 @@ theorem walk_offset (W : ℕ → ZMod n) (T : ℕ) (hW : ∀ t < T, Near (W t) (
     · refine ⟨b+1,by omega,?_⟩
       have h' : W (t+1) = W t - 1 := by rw [h]; ring
       rw [h',he]; push_cast; ring
+
+/-- An odd closed walk around a cycle must traverse at least its length. -/
+theorem odd_closed_walk_length (W : ℕ → ZMod n) (T : ℕ) (hodd : Odd T)
+    (hclosed : W T = W 0) (hW : ∀ t < T, Near (W t) (W (t+1))) : n ≤ T := by
+  by_contra hn
+  have hT : T < n := by omega
+  obtain ⟨b,hb,he⟩ := walk_offset W T hW T le_rfl
+  have heq : (T : ZMod n) = ((2*b : ℕ) : ZMod n) := by
+    rw [hclosed] at he
+    push_cast
+    linear_combination -he
+  have small_zero : ∀ d : ℕ, d < n → (d : ZMod n) = 0 → d = 0 := by
+    intro d hd hz
+    have hdiv := (ZMod.natCast_eq_zero_iff d n).mp hz
+    have hmod := Nat.mod_eq_zero_of_dvd hdiv
+    rwa [Nat.mod_eq_of_lt hd] at hmod
+  rcases le_total (2*b) T with h | h
+  · have hz : T-2*b = 0 := small_zero _ (by omega) (by
+      rw [Nat.cast_sub h,heq,sub_self])
+    obtain ⟨a,ha⟩ := hodd
+    omega
+  · have hz : 2*b-T = 0 := small_zero _ (by omega) (by
+      rw [Nat.cast_sub h,← heq,sub_self])
+    obtain ⟨a,ha⟩ := hodd
+    omega
+
+/-- A homomorphism from an odd cycle cannot increase its length. -/
+theorem length_le_of_hom {k : ℕ} [Fact (1 < k)] [Fact (1 < n)]
+    (hk : Odd k) (f : cyc k →g cyc n) : n ≤ k := by
+  apply odd_closed_walk_length (fun t => f (t : ZMod k)) k hk
+  · simp
+  · intro t _
+    apply (cyc_adj _ _).mp
+    apply f.map_adj
+    apply (cyc_adj _ _).mpr
+    exact Or.inl (by push_cast; rfl)
+
+/-- Homomorphically equivalent odd cycles have the same length. -/
+theorem length_eq_of_homs {k : ℕ} [Fact (1 < k)] [Fact (1 < n)]
+    (hk : Odd k) (hn : Odd n) (f : cyc k →g cyc n) (g : cyc n →g cyc k) : k = n :=
+  Nat.le_antisymm (length_le_of_hom hn g) (length_le_of_hom hk f)
 
 theorem walk_ne (hodd : Odd n) (hn : 3 ≤ n) (W : ℕ → ZMod n)
     (hW : ∀ t < n-2, Near (W t) (W (t+1))) : W 0 ≠ W (n-2) := by

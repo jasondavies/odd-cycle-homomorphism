@@ -1,10 +1,10 @@
-# The parameterised complexity of homomorphism to an odd cycle
+# Parameterised complexity of graph homomorphism to odd cycles
 
 This repository contains the paper, Lean proofs, and executable checks for
 homomorphism from a graph `G` to an odd cycle `C_n`.
-The target length `n` is part of the input, given explicitly or in unary.
+The odd target length `n ≥ 5` is part of the input and may be given in binary.
 
-Read the paper: **[The parameterised complexity of homomorphism to an odd cycle](paper/odd-cycle-homomorphism.pdf)**.
+Read the paper: **[Parameterised complexity of graph homomorphism to odd cycles](paper/odd-cycle-homomorphism.pdf)**.
 For a short explanation of the gadgets and structural bounds, see
 [CONSTRUCTION.md](CONSTRUCTION.md).
 
@@ -18,6 +18,8 @@ For a short explanation of the gadgets and structural bounds, see
 
 All three hardness statements follow from one reduction from List Colouring,
 which increases treewidth, pathwidth, and feedback vertex number by constants.
+For padded inputs containing an edge, treewidth and feedback vertex number
+increase by exactly two.
 Membership follows from separate arguments: the XNLP and XALP membership
 statements require supplied decompositions; the W[P] upper bound does not.
 
@@ -26,6 +28,11 @@ has treewidth and pathwidth two; the source width varies with the parameter.
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
 The hard sources can be connected, 2-degenerate, and of arbitrarily large
 prescribed constant girth.
+
+The same three classifications hold for recognising graphs whose core is an
+odd cycle, with no target supplied. For a nonbipartite graph this asks whether
+it maps to its own shortest odd cycle; the paper gives the equivalent
+circular-colouring formulation.
 
 This answers the [treewidth question](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth):
 homomorphism parameterised by the maximum of the two input treewidths is
@@ -37,7 +44,7 @@ See the prior-work acknowledgement below.
 The central theorem, [`ListReduction.reduction`](TreewidthHom/ListTheorem.lean),
 checks that a list colouring exists exactly when `G → C_n`, together with:
 
-- source treewidth at most `max(w+2, 4)` for input treewidth `w`;
+- source treewidth at most `max(w+2, 3)` for input treewidth `w`;
 - source pathwidth at most `p+6` for input pathwidth `p`;
 - a feedback vertex set of size `|S|+2` for an input feedback vertex set `S`;
 - polynomial source size and target pathwidth at most two.
@@ -48,8 +55,9 @@ and adds that the source is 2-degenerate, has girth at least `n`, and is
 connected when every list omits a colour. Lean also checks the correctness
 arguments behind the three membership algorithms, but not their resource bounds.
 
-Complexity classifications and machine resource bounds are proved or cited in
-the paper, outside Lean.
+The matching minor-based lower bounds, binary-length equivalence, and
+odd-cycle-core corollary are proved in the paper, outside Lean, as are the
+complexity classifications and machine resource bounds.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
 explains the verification boundary.
 
@@ -66,7 +74,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 57 declarations. The finite suite
+The Lean audit builds the library and checks 62 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not

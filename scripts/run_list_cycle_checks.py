@@ -54,7 +54,7 @@ def verify(lists, edges, n, bags=None, tree=None, is_path=True, check_girth=Fals
     require(len(removed) == len(S) + 2)
     require(is_forest_without(g.count, g.edges, removed))
     td, tt = g.tree_decomposition(bags, tree)
-    check_tree_decomposition(g.count, g.edges, td, tt, max(width+2, 4))
+    check_tree_decomposition(g.count, g.edges, td, tt, max(width+2, 3))
     if is_path:
         pd = g.path_decomposition(bags)
         check_path_decomposition(g.count, g.edges, pd, width+5)
@@ -131,7 +131,7 @@ def main():
         "girth_checks": girth_checks,
         "targeted_cases": targeted,
         "checks": ["decision equivalence", "returned homomorphism edges",
-                   "polynomial size bound", "tree decomposition",
+                   "polynomial size bound", "tree decomposition (max(w+2,3))",
                    "path decomposition (+5 direct sweep; Lean proves +6)",
                    "feedback vertex set transfer", "2-degeneracy",
                    "exact girth on targeted cases"],

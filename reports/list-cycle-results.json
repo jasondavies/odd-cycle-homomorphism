@@ -61,7 +61,7 @@
     "decision equivalence",
     "returned homomorphism edges",
     "polynomial size bound",
-    "tree decomposition",
+    "tree decomposition (max(w+2,3))",
     "path decomposition (+5 direct sweep; Lean proves +6)",
     "feedback vertex set transfer",
     "2-degeneracy",

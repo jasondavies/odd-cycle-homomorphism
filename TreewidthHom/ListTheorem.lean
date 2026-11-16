@@ -30,7 +30,7 @@ resource bounds are deliberately not encoded in this theorem. -/
 theorem reduction (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     (hodd : Odd n) (hn : 5 ≤ n) :
     (Nonempty (source F L →g cyc n) ↔ Colorable F L) ∧
-    (∀ w, HasWidth F w → HasWidth (source F L) (max (w+2) 4)) ∧
+    (∀ w, HasWidth F w → HasWidth (source F L) (max (w+2) 3)) ∧
     (∀ w, HasPathWidth F w → HasPathWidth (source F L) (w+6)) ∧
     HasPathWidth (cyc n) 2 ∧
     (∀ S : Finset (Fin m), (F.induce {v | v ∉ S}).IsAcyclic →

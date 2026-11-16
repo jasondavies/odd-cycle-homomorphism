@@ -1,5 +1,6 @@
 """Regressions for optimized execution and rejection of invalid certificates."""
 from pathlib import Path
+import itertools
 import json
 import subprocess
 import sys
@@ -7,14 +8,66 @@ import tempfile
 import unittest
 
 from check_formalization import audit_output
-from list_cycle_hom import check_path_decomposition, check_tree_decomposition, hom_to_cycle
-from run_list_cycle_checks import girth
+from list_cycle_hom import (
+    Reduction, check_path_decomposition, check_tree_decomposition, hom_to_cycle,
+    is_forest_without,
+)
+from run_list_cycle_checks import girth, verify
 from verification import VerificationError
 
 SCRIPTS = Path(__file__).resolve().parent
 
 
 class VerificationTests(unittest.TestCase):
+    def test_treewidth_three_with_full_and_empty_lists(self):
+        # Full lists omit the padding assumption: the upper bound still holds.
+        for domain in (set(range(5)), set()):
+            with self.subTest(domain=domain):
+                result = verify([domain], set(), 5)
+                self.assertEqual(result["satisfiable"], bool(domain))
+
+    def test_join_minor_and_exact_feedback_number(self):
+        for lists, edges, input_fvs in (
+                ([{0}, {1}], {(0, 1)}, 0),
+                ([{0, 1, 2}]*3, {(0, 1), (0, 2), (1, 2)}, 1)):
+            with self.subTest(edges=edges):
+                g = Reduction(lists, edges, 5)
+                branches = [{v} for v in range(g.m + 2)]
+                for boundary, cycle, link, d in g.sweeps:
+                    if cycle is not None and d == g.n-1:
+                        hub, = boundary
+                        self.assertIsNotNone(link)
+                        branches[hub].update(cycle[2:])
+                        branches[hub].update(link[1:-1])
+                    elif cycle is None:
+                        branches[min(boundary)].update(link[1:-1])
+                assignment = {}
+                for i, branch in enumerate(branches):
+                    self.assertTrue(branch.isdisjoint(assignment))
+                    assignment.update({v: i for v in branch})
+                    reached = {next(iter(branch))}
+                    while True:
+                        more = {v for u, v in g.edges if u in reached and v in branch}
+                        more |= {u for u, v in g.edges if v in reached and u in branch}
+                        if more <= reached:
+                            break
+                        reached |= more
+                    self.assertEqual(reached, branch)
+                quotient = {tuple(sorted((assignment[u], assignment[v])))
+                            for u, v in g.edges if u in assignment and v in assignment
+                            and assignment[u] != assignment[v]}
+                expected = edges | {(g.A, g.B)} | {
+                    (v, a) for v in range(g.m) for a in (g.A, g.B)}
+                self.assertEqual(quotient, expected)
+                # Exhaustively rule out every smaller feedback set in these examples.
+                self.assertFalse(any(is_forest_without(g.count, g.edges, removed)
+                                     for removed in itertools.combinations(
+                                         range(g.count), input_fvs+1)))
+                original_set = next(set(s) for s in itertools.combinations(range(g.m), input_fvs)
+                                    if is_forest_without(g.m, edges, s))
+                self.assertTrue(is_forest_without(g.count, g.edges,
+                                                 original_set | {g.A, g.B}))
+
     def test_forest_completion_all_optimization_modes(self):
         code = """
 import json

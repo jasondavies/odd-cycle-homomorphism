@@ -1,6 +1,6 @@
 # Manuscript
 
-[The parameterised complexity of homomorphism to an odd cycle](odd-cycle-homomorphism.pdf)
+[Parameterised complexity of graph homomorphism to odd cycles](odd-cycle-homomorphism.pdf)
 — [LaTeX source](odd-cycle-homomorphism.tex).
 
 From the repository root:

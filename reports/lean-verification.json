@@ -1,7 +1,26 @@
 {
-  "project_commit": "c41b7c17451cf3de07f732106413931294d9cff8",
-  "working_tree_dirty": false,
-  "working_tree_status": [],
+  "project_commit": "ab6f4116fad1c5503722f4947e3a61e0e4d7b62e",
+  "working_tree_dirty": true,
+  "working_tree_status": [
+    " M AxiomAudit.lean",
+    " M CONSTRUCTION.md",
+    " M FORMALIZATION.md",
+    " M README.md",
+    " M TreewidthHom/ListReduction.lean",
+    " M TreewidthHom/ListTheorem.lean",
+    " M TreewidthHom/ListWidth.lean",
+    " M TreewidthHom/OddCycleTarget.lean",
+    " M TreewidthHom/Parameters.lean",
+    " M paper/README.md",
+    " M paper/odd-cycle-homomorphism.pdf",
+    " M paper/odd-cycle-homomorphism.tex",
+    " M reports/list-cycle-results.json",
+    " M scripts/check_formalization.py",
+    " M scripts/list_cycle_hom.py",
+    " M scripts/run_list_cycle_checks.py",
+    " M scripts/test_verification.py",
+    "?? TreewidthHom/GraftWidth.lean"
+  ],
   "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
   "toolchain": "leanprover/lean4:v4.35.0",
   "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
@@ -11,6 +30,7 @@
     "TreewidthHom.intervalDecomposition",
     "TreewidthHom.Graft.isTree",
     "TreewidthHom.Graft.running_of_tops",
+    "TreewidthHom.Graft.hasWidth",
     "TreewidthHom.Graft.extend",
     "TreewidthHom.acyclic_of_apex_forest",
     "TreewidthHom.exists_forestOrientation",
@@ -22,6 +42,10 @@
     "TreewidthHom.pathWidth_linked_of_bags",
     "TreewidthHom.OddCycle.cyc_eq_cycleGraph",
     "TreewidthHom.OddCycle.rotation_or_reflection",
+    "TreewidthHom.OddCycle.odd_closed_walk_length",
+    "TreewidthHom.OddCycle.length_le_of_hom",
+    "TreewidthHom.OddCycle.length_eq_of_homs",
+    "TreewidthHom.OddCycle.ListReduction.palette_missing_last",
     "TreewidthHom.OddCycle.walk_iff_ne",
     "TreewidthHom.OddCycle.target_pathWidth",
     "TreewidthHom.OddCycle.ListReduction.source_hom_iff",
@@ -90,6 +114,11 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.Graft.hasWidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.Graft.extend": [
       "propext",
       "Classical.choice",
@@ -141,6 +170,26 @@
       "Quot.sound"
     ],
     "TreewidthHom.OddCycle.rotation_or_reflection": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.odd_closed_walk_length": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.length_le_of_hom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.length_eq_of_homs": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.palette_missing_last": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -352,5 +401,5 @@
     ]
   },
   "build_passed": true,
-  "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy, girth and connectedness are outside Lean."
+  "scope": "List Colouring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,3), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. parameter_reduction adds numerical parameter bounds, degeneracy, girth, connectedness under omitted-colour hypotheses, and an edge bound. Odd closed-walk length and palette-padding lemmas are checked, as are the bag and forest extension criteria. Matching minor-based lower bounds, binary-length equivalence and emission, core/circular-colouring consequences, external hardness, and machine resource bounds remain outside Lean."
 }

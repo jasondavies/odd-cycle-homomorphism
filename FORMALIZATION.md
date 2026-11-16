@@ -17,8 +17,12 @@ successor lengths. No source or target lists remain in the output problem.
 | --- | --- |
 | Odd-cycle endomorphisms are rotations or reflections | `OddCycle.rotation_or_reflection`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Length-`n-2` links enforce distinct images | `OddCycle.walk_iff_ne`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
+| Odd closed walks in `C_n` have length at least `n` | `OddCycle.odd_closed_walk_length`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
+| Odd-cycle homomorphisms cannot increase length; equivalence forces equal lengths | `OddCycle.length_le_of_hom`, `OddCycle.length_eq_of_homs`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
+| Lists contained in a smaller palette omit coordinate `n-1` | `ListReduction.palette_missing_last`, [ListReduction](TreewidthHom/ListReduction.lean) |
 | Decision equivalence | `ListReduction.source_hom_iff_colorable`, [ListReduction](TreewidthHom/ListReduction.lean) |
-| Source treewidth `max(w+2,4)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
+| Rooted-tree attachments raise treewidth only to one | `Graft.hasWidth`, [GraftWidth](TreewidthHom/GraftWidth.lean) |
+| Source treewidth `max(w+2,3)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
 | Source pathwidth `p+6` | `ListReduction.source_pathWidth`, [ListPathWidth](TreewidthHom/ListPathWidth.lean) |
 | Target pathwidth 2 | `OddCycle.target_pathWidth`, [CycleWidth](TreewidthHom/CycleWidth.lean) |
 | Forest orientation exists | `exists_forestOrientation`, [ForestOrientation](TreewidthHom/ForestOrientation.lean) |
@@ -27,7 +31,7 @@ successor lengths. No source or target lists remain in the output problem.
 | Polynomial source cardinality | `ListReduction.source_card_le`, [ListTheorem](TreewidthHom/ListTheorem.lean) |
 | Combined certificate | `ListReduction.reduction`, [ListTheorem](TreewidthHom/ListTheorem.lean) |
 | Treewidth, pathwidth and feedback vertex number as minima, attained for finite graphs | `treewidth`, `pathwidth`, `fvs`, `hasWidth_treewidth`, `hasPathWidth_pathwidth`, `exists_fvs`, [Parameters](TreewidthHom/Parameters.lean) |
-| `tw(G) ≤ max(tw(F)+2,4)`, `pw(G) ≤ pw(F)+6`, `fvs(G) ≤ fvs(F)+2` | `ListReduction.treewidth_source_le`, `pathwidth_source_le`, `fvs_source_le`, [Parameters](TreewidthHom/Parameters.lean) |
+| `tw(G) ≤ max(tw(F)+2,3)`, `pw(G) ≤ pw(F)+6`, `fvs(G) ≤ fvs(F)+2` | `ListReduction.treewidth_source_le`, `pathwidth_source_le`, `fvs_source_le`, [Parameters](TreewidthHom/Parameters.lean) |
 | Source is 2-degenerate | `ListReduction.source_degenerate`, [ListSparse](TreewidthHom/ListSparse.lean) |
 | Every source cycle has length at least `n`; girth exactly `n` for nonempty `F` | `ListReduction.source_cycle_length`, `source_egirth`, [ListSparse](TreewidthHom/ListSparse.lean) |
 | Source is connected when every list omits a residue | `ListReduction.source_connected`, [ListSparse](TreewidthHom/ListSparse.lean) |
@@ -61,6 +65,9 @@ The finite source graph uses one reference copy for *every* vertex/residue pair,
 including allowed colours. A domain link exists only for forbidden colours.
 Each original edge is represented once, using increasing vertex indices.
 The executable constructor follows the same graph up to vertex renaming.
+The sharper treewidth upper bound holds even for full lists. The exact
+parameter equalities in the paper use a forbidden private coordinate at every
+hub and an input edge; they are not conclusions of the generic Lean reduction.
 
 ## Outside Lean
 
@@ -69,7 +76,11 @@ The following are not formalised as machine-level theorems:
 - the published complexity of List Colouring;
 - the logspace transducer and the polynomial number of output bags;
 - time and space analysis of the XNLP, XALP and W[P] membership algorithms;
-- the resulting complexity-class hardness and completeness statements.
+- the resulting complexity-class hardness and completeness statements;
+- the join minor and matching treewidth and feedback-number lower bounds;
+- the binary target-length equivalence and its logspace transducer (the
+  underlying odd-closed-walk length inequality is checked);
+- the odd-cycle-core and circular-colouring corollary.
 
 The paper provides proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
@@ -82,7 +93,7 @@ Binary CSP. No W[3]-membership result is claimed.
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 57 declarations
+`scripts/check_formalization.py` builds the library and audits the 62 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report
@@ -99,3 +110,8 @@ a branching decomposition. Five targeted cases (including empty input) also chec
 exact girth independently by breadth-first search.
 The direct executable path sweep meets `p+5`; Lean's modular proof uses `p+6`.
 See [reports/list-cycle-results.json](reports/list-cycle-results.json).
+
+Regression tests additionally validate the join-minor branch sets and exhaustively
+check the feedback-number lower bound on an edge and a triangle. They also check
+the sharper treewidth certificate on full and empty lists. These finite examples
+do not replace the prose proof of exactness.

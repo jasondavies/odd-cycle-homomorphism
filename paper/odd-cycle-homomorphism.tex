@@ -7,7 +7,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
 \hypersetup{
-  pdftitle={The parameterised complexity of homomorphism to an odd cycle},
+  pdftitle={Parameterised complexity of graph homomorphism to odd cycles},
   pdfauthor={Jason Davies},
   pdfsubject={Parameterised complexity and a Lean-checked List Colouring reduction},
   pdfkeywords={graph homomorphism, odd cycle, treewidth, pathwidth, feedback vertex set, Lean}
@@ -28,7 +28,7 @@
 \newcommand{\lean}[1]{\nolinkurl{#1}}
 \makeatletter\g@addto@macro\UrlBreaks{\do\_}\makeatother
 \emergencystretch=2em
-\title{The parameterised complexity of homomorphism to an odd cycle}
+\title{Parameterised complexity of graph homomorphism to odd cycles}
 \author{Jason Davies\thanks{\href{mailto:jason@jasondavies.com}{\nolinkurl{jason@jasondavies.com}}}}
 \date{Draft --- November 16, 2026}
 \begin{document}
@@ -44,7 +44,7 @@ all three hardness statements, increasing treewidth, pathwidth, and feedback
 vertex number by constants.
 The construction uses reference cycles sharing one edge and paths of length
 $n-2$, which enforce unequal images in the target $C_n$.
-The reduction's decision equivalence, all three structural bounds, target
+The reduction's decision equivalence, parameter upper bounds, target
 pathwidth two, and a polynomial size bound are checked in Lean~4.
 The source can additionally be restricted to be 2-degenerate and to have
 arbitrarily large prescribed constant girth; both properties are also checked.
@@ -73,7 +73,7 @@ classification from one direct reduction.
 
 \begin{theorem}\label{thm:main}
 Consider the problem of deciding $G\to C_n$, where $G$ is a finite simple
-undirected graph and $n\geq5$ is odd and given in unary.
+undirected graph and $n\geq5$ is odd and given in binary.
 \begin{enumerate}
 \item Given a path decomposition, it is XNLP-complete parameterised by its width.
 \item Given a tree decomposition, it is XALP-complete parameterised by its width.
@@ -97,8 +97,10 @@ gives the machine definitions and membership arguments.
 The problem has an equivalent formulation as circular colouring. A graph has
 a homomorphism to $C_{2k+1}$ exactly when its circular chromatic number is
 at most $2+1/k$~\cite{zhu2001}. Theorem~\ref{thm:main} therefore classifies
-the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in unary,
-under the same three parameters.
+the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in binary,
+under the same three parameters. Corollary~\ref{cor:core} gives the same
+classifications for recognising graphs whose core is an odd cycle, without
+supplying a target.
 
 The main technical statement is an additive structural transfer.
 
@@ -106,13 +108,15 @@ The main technical statement is an additive structural transfer.
 There is a polynomial-size, logspace reduction from List Colouring on a
 graph $F$ to $G\to C_n$, with $n$ odd and $n\geq5$, such that
 \[
- \tw(G)\leq\max\{\tw(F)+2,4\},\qquad
+ \tw(G)\leq\max\{\tw(F)+2,3\},\qquad
  \pw(G)\leq\pw(F)+6,\qquad
  \fvs(G)\leq\fvs(F)+2.
 \]
 Supplied tree or path decompositions can be transformed within the same
 resource bounds. For every feedback vertex set $S$ of $F$, the construction
-specifies a feedback vertex set of $G$ of size $|S|+2$.
+specifies a feedback vertex set of $G$ of size $|S|+2$. If $F$ contains an edge, then the treewidth and
+feedback vertex number bounds are exact:
+$\tw(G)=\tw(F)+2$ and $\fvs(G)=\fvs(F)+2$.
 \end{theorem}
 
 The construction removes lists by giving each forbidden occurrence $(v,d)$
@@ -141,7 +145,17 @@ $c^{\operatorname{ctw}(G)}|V(G)|^{O(1)}$ for every fixed odd cycle target,
 where $\operatorname{ctw}$ denotes cutwidth~\cite{pr2021}. Our statements concern
 uniform parameterised hardness and completeness as the target length varies.
 
-\section{Two properties of odd cycles}
+Disequality and list gadgets for projective cores are developed by Okrasa and
+Rz\k{a}\.{z}ewski~\cite[Lemma~17 and Proposition~19]{or2020}; their fixed-target
+width overhead may depend on the target. Kostochka, Ne\v{s}et\v{r}il and
+Smol\'ikov\'a prove NP-completeness of fixed-$H$ colouring on 2-degenerate
+sources for nonbipartite triangle-free $H$~\cite[Theorem~1.3]{kns2001}.
+Here the elimination of lists is uniform and polynomial-size, with additive
+structural overhead independent of the target length for all three parameters.
+The single-link reference copies provide the feedback vertex guarantee as well
+as connected sources of prescribed large girth.
+
+\section{Properties of odd cycles}
 \paragraph{Conventions.}
 All graphs are finite, simple, and undirected. Path length counts edges.
 A tree decomposition consists of a nonempty tree $T$ and bags
@@ -189,6 +203,28 @@ appropriate sequence of forward and backward steps.
 A \emph{link} below means a path of length $n-2$ whose internal vertices
 are private. Different links may share endpoints, but no internal vertices.
 
+\begin{lemma}[Capping the target length]\label{lem:cap}
+Let $m=|V(G)|$. If $n>m$, then $G\to C_n$ if and only if $G$ is bipartite.
+For every odd $n\geq5$, setting $n'=\min\{n,2m+5\}$ preserves whether
+$G\to C_n$. The binary encoding of $n$ can be transformed to the unary
+encoding of $n'$ in logarithmic space, leaving $G$ unchanged.
+\end{lemma}
+\begin{proof}
+An odd closed walk of length $t$ in $C_n$ has an odd integer displacement
+that is a multiple of $n$, so $t\geq n$. A nonbipartite graph on $m$
+vertices contains an odd cycle of length at most $m$, precluding a
+homomorphism to $C_n$ when $n>m$. Conversely, a bipartition maps to any
+edge of $C_n$.
+
+If the cap changes the target, both $n$ and $n'$ exceed $m$, so the
+preceding equivalence applies to both. The cap is odd and at least five.
+Scan the binary digits of $n$ with an accumulator saturated at $2m+5$;
+then emit its value in unary. The counter uses $O(\log(m+2))$ bits and
+the output has $O(m+1)$ symbols. Input validity, including oddness, can
+also be checked by scans. No source parameter or supplied decomposition
+changes.
+\end{proof}
+
 \section{The reduction}\label{sec:reduction}
 An instance of List Colouring consists of a graph $F$ and lists
 $L(v)\subseteq\{0,\ldots,q-1\}$. It asks for a map $c$ with
@@ -212,7 +248,7 @@ links, not edges of $G$. Copies $R_{v,d}$ with $d\in L(v)$ have no domain
 link; retaining these harmless copies makes the finite vertex type in
 Lean uniform.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[x=1.35cm,y=1cm,
   vertex/.style={circle,draw,fill=white,inner sep=1.6pt,line width=.6pt},
@@ -294,30 +330,39 @@ these extensions independent.
 \end{minipage}\par
 
 \subsection{Treewidth}\label{sec:treewidth}
-Take a tree decomposition of $F$ of width $w$. Replace each original
-vertex by its hub and put $A,B$ into every bag; these bags have size at
-most $w+3$. They serve as the original tree of bags.
+Deleting $A,B$ from $G$ exposes a subdivision of $F$, trees attached
+at single hubs, and separate tree components. Subdivision and such tree
+attachments raise treewidth only to at most one, giving
+$\tw(G-\{A,B\})\leq\max\{\tw(F),1\}$. Adding the two anchors yields
+$\tw(G)\leq\max\{\tw(F)+2,3\}$. We give an explicit certificate construction
+so the same bound holds for supplied decompositions within the claimed resources.
 
-For a reference copy and its optional domain link, use boundary
-$\{A,B,h_v\}$ and attach its decomposition at a bag containing that
-boundary. Removing the boundary leaves a forest: the private part of
-the reference cycle is a path, with at most one attached path. A forest
-has a decomposition with bags of size at most two. Add the entire
-boundary to each of these bags, obtaining bags of size at most five.
-For an original-edge link use boundary $\{h_u,h_v\}$ and bags of size
-at most four, attached at a bag containing its endpoints.
+Let $J$ contain the reference cycles, the hubs with the original edges of
+$F$, and a direct edge from coordinate $d$ of $R_{v,d}$ to $h_v$ for every
+pair $(v,d)$, including allowed colours. Root the private reference path
+$2,\ldots,n-1$ at coordinate $d$ when $d\geq2$, and at coordinate $2$
+otherwise. Attach this root to $h_v$, allowing an extra edge when needed.
+The resulting graph of hubs and private paths contains $J-\{A,B\}$ and
+is obtained from $F$ by attaching rooted trees at single vertices.
 
-All edges are covered. A boundary vertex occurs throughout its attached
-bags, and every other new vertex belongs to a single attached
-decomposition. Hence occurrence sets remain connected. The resulting
-width is at most $\max\{w+2,4\}$.
+Keep the input bags. For each new vertex $x$, add the bag
+$\{x,\operatorname{parent}(x)\}$ below its parent's bag, attaching a root
+bag to an input bag containing its hub. These are bags of size at most
+two. Add $A,B$ to every bag. The resulting decomposition of $J$ has width
+at most $\max\{w+2,3\}$: old bags have size at most $w+3$, and new bags
+have size at most four.
+
+Delete unused direct domain edges and replace each required domain or
+original edge $ab$ by its link. Subdivision uses bags of size three:
+for internal vertices $x_1,\ldots,x_t$, attach the chain
+$\{b,a,x_1\},\{b,x_1,x_2\},\ldots,\{b,x_{t-1},x_t\}$ at a bag containing
+$a,b$. Vertex occurrences stay connected and all edges are covered.
+The width remains at most $\max\{w+2,3\}$.
 
 \subsection{Pathwidth}\label{sec:pathwidth}
-For a convenient modular bound, first consider an auxiliary graph $J$.
-It contains the reference cycles, the hubs with the original edges of
-$F$, and the direct edge from coordinate $d$ of $R_{v,d}$ to $h_v$ for
-every pair $(v,d)$. Including the latter edge even for an allowed colour
-can only help provide a decomposition for the eventual source.
+Use the same auxiliary graph $J$ as in Section~\ref{sec:treewidth}.
+Its direct domain edges for allowed colours can only help provide a
+decomposition for the eventual source.
 
 Given a path decomposition of $F$ of width $p$, add $A,B$ to every bag.
 At the first bag containing $h_v$, process all its reference cycles
@@ -348,6 +393,50 @@ optional domain link attaches it to at most one surviving hub, or leaves
 pendant or detached fragments when an endpoint was deleted. Such
 attachments cannot create a cycle. Thus $S'$ is a feedback vertex set
 and $|S'|=|S|+2$.
+
+\subsection{Exact parameter transfer}
+\begin{proposition}\label{prop:exact}
+For the padded construction, $K_2\vee F$ is a minor of $G$, where the join
+adds two adjacent vertices adjacent to every vertex of $F$.
+If $F$ contains an edge, then
+\[
+ \tw(G)=\tw(F)+2,\qquad \fvs(G)=\fvs(F)+2.
+\]
+\end{proposition}
+\begin{proof}
+Since $q<n$, residue $n-1$ is forbidden at every hub. For each $v$, take
+the copy $R_{v,n-1}$ and contract its entire private path and domain link
+into $h_v$. Its edges to coordinates $0$ and $1$ become $h_vA$ and $h_vB$.
+These private paths and link interiors are disjoint for distinct hubs.
+Retain $AB$, contract the original-edge links to edges, and discard the
+unused pieces. This produces $K_2\vee F$ without identifying hubs.
+
+For nonempty $F$, the standard join identity gives
+$\tw(K_2\vee F)=\tw(F)+2$. Every chordal completion of the join restricts
+to one of $F$, and every chordal completion of $F$ extends to the join;
+adjoining the two universal vertices increases the maximum clique size by two.
+Minor monotonicity supplies the lower bound,
+and the upper bound in Section~\ref{sec:treewidth} matches it when $F$
+has an edge.
+
+Write $k=\fvs(F)$, $c=\operatorname{vc}(F)$ for its vertex cover number,
+and $m=|V(F)|$. Deleting both, exactly one, or neither of the two new
+vertices gives, respectively,
+\[
+ \fvs(K_2\vee F)=\min\{k+2,c+1,m\}.
+\]
+Indeed, with one new vertex surviving, the remaining vertices of $F$
+must be independent; with both surviving, no vertex of $F$ may survive.
+When $F$ has an edge, $k\leq c-1$: retain one vertex of a minimum vertex
+cover, leaving a star and isolated vertices after deleting the others.
+Also $k\leq m-2$, by retaining the endpoints of an edge. Thus the displayed
+minimum is $k+2$. Feedback vertex number is minor-monotone, so the existing
+upper bound $\fvs(G)\leq k+2$ is exact.
+\end{proof}
+The missing-colour hypothesis is essential to this minor argument. It is
+provided by palette padding, but need not hold for arbitrary lists of
+residues in the generic formal constructor. The equalities are proved here
+for inputs with an edge; the upper bounds also cover edgeless and empty inputs.
 
 \subsection{Size and construction resources}
 Write $m=|V(F)|$, $e=|E(F)|$, and
@@ -382,18 +471,20 @@ bag containing $v$; an original-edge link belongs to the first bag
 containing both endpoints. Such an owning bag exists by vertex or edge
 coverage and can be found by scans.
 
-The forest decomposition used in Section~\ref{sec:treewidth} has a direct
-description. After removing its boundary $D$, root the reference path at
-coordinate $2$, and orient any attached link away from that path. If a
-link instead meets $A$ or $B$, its remaining internal path is a separate
-component, rooted at the end nearest that anchor. An original-edge link
-also leaves a single path. Thus roots and parents follow from positions
-along the explicitly indexed paths; no general forest search is needed.
-For each component root $r$, create bag $D\cup\{r\}$ and attach it to
-the owning input bag. For every other vertex $x$, create
-$D\cup\{x,\operatorname{parent}(x)\}$, with its index-tree parent the
-bag belonging to $\operatorname{parent}(x)$. These formulas describe
-both the bags and every edge of the output decomposition tree.
+The reference-path root has coordinate $r=\max\{2,d\}$. Its bag has
+parent the owning input bag; the bag at any other private coordinate $j$
+has parent $j+1$ if $j<r$, and $j-1$ if $j>r$, within the same copy.
+Its vertex parent follows the same rule, except that the root's vertex
+parent is $h_v$. Emit the input bags with $A,B$ added, and the reference
+bags $\{A,B,x,\operatorname{parent}(x)\}$. These formulas require only
+coordinate comparisons and give the decomposition of $J$ directly.
+
+A required direct domain edge belongs to its copy's root bag when $d\geq2$,
+and to its owning input bag when $d=0$ or $d=1$. An original edge belongs
+to its owning input bag. Emit each subdivision chain of size-three bags
+from Section~\ref{sec:treewidth} at that bag. Parents within a chain are
+consecutive indices, so both bags and decomposition edges can be emitted
+without a general forest traversal.
 
 \paragraph{Emitting a path decomposition.}
 Implement the two stages of Section~\ref{sec:pathwidth} in order.
@@ -461,6 +552,11 @@ gives the additional source restrictions. This establishes all hardness
 parts of Theorem~\ref{thm:main}.
 
 \subsection{Membership with supplied decompositions}
+By Lemma~\ref{lem:cap}, first replace a binary target length by its
+linear-size cap. In the membership arguments below, $n$ denotes this
+capped length, so target vertices have $O(\log N)$-bit identifiers and
+all loops over the target take polynomial time.
+
 We first isolate the common correctness argument. A bag assignment is a
 map $a_t:B_t\to V(H)$ that preserves every graph edge with both endpoints
 in $B_t$.
@@ -488,7 +584,7 @@ correctness, including when the source is disconnected.
 
 There are at most $2(w+1)$ vertex-image records on the work tape at once.
 Both vertex identifiers and images occupy $O(\log N)$ bits, since the
-graph is explicit and $n$ is unary. Scans of the input and of the two
+graph is explicit and $n$ has been capped by Lemma~\ref{lem:cap}. Scans of the input and of the two
 records suffice for all tests. There are at most $N$ bags and each has
 at most $N$ entries, so even repeated pairwise comparisons take polynomial
 time with an exponent independent of $w$. The working space is
@@ -573,15 +669,68 @@ source. These cases are polynomial-time decidable. On the other hand,
 fixing the target cycle itself would make the source-width problem FPT
 by the usual dynamic programme; variability of $n$ is essential.
 
+\subsection{Recognising odd-cycle cores}
+A finite graph's \emph{core} is its smallest homomorphically equivalent
+subgraph, unique up to isomorphism. Every odd cycle is a core by rigidity
+(the same proof applies to $C_3$). Mapping a graph to its own shortest odd
+cycle is a classical question studied by Gerards~\cite{gerards1988}.
+
+\begin{corollary}\label{cor:core}
+Recognising graphs whose core is an odd cycle is XNLP-complete for the width
+of a supplied path decomposition, XALP-complete for the width of a supplied
+tree decomposition, and W[3]-hard and in W[P] for feedback vertex number.
+Hardness holds on connected, 2-degenerate graphs of arbitrarily large
+prescribed constant girth.
+
+For a nonbipartite graph $G$ of odd girth $g$, the equivalent conditions are
+\[
+ \operatorname{core}(G)\cong C_g
+ \quad\Longleftrightarrow\quad G\to C_g
+ \quad\Longleftrightarrow\quad \chi_c(G)=\frac{2g}{g-1}.
+\]
+\end{corollary}
+\begin{proof}
+If $G$ is homomorphically equivalent to $C_\ell$, then $C_\ell\to G$
+gives an odd closed walk of length $\ell$, containing an odd cycle;
+hence $g\leq\ell$. A shortest odd cycle also gives
+$C_g\to G\to C_\ell$, so $\ell\leq g$ by the odd-walk argument in
+Lemma~\ref{lem:cap}. Thus $\ell=g$. Conversely, $G\to C_g$ and the
+inclusion of a shortest odd cycle give homomorphisms in both directions.
+Circular chromatic number is monotone under homomorphisms, and
+$\chi_c(C_g)=2g/(g-1)$. Together with the circular-colouring characterisation
+of $G\to C_g$, this proves the displayed equivalences.
+
+For hardness, ensure that $F$ contains an edge by adjoining a disjoint edge
+with singleton lists prescribing two distinct fresh colours. This preserves
+list colourability and feedback vertex number, and changes treewidth and
+pathwidth only to their maximum with one. Supplied decompositions extend by
+one bag. The output has girth exactly $n$ and contains a reference $C_n$,
+so its odd girth is $n$. Consequently, it has an odd-cycle core exactly when
+$G\to C_n$. The reduction can discard the target. All source restrictions
+are inherited; in particular these hard instances have chromatic number
+exactly three, since they are 2-degenerate and contain an odd cycle.
+
+For XNLP and XALP membership, guess an odd $3\leq\ell\leq|V(G)|$ and
+verify $C_\ell\to G$ by guessing a closed walk of length $\ell$, using
+logarithmic workspace. Then run the corresponding bag-assignment algorithm
+for $G\to C_\ell$, including the case $\ell=3$. These two phases fit the
+same time and space bounds. For W[P], compute the odd girth in deterministic
+polynomial time, rejecting bipartite graphs, and use the feedback vertex
+algorithm for $G\to C_g$. Bipartite graphs cannot have odd-cycle cores.
+\end{proof}
+
 \appendix
 \section{Lean verification}\label{app:lean}
 \paragraph{Artifact availability.}
 The Lean development is in the public repository
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-The verified reduction and executable checks are available at commit
+The preceding verified artifact is available at commit
 \href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/c41b7c17451cf3de07f732106413931294d9cff8}{\texttt{c41b7c1}}~\cite{artifact}.
 Its \lean{README.md} gives reproduction commands and
 \lean{FORMALIZATION.md} maps the checked statements to declarations.
+This draft extends that artifact with the sharper treewidth certificate and
+cycle-length lemmas in the accompanying source tree; its generated audit report
+records the base commit and working-tree status.
 
 The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
 mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
@@ -598,7 +747,7 @@ certificates, target pathwidth two, feedback vertex set transfer with
 exact cardinality $|S|+2$, and the polynomial bound in~\eqref{eq:size}.
 The companion theorem \lean{parameter_reduction} defines treewidth, pathwidth,
 and feedback vertex number as minima, restates the transfer as the
-inequalities of Theorem~\ref{thm:transfer}, and adds the properties of
+upper bounds of Theorem~\ref{thm:transfer}, and adds the properties of
 Proposition~\ref{prop:sparse}.
 The following names are in the namespace
 \lean{TreewidthHom.OddCycle.ListReduction}.
@@ -609,7 +758,7 @@ The following names are in the namespace
 Statement & Principal declaration \\
 \midrule
 Decision equivalence & \lean{source_hom_iff_colorable} \\
-Treewidth $\max\{w+2,4\}$ & \lean{source_width} \\
+Treewidth $\max\{w+2,3\}$ & \lean{source_width} \\
 Pathwidth $p+6$ & \lean{source_pathWidth} \\
 Deleting the transferred set leaves a forest & \lean{source_feedback} \\
 Transferred set has size $|S|+2$ & \lean{removed_card} \\
@@ -635,10 +784,12 @@ used for W[P] membership: a guess on a feedback vertex set extends to a
 homomorphism exactly when it preserves the edges inside the set and every
 root of the remaining forest has a feasible pair.
 
-The formal statements do not encode Turing machines or complexity classes.
-The published hardness of List Colouring, the reduction's time and space
-bounds, the membership algorithms' resource analysis, and the complexity
-conclusions are mathematical arguments in the text.
+The sharper treewidth upper bound and the odd-closed-walk length bound are
+checked. The minor-based matching lower bounds, the binary-length equivalence
+and its transducer, and the odd-cycle-core and circular-colouring corollary remain
+mathematical arguments in the text. The formal statements do not encode Turing
+machines or complexity classes: the published hardness of List Colouring,
+machine resource bounds, and complexity conclusions are proved or cited here.
 Noncomputable choices used to select bags or roots in structural proofs
 do not stand in for a verified implementation of the logspace transducer.
 
@@ -670,7 +821,7 @@ human review of the complete argument.
 \bibitem{artifact}
 Jason Davies.
 Odd-cycle homomorphism: Lean formalisation and executable checks.
-Software repository, 2026. Version
+Software repository, 2026. Preceding artifact version
 \href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/c41b7c17451cf3de07f732106413931294d9cff8}{\texttt{c41b7c1}}.
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
 
@@ -747,5 +898,22 @@ Schloss Dagstuhl, 2021.
 Xuding Zhu.
 Circular chromatic number: a survey.
 \emph{Discrete Mathematics} 229(1--3):371--410, 2001.
+\bibitem{or2020}
+Karolina Okrasa and Pawe{\l} Rz\k{a}\.{z}ewski.
+Fine-grained complexity of the graph homomorphism problem for bounded-treewidth graphs.
+arXiv:1906.08371v3, 2020.
+\url{https://arxiv.org/abs/1906.08371v3}.
+
+\bibitem{kns2001}
+A. Kostochka, J. Ne\v{s}et\v{r}il and P. Smol\'ikov\'a.
+Colorings and homomorphisms of degenerate and bounded degree graphs.
+\emph{Discrete Mathematics} 233:257--276, 2001.
+\href{https://doi.org/10.1016/S0012-365X(00)00245-4}{doi:10.1016/S0012-365X(00)00245-4}.
+
+\bibitem{gerards1988}
+A. M. H. Gerards.
+Homomorphisms of graphs into odd cycles.
+\emph{Journal of Graph Theory} 12(1):73--83, 1988.
+\href{https://doi.org/10.1002/jgt.3190120108}{doi:10.1002/jgt.3190120108}.
 \end{thebibliography}
 \end{document}

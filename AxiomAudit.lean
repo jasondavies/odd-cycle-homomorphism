@@ -5,6 +5,7 @@ import TreewidthHom
 #print axioms TreewidthHom.intervalDecomposition
 #print axioms TreewidthHom.Graft.isTree
 #print axioms TreewidthHom.Graft.running_of_tops
+#print axioms TreewidthHom.Graft.hasWidth
 #print axioms TreewidthHom.Graft.extend
 #print axioms TreewidthHom.acyclic_of_apex_forest
 #print axioms TreewidthHom.exists_forestOrientation
@@ -16,6 +17,10 @@ import TreewidthHom
 #print axioms TreewidthHom.pathWidth_linked_of_bags
 #print axioms TreewidthHom.OddCycle.cyc_eq_cycleGraph
 #print axioms TreewidthHom.OddCycle.rotation_or_reflection
+#print axioms TreewidthHom.OddCycle.odd_closed_walk_length
+#print axioms TreewidthHom.OddCycle.length_le_of_hom
+#print axioms TreewidthHom.OddCycle.length_eq_of_homs
+#print axioms TreewidthHom.OddCycle.ListReduction.palette_missing_last
 #print axioms TreewidthHom.OddCycle.walk_iff_ne
 #print axioms TreewidthHom.OddCycle.target_pathWidth
 #print axioms TreewidthHom.OddCycle.ListReduction.source_hom_iff

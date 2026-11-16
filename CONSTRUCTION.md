@@ -39,9 +39,11 @@ the paper, Lean, and the executable construction.
 
 ## Structural bounds
 
-- **Treewidth:** add `A,B` to the original bags. A reference gadget with boundary
-  `{A,B,h_v}` becomes a forest after deleting that boundary, so attach its
-  forest bags augmented by the boundary. Result: `tw(G) ≤ max(tw(F)+2,4)`.
+- **Treewidth:** root each private reference path at its domain coordinate
+  (or at coordinate 2 for an anchor coordinate), and attach the root to its hub.
+  These tree attachments need bags of size two. Adding `A,B` gives bags of
+  size four; subdividing the required edges needs bags of size three.
+  Result: `tw(G) ≤ max(tw(F)+2,3)`.
 - **Pathwidth:** first process each reference cycle with two private vertices
   at a time while retaining its hub and `A,B`, giving `p+4` for the graph with
   direct constraint edges. Subdivide those edges by serial path sweeps, adding
@@ -50,6 +52,19 @@ the paper, Lean, and the executable construction.
   links leave a subdivided forest with path fragments; each reference path and
   its optional single link attach to at most one surviving hub. The deleted
   set has size `|S|+2`.
+
+For padded lists, coordinate `n-1` is forbidden at every hub. Contract each
+selected reference path and its domain link into its hub, then contract the
+original-edge links. This exhibits `K₂ ∨ F` as a minor. If `F` has an edge,
+minor monotonicity gives matching lower bounds:
+
+```
+tw(G) = tw(F)+2,     fvs(G) = fvs(F)+2.
+```
+
+The paper proves these equalities, including the feedback-number calculation
+for the join. Lean currently checks the upper bounds and palette-padding lemma;
+the minor and matching lower bounds remain prose proofs.
 
 For `m=|V(F)|`, `e=|E(F)|` and `f=Σ_v(n-|L(v)|)`,
 
@@ -75,3 +90,15 @@ The reference cycles have girth `n`; any cycle using links must use at least
 two complete links, giving length at least `2(n-2) ≥ n`.
 Choosing `n` above any fixed threshold gives the large-girth restriction
 without changing the parameter bounds.
+
+## Target encoding and recognition
+
+Binary target lengths suffice: an odd cycle longer than `|V(G)|` admits a
+homomorphism from `G` exactly when `G` is bipartite. Thus replacing `n` by
+`min(n, 2|V(G)|+5)` preserves the answer and allows a linear-size unary target.
+
+For nonempty input, the constructed graph contains `C_n` and has odd girth `n`.
+It therefore has an odd-cycle core exactly when it maps to `C_n`. Discarding
+the target gives the same complexity classifications for recognising graphs
+whose core is an odd cycle. The paper handles the empty case by a forced-edge
+preprocessing step and proves membership separately.

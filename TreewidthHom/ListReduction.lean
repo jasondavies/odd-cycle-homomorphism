@@ -60,6 +60,16 @@ theorem base_anchor_adj : (base m n).Adj (.inl (.inl 0)) (.inl (.inl 1)) := by
   apply (fromRel_adj _ _ _).mpr
   exact ⟨by simp,Or.inl (Or.inl ⟨rfl,rfl⟩)⟩
 
+/-- Palette padding leaves the last reference coordinate forbidden at every hub. -/
+theorem palette_missing_last (L : Fin m → Finset (ZMod n)) {q : ℕ}
+    (hq : q < n) (hL : ∀ v d, d ∈ L v → d.val < q) :
+    ∀ v, ((n-1 : ℕ) : ZMod n) ∉ L v := by
+  intro v hv
+  have h := hL v _ hv
+  have hn : 1 < n := Fact.out
+  rw [ZMod.val_natCast,Nat.mod_eq_of_lt (by omega : n-1 < n)] at h
+  omega
+
 theorem base_ref_adj (i : Copies m n) (d : ZMod n) :
     (base m n).Adj (.inl (ref i d)) (.inl (ref i (d+1))) := by
   refine (fromRel_adj _ _ _).mpr ⟨?_,Or.inl (Or.inr ⟨i,d,rfl,rfl⟩)⟩

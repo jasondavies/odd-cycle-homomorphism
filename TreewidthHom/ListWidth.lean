@@ -2,6 +2,7 @@ module
 
 public import TreewidthHom.ListReduction
 public import TreewidthHom.LinkedWidth
+public import TreewidthHom.GraftWidth
 public import TreewidthHom.DecompositionMaps
 
 @[expose] public section
@@ -31,97 +32,97 @@ theorem link_adj_aug (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)) (
   · exact ⟨d,rfl⟩
   · exact h.2
 
-/-- Rearrange hubs, shared vertices, and private reference vertices. -/
-def layout : ((Fin m ⊕ Fin 2) ⊕ Private m n) ≃ BaseVertex m n where
+/-- The reference paths root at their domain-link coordinate, or at coordinate
+2 when that coordinate is one of the anchors. -/
+def referenceParent (p : Private m n) : Fin m ⊕ Private m n :=
+  if h : p.2.val < p.1.2.val-2 then
+    .inr (p.1,⟨p.2.val+1,by have := ZMod.val_lt p.1.2; omega⟩)
+  else if h : p.1.2.val-2 < p.2.val then
+    .inr (p.1,⟨p.2.val-1,by have := p.2.isLt; omega⟩)
+  else .inl p.1.1
+
+def referenceGraft (m n : ℕ) [Fact (1 < n)] : Graft (Fin m) (Private m n) where
+  parent := referenceParent
+  height p := (p.2.val-(p.1.2.val-2))+((p.1.2.val-2)-p.2.val)
+  decreases := by
+    intro p r h
+    dsimp [referenceParent] at h
+    split_ifs at h with h1 h2
+    · cases Sum.inr.inj h
+      dsimp
+      omega
+    · cases Sum.inr.inj h
+      dsimp
+      omega
+
+theorem reference_parent_root {p : Private m n} (h : p.2.val = p.1.2.val-2) :
+    referenceParent p = .inl p.1.1 := by simp [referenceParent,h]
+
+theorem reference_parent_step {p r : Private m n}
+    (he : p.1 = r.1) (hh : r.2.val = p.2.val+1) :
+    referenceParent p = .inr r ∨ referenceParent r = .inr p := by
+  by_cases h : p.2.val < p.1.2.val-2
+  · left
+    simp only [referenceParent,h,↓reduceDIte,Sum.inr.injEq]
+    exact Prod.ext he (Fin.ext (by simp; omega))
+  · right
+    have h1 : ¬ r.2.val < r.1.2.val-2 := by rw [← he]; omega
+    have h2 : r.1.2.val-2 < r.2.val := by rw [← he]; omega
+    simp only [referenceParent,h1,h2,↓reduceDIte,Sum.inr.injEq]
+    exact Prod.ext he.symm (Fin.ext (by simp; omega))
+
+/-- Put the two anchors outside the graph of hubs and attached reference trees. -/
+def layout : ((Fin m ⊕ Private m n) ⊕ Fin 2) ≃ BaseVertex m n where
   toFun
     | .inl (.inl v) => .inr v
-    | .inl (.inr a) => .inl (.inl a)
-    | .inr p => .inl (.inr p)
+    | .inl (.inr p) => .inl (.inr p)
+    | .inr a => .inl (.inl a)
   invFun
     | .inr v => .inl (.inl v)
-    | .inl (.inl a) => .inl (.inr a)
-    | .inl (.inr p) => .inr p
-  left_inv := by rintro ((v | a) | p) <;> rfl
+    | .inl (.inr p) => .inl (.inr p)
+    | .inl (.inl a) => .inr a
+  left_inv := by rintro ((v | p) | a) <;> rfl
   right_inv := by rintro ((a | p) | v) <;> rfl
 
-/-- Add the shared edge to all old bags; sweep each reference path with its hub. -/
+/-- Removing the anchors exposes the input graph with rooted trees attached;
+adding the anchors back gives bags of size at most max(w+3,4). -/
 theorem aug_width (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasWidth F w) :
-    HasWidth (aug (n := n) F) (max (w+2) 4) := by
+    HasWidth (aug (n := n) F) (max (w+2) 3) := by
   classical
-  obtain ⟨d,B,T,D,hw⟩ := hw
+  obtain ⟨d,B,T,D,hD⟩ := (referenceGraft m n).hasWidth hw
   let H := (aug (n := n) F).comap layout
-  let G0 : SimpleGraph (Fin m ⊕ Fin 2) := H.comap Sum.inl
-  let D0 := D.addApices G0 (fun {u v} h => h)
-  choose owner ho using D.vertex_cover
-  let start : Copies m n → Fin m ⊕ Fin 2 := fun i => .inl i.1
-  let prev : Private m n → ((Fin m ⊕ Fin 2) ⊕ Private m n) := ChainGraft.prev start
-  let A := ChainGraft.graft (n-2) (fun i : Copies m n => owner i.1)
-  let boundary : Private m n → Finset ((Fin m ⊕ Fin 2) ⊕ Private m n) := fun p =>
-    {.inl (.inl p.1.1),.inl (.inr 0),.inl (.inr 1)}
-  let bag : Private m n → Finset ((Fin m ⊕ Fin 2) ⊕ Private m n) := fun p =>
-    boundary p ∪ {Sum.inr p,prev p}
-  have own : ∀ p, Sum.inr p ∈ bag p := by intro p; simp [bag]
-  have new_mem : ∀ r p, Sum.inr r ∈ bag p ↔ r = p ∨ prev p = Sum.inr r := by
-    intro r p; simp [bag, boundary, eq_comm]
-  have old_mem : ∀ v p, Sum.inl v ∈ bag p ↔ v = .inl p.1.1 ∨ ∃ a, v = .inr a := by
-    intro v p
-    cases v with
-    | inl v => by_cases hz : p.2.val=0 <;> simp [bag,boundary,prev,ChainGraft.prev,start,hz]
-    | inr a =>
-      have ha : a=0 ∨ a=1 := by fin_cases a <;> simp
-      rcases ha with rfl | rfl <;> simp [bag,boundary]
-  have mixed : ∀ (v : Fin m ⊕ Fin 2) p, H.Adj (.inl v) (.inr p) → Sum.inl v ∈ bag p := by
-    intro v p h
-    apply (old_mem v p).mpr
-    cases v with
-    | inl v =>
-      obtain ⟨d,he⟩ : ∃ d, Sum.inr p = ref (v,d) d := h
-      have hh := (ref_private he.symm).1
-      left; exact congrArg Sum.inl (congrArg Prod.fst hh).symm
-    | inr a => exact Or.inr ⟨a,rfl⟩
-  let D1 := A.extend D0 H bag (fun p => ⟨p,own p⟩)
-    (by
-      rintro (u | p) (v | r) h
-      · obtain ⟨b,hu,hv⟩ := D0.edge_cover h
-        exact ⟨.inl b,by simpa using hu,by simpa using hv⟩
-      · exact ⟨.inr r,mixed u r h,own r⟩
-      · exact ⟨.inr p,own p,mixed v p h.symm⟩
-      · obtain ⟨he,hh⟩ := private_adj h
-        exact ChainGraft.edge_cover D0 start bag new_mem he hh)
-    (by
-      intro v p hv
-      have hv' := (old_mem v p).mp hv
-      by_cases hz : p.2.val=0
-      · have hp : A.parent p = .inl (owner p.1.1) := by simp [A,ChainGraft.graft,ChainGraft.prev,hz]
-        rw [hp,graftBag_inl_inl]
-        rcases hv' with rfl | ⟨a,rfl⟩
-        · exact (D.inl_mem_apexBag _ _).mpr (ho _)
-        · exact D.inr_mem_apexBag _ _
-      · simp only [A,ChainGraft.graft,ChainGraft.prev,hz,↓reduceDIte,graftBag_inr]
-        apply (old_mem _ _).mpr
-        exact hv')
-    (ChainGraft.unique_top D0 start bag new_mem (fun i : Copies m n => owner i.1))
+  have hbase : ∀ {u v}, H.Adj (.inl u) (.inl v) →
+      ((referenceGraft m n).graph F).Adj u v := by
+    have mixed : ∀ (v : Fin m) (p : Private m n),
+        (∃ d, Sum.inr p = ref (v,d) d) → referenceParent p = .inl v := by
+      intro v p ⟨d,he⟩
+      obtain ⟨hi,hv⟩ := ref_private he.symm
+      have hp : p.2.val = p.1.2.val-2 := by rw [hi]; dsimp; omega
+      rw [reference_parent_root hp,hi]
+    rintro (u | p) (v | r) h
+    · exact h
+    · exact mixed u r h
+    · exact mixed v p h
+    · obtain ⟨he,hh⟩ := private_adj h
+      rcases hh with hh | hh
+      · exact reference_parent_step he hh
+      · exact (reference_parent_step he.symm hh).symm
+  let D' := D.addApices H hbase
   have he : ∀ u v, (aug F).Adj (layout u) (layout v) → H.Adj u v := fun _ _ h => h
-  refine ⟨inferInstance,_,_,D1.mapEquiv layout he,fun b => ?_⟩
+  refine ⟨inferInstance,_,_,D'.mapEquiv layout he,fun b => ?_⟩
   rw [Decomposition.mapEquiv_card]
-  apply graftBag_card D0 bag (k := w+2) (m := 4) ?_ ?_
-  · intro b
-    exact D.two_apex_width hw (by simp) b
-  · intro p
-    have h1 : (boundary p).card ≤ 3 := Finset.card_le_three
-    have h2 : ({Sum.inr p,prev p} : Finset ((Fin m ⊕ Fin 2) ⊕ Private m n)).card ≤ 2 := Finset.card_le_two
-    have h3 := Finset.card_union_le (boundary p) {Sum.inr p,prev p}
-    change (boundary p ∪ {Sum.inr p,prev p}).card ≤ 5
-    omega
+  have h := D.two_apex_width hD (A := Fin 2) (by simp) b
+  change (D.apexBag (A := Fin 2) b).card ≤ _
+  omega
 
 theorem source_width (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     {w : ℕ} (hw : HasWidth F w) :
-    HasWidth (source F L) (max (w+2) 4) := by
+    HasWidth (source F L) (max (w+2) 3) := by
   classical
   obtain ⟨d,B,T,D,hw⟩ := aug_width (n := n) F hw
   choose owner hs ht using fun l : Link F L => D.edge_cover (link_adj_aug F L l)
   have h := width_linked_of_bags D (base m n) (base_le_aug F)
-    (fun l : Link F L => src l.val) (fun l => dst l.val) (n-3) (max (w+2) 4)
+    (fun l : Link F L => src l.val) (fun l => dst l.val) (n-3) (max (w+2) 3)
     hw owner hs ht
   exact h.mono (by omega)
 

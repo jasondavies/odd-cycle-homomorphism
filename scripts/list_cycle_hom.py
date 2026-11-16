@@ -54,30 +54,46 @@ class Reduction:
         return path
 
     def tree_decomposition(self, original_bags, original_tree):
-        """Attach a boundary-plus-forest decomposition for every gadget."""
+        """Root each reference tree at its hub attachment, then add the anchors.
+
+        Reference bags have size at most four. Original-edge subdivisions
+        use bags of size three, giving width max(w+2, 3).
+        """
         bags = [set(b) | {self.A, self.B} for b in original_bags]
         tree = list(original_tree)
         adj = [[] for _ in range(self.count)]
         for u, v in self.edges:
             adj[u].append(v)
             adj[v].append(u)
+        anchors = {self.A, self.B}
         for boundary, internal in self.parts:
             owner = next(i for i, b in enumerate(original_bags)
-                         if boundary - {self.A, self.B} <= set(b))
+                         if boundary - anchors <= set(b))
+            if not anchors <= boundary:
+                u, v = sorted(boundary)
+                parent_bag, previous = owner, u
+                for x in internal:
+                    bi = len(bags)
+                    bags.append({v, previous, x})
+                    tree.append((parent_bag, bi))
+                    parent_bag, previous = bi, x
+                continue
+            hub, = boundary - anchors
             unseen = set(internal)
             while unseen:
-                root = min(unseen)
+                attached = [x for x in unseen if hub in adj[x]]
+                root = min(attached) if attached else min(unseen)
                 unseen.remove(root)
-                queue = [(root, None, owner)]
+                queue = [(root, hub if attached else None, owner)]
                 while queue:
                     v, parent, parent_bag = queue.pop()
                     bi = len(bags)
-                    bags.append(boundary | {v} | ({parent} if parent is not None else set()))
+                    bags.append(anchors | {v} | ({parent} if parent is not None else set()))
                     tree.append((parent_bag, bi))
                     for u in adj[v]:
-                        if u in boundary or u == parent:
+                        if u in anchors or u == parent:
                             continue
-                        require(u in unseen, "local gadget interior is not a forest")
+                        require(u in unseen, "reference attachment is not a forest")
                         unseen.remove(u)
                         queue.append((u, v, bi))
         return bags, tree

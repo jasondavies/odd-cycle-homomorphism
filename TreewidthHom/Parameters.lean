@@ -74,9 +74,9 @@ end
 namespace OddCycle.ListReduction
 variable {m n : ℕ} [Fact (1 < n)]
 
-/-- The reduction raises treewidth by at most two, above a floor of four. -/
+/-- The reduction raises treewidth by at most two, above a floor of three. -/
 theorem treewidth_source_le (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)) :
-    treewidth (source F L) ≤ max (treewidth F + 2) 4 :=
+    treewidth (source F L) ≤ max (treewidth F + 2) 3 :=
   treewidth_le (source_width F L (hasWidth_treewidth F))
 
 /-- The reduction raises pathwidth by at most six. -/
@@ -117,7 +117,7 @@ sparsity of the source. Complexity classes are not encoded here. -/
 theorem parameter_reduction (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     (hodd : Odd n) (hn : 5 ≤ n) :
     (Nonempty (source F L →g cyc n) ↔ Colorable F L) ∧
-    treewidth (source F L) ≤ max (treewidth F + 2) 4 ∧
+    treewidth (source F L) ≤ max (treewidth F + 2) 3 ∧
     pathwidth (source F L) ≤ pathwidth F + 6 ∧
     fvs (source F L) ≤ fvs F + 2 ∧
     pathwidth (cyc n) ≤ 2 ∧
