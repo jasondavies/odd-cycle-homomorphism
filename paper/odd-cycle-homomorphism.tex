@@ -30,7 +30,7 @@
 \emergencystretch=2em
 \title{Parameterised complexity of graph homomorphism to odd cycles}
 \author{Jason Davies\thanks{\href{mailto:jason@jasondavies.com}{\nolinkurl{jason@jasondavies.com}}}}
-\date{Draft --- November 16, 2026}
+\date{November 16, 2026}
 \begin{document}
 \maketitle
 
@@ -88,6 +88,9 @@ without a supplied decomposition as well, but make no membership claim for
 those variants. All targets have treewidth and pathwidth exactly two.
 Thus the result gives XALP-hardness parameterised by the maximum of the two
 input treewidths, and XNLP-hardness for the analogous pathwidth parameter.
+XNLP-hardness implies W[$t$]-hardness for every fixed $t\geq1$~\cite[Lemma~2]{bgns2024}.
+Since $\tw(G)\leq\pw(G)$, this gives, in particular, W[1]-hardness
+parameterised by $\max\{\tw(G),\tw(H)\}$, even when $H$ is an odd cycle.
 The distinction between the two completeness classifications reflects
 whether the algorithm retains successive bag assignments or additionally
 uses a stack of saved parent assignments. Section~\ref{sec:complexity}
@@ -136,7 +139,7 @@ and feedback vertex number when $F$ contains an edge.
 \paragraph{Prior work and attribution.}
 Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
 from workshop participants~\cite{amarilli2016}. The relationship between
-those reductions and this construction has not been established; this draft
+those reductions and this construction has not been established; this paper
 makes no priority claim for the original hardness question.
 Our starting results are the XNLP-completeness of List Colouring for
 pathwidth~\cite[Theorem~15]{bgns2024}, its XALP-completeness for
@@ -151,7 +154,7 @@ where $\operatorname{ctw}$ denotes cutwidth~\cite{pr2021}. Our statements concer
 uniform parameterised hardness and completeness as the target length varies.
 
 Disequality and list gadgets for projective cores are developed by Okrasa and
-Rz\k{a}\.{z}ewski~\cite[Lemma~17 and Proposition~19]{or2020}; their fixed-target
+Rz\k{a}\.{z}ewski~\cite[preprint version, Lemma~17 and Proposition~19]{or2021}; their fixed-target
 width overhead may depend on the target. Kostochka, Ne\v{s}et\v{r}il and
 Smol\'ikov\'a prove NP-completeness of fixed-$H$ colouring on 2-degenerate
 sources for nonbipartite triangle-free $H$~\cite[Theorem~1.3]{kns2001}.
@@ -618,6 +621,8 @@ each stack frame has $O((w+1)\log N)$ bits. The total stack size need
 not satisfy this working-space bound. Each frame is pushed and popped
 once, and children can be located by input scans, so the total running
 time is polynomial. This proves XALP membership.
+Both bag-assignment algorithms apply to arbitrary explicitly given targets
+$H$, using adjacency in $H$ in place of adjacency in $C_n$.
 
 \paragraph{Checking the certificate.}
 The algorithms do not assume valid decompositions as a promise.
@@ -709,12 +714,12 @@ Circular chromatic number is monotone under homomorphisms, and
 $\chi_c(C_g)=2g/(g-1)$. Together with the circular-colouring characterisation
 of $G\to C_g$, this proves the displayed equivalences.
 
-For hardness, ensure that $F$ contains an edge by adjoining a disjoint edge
-with singleton lists prescribing two distinct fresh colours. This preserves
-list colourability and feedback vertex number, and changes treewidth and
-pathwidth only to their maximum with one. Supplied decompositions extend by
-one bag. The output has girth exactly $n$ and contains a reference $C_n$,
-so its odd girth is $n$. Consequently, it has an odd-cycle core exactly when
+For hardness, ensure that $F$ is nonempty by adjoining an isolated vertex
+with a singleton list prescribing a fresh colour. This preserves list
+colourability and all three parameters; supplied decompositions extend by
+one singleton bag without increasing their width. Nonemptiness guarantees
+a reference cycle in the output, whose girth and odd girth are therefore
+both exactly $n$. Consequently, it has an odd-cycle core exactly when
 $G\to C_n$. The reduction can discard the target. All source restrictions
 are inherited; in particular these hard instances have chromatic number
 exactly three, since they are 2-degenerate and contain an odd cycle.
@@ -824,26 +829,12 @@ human review of the complete argument.
 
 \begin{thebibliography}{10}
 \raggedright
-\bibitem{artifact}
-Jason Davies.
-Odd-cycle homomorphism: Lean formalisation and executable checks.
-Software repository, 2026. Version
-\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/3d0a9d4e7d816ae898ad36ccd8d540cd1db51dcb}{\texttt{3d0a9d4}}.
-\url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-
 \bibitem{amarilli2016}
 Antoine Amarilli.
 Complexity of the homomorphism problem parameterized by treewidth.
 \emph{Theoretical Computer Science Stack Exchange}, question~34877,
 June~2, 2016; comment announcing W[1]-hardness, May~30, 2025.
 \url{https://cstheory.stackexchange.com/q/34877}.
-
-\bibitem{bgns2024}
-Hans L. Bodlaender, Carla Groenland, Jesper Nederlof and C\'eline Swennenhuis.
-Parameterized problems complete for nondeterministic FPT time and
-logarithmic space.
-\emph{Information and Computation} 300:105195, 2024.
-\href{https://doi.org/10.1016/j.ic.2024.105195}{doi:10.1016/j.ic.2024.105195}.
 
 \bibitem{bggpp2022}
 Hans L. Bodlaender, Carla Groenland, Hugo Jacob, Marcin Pilipczuk and
@@ -852,6 +843,13 @@ On the complexity of problems on tree-structured graphs.
 In \emph{17th International Symposium on Parameterized and Exact Computation
 (IPEC 2022)}, LIPIcs, vol.~249, pp.~6:1--6:17. Schloss Dagstuhl, 2022.
 \href{https://doi.org/10.4230/LIPIcs.IPEC.2022.6}{doi:10.4230/LIPIcs.IPEC.2022.6}.
+
+\bibitem{bgns2024}
+Hans L. Bodlaender, Carla Groenland, Jesper Nederlof and C\'eline Swennenhuis.
+Parameterized problems complete for nondeterministic FPT time and
+logarithmic space.
+\emph{Information and Computation} 300:105195, 2024.
+\href{https://doi.org/10.1016/j.ic.2024.105195}{doi:10.1016/j.ic.2024.105195}.
 
 \bibitem{bgp2023}
 Hans L. Bodlaender, Carla Groenland and Micha{\l} Pilipczuk.
@@ -872,6 +870,14 @@ Full version, arXiv:2208.12543v5, 2023.
 Marek Cygan, Fedor V. Fomin, {\L}ukasz Kowalik, Daniel Lokshtanov,
 D\'aniel Marx, Marcin Pilipczuk, Micha{\l} Pilipczuk and Saket Saurabh.
 \emph{Parameterized Algorithms}. Springer, 2015.
+\href{https://doi.org/10.1007/978-3-319-21275-3}{doi:10.1007/978-3-319-21275-3}.
+
+\bibitem{artifact}
+Jason Davies.
+Odd-cycle homomorphism: Lean formalisation and executable checks.
+Software repository, 2026. Version
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/3d0a9d4e7d816ae898ad36ccd8d540cd1db51dcb}{\texttt{3d0a9d4}}.
+\url{https://github.com/jasondavies/odd-cycle-homomorphism}.
 
 \bibitem{deMouraUllrich2021}
 Leonardo de Moura and Sebastian Ullrich.
@@ -884,12 +890,32 @@ pp.~625--635. Springer, 2021.
 J\"org Flum and Martin Grohe.
 \emph{Parameterized Complexity Theory}.
 Texts in Theoretical Computer Science. Springer, 2006.
+\href{https://doi.org/10.1007/3-540-29953-X}{doi:10.1007/3-540-29953-X}.
+
+\bibitem{gerards1988}
+A. M. H. Gerards.
+Homomorphisms of graphs into odd cycles.
+\emph{Journal of Graph Theory} 12(1):73--83, 1988.
+\href{https://doi.org/10.1002/jgt.3190120108}{doi:10.1002/jgt.3190120108}.
+
+\bibitem{kns2001}
+A. Kostochka, J. Ne\v{s}et\v{r}il and P. Smol\'ikov\'a.
+Colorings and homomorphisms of degenerate and bounded degree graphs.
+\emph{Discrete Mathematics} 233:257--276, 2001.
+\href{https://doi.org/10.1016/S0012-365X(00)00245-4}{doi:10.1016/S0012-365X(00)00245-4}.
 
 \bibitem{mathlib2020}
 The mathlib Community.
 The Lean mathematical library.
 In \emph{Certified Programs and Proofs (CPP 2020)}, pp.~367--381. ACM, 2020.
 \href{https://doi.org/10.1145/3372885.3373824}{doi:10.1145/3372885.3373824}.
+
+\bibitem{or2021}
+Karolina Okrasa and Pawe{\l} Rz\k{a}\.{z}ewski.
+Fine-grained complexity of the graph homomorphism problem for bounded-treewidth graphs.
+\emph{SIAM Journal on Computing} 50(2):487--508, 2021.
+\href{https://doi.org/10.1137/20M1320146}{doi:10.1137/20M1320146}.
+Preprint version: \href{https://arxiv.org/abs/1906.08371v3}{arXiv:1906.08371v3}, 2020.
 
 \bibitem{pr2021}
 Marta Piecyk and Pawe{\l} Rz\k{a}\.{z}ewski.
@@ -904,22 +930,6 @@ Schloss Dagstuhl, 2021.
 Xuding Zhu.
 Circular chromatic number: a survey.
 \emph{Discrete Mathematics} 229(1--3):371--410, 2001.
-\bibitem{or2020}
-Karolina Okrasa and Pawe{\l} Rz\k{a}\.{z}ewski.
-Fine-grained complexity of the graph homomorphism problem for bounded-treewidth graphs.
-arXiv:1906.08371v3, 2020.
-\url{https://arxiv.org/abs/1906.08371v3}.
-
-\bibitem{kns2001}
-A. Kostochka, J. Ne\v{s}et\v{r}il and P. Smol\'ikov\'a.
-Colorings and homomorphisms of degenerate and bounded degree graphs.
-\emph{Discrete Mathematics} 233:257--276, 2001.
-\href{https://doi.org/10.1016/S0012-365X(00)00245-4}{doi:10.1016/S0012-365X(00)00245-4}.
-
-\bibitem{gerards1988}
-A. M. H. Gerards.
-Homomorphisms of graphs into odd cycles.
-\emph{Journal of Graph Theory} 12(1):73--83, 1988.
-\href{https://doi.org/10.1002/jgt.3190120108}{doi:10.1002/jgt.3190120108}.
+\href{https://doi.org/10.1016/S0012-365X(00)00217-X}{doi:10.1016/S0012-365X(00)00217-X}.
 \end{thebibliography}
 \end{document}
