@@ -1,7 +1,7 @@
-# Homomorphism to an odd cycle
+# The parameterised complexity of homomorphism to an odd cycle
 
-One reduction from List Colouring establishes the parameterised complexity of
-deciding whether a graph `G` admits a homomorphism to an odd cycle `C_n`.
+This repository contains the paper, Lean proofs, and executable checks for
+homomorphism from a graph `G` to an odd cycle `C_n`.
 The target length `n` is part of the input, given explicitly or in unary.
 
 Read the paper: **[The parameterised complexity of homomorphism to an odd cycle](paper/odd-cycle-homomorphism.pdf)**.
@@ -15,6 +15,11 @@ For a short explanation of the gadgets and structural bounds, see
 | Width of a supplied path decomposition of `G` | XNLP-complete |
 | Width of a supplied tree decomposition of `G` | XALP-complete |
 | Feedback vertex number of `G` | W[3]-hard; in W[P] |
+
+All three hardness statements follow from one reduction from List Colouring,
+which increases treewidth, pathwidth, and feedback vertex number by constants.
+Membership follows from separate arguments: the XNLP and XALP membership
+statements require supplied decompositions; the W[P] upper bound does not.
 
 The hardness results also hold without supplied decompositions. Every target
 has treewidth and pathwidth two; the source width varies with the parameter.

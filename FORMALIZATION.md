@@ -51,9 +51,9 @@ The following are not formalised as machine-level theorems:
 
 The paper provides proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
-the logspace transducer. Completeness is stated only with a supplied decomposition.
-For feedback vertex number, the W[P] upper bound follows from Binary CSP
-in the paper; no W[3]-membership result is claimed.
+the logspace transducer. The XNLP and XALP completeness statements use supplied
+decompositions. For feedback vertex number, the W[P] upper bound follows from
+Binary CSP and needs no supplied decomposition; no W[3]-membership result is claimed.
 
 ## Reproduction and audits
 
