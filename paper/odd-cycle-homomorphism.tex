@@ -182,7 +182,7 @@ The possible integer displacements of a walk of that length are
 These $n-1$ integers give distinct residues modulo $n$: a difference is
 $2j$ with $0<|j|<n$, and $n$ is odd. None is zero modulo $n$, since each
 is odd and has absolute value less than $n$. Thus they give exactly the
-nonzero residues, and every listed displacement is realized by an
+nonzero residues, and every listed displacement is realised by an
 appropriate sequence of forward and backward steps.
 \end{proof}
 
@@ -551,19 +551,18 @@ the leaves upwards in polynomial time, and the guess extends to a
 homomorphism exactly when every root has a feasible pair. This proves
 membership in W[P].
 
-The same bound also follows from the W[P] upper bound for Binary CSP
-parameterised by feedback vertex number~\cite[Theorem~2]{bgp2023}: give each
-vertex of $G$ the domain $\Z/n\Z$ and, for each edge, allow exactly the
-ordered pairs adjacent in $C_n$. The constraint graph is $G$, and the
-explicit relations have polynomial size because $n$ is unary. Together with
-the reduction, this proves the third part of Theorem~\ref{thm:main}.
+This membership result also follows from the Binary CSP upper
+bound~\cite[Theorem~2]{bgp2023}, since the standard encoding preserves the
+constraint graph. Together with the reduction, this proves the third part
+of Theorem~\ref{thm:main}.
 
 \paragraph{Scope and targets of width one.}
-We do not claim W[3]-membership for feedback vertex number, or XNLP-membership
-for treewidth. Binary CSP is W[SAT]-hard for feedback vertex
-number~\cite[Theorem~2]{bgp2023}; whether homomorphism to an odd cycle is
-hard for a class above W[3] under this parameter is open. The two supplied-decomposition completeness statements have
-different parameters and different machine models.
+For feedback vertex number, the present arguments establish W[3]-hardness
+and W[P]-membership, leaving a gap between the lower and upper bounds.
+For comparison, Binary CSP is W[SAT]-hard for feedback vertex
+number~\cite[Theorem~2]{bgp2023}. The two supplied-decomposition completeness
+statements have different parameters and different machine models; we do not
+claim XNLP-membership for treewidth.
 
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
 If a target forest has an edge, a source maps to it exactly when the source is bipartite:
@@ -699,7 +698,7 @@ Hans L. Bodlaender, Carla Groenland and Micha{\l} Pilipczuk.
 Parameterized complexity of Binary CSP: vertex cover, treedepth, and
 related parameters.
 Full version, arXiv:2208.12543v5, 2023.
-\url{https://arxiv.org/abs/2208.12543}.
+\url{https://arxiv.org/abs/2208.12543v5}.
 
 \bibitem{cygan2015}
 Marek Cygan, Fedor V. Fomin, {\L}ukasz Kowalik, Daniel Lokshtanov,
