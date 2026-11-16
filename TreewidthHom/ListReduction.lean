@@ -121,7 +121,7 @@ theorem coloring_of_hom (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)
   have hsq : ε*ε = 1 := by rcases hε with h | h <;> rw [h] <;> ring
   have href : ∀ i : Copies m n, ∀ d, φ (.inl (ref i d)) = r+ε*d := by
     intro i
-    obtain ⟨r',ε',_,hf⟩ := dial hodd (fun d => φ (.inl (ref i d)))
+    obtain ⟨r',ε',_,hf⟩ := rotation_or_reflection hodd (fun d => φ (.inl (ref i d)))
       (fun d => (cyc_adj _ _).mp (φ.map_rel (base_ref_adj i d)))
     have h0 : r' = r := by simpa [r] using (hf 0).symm
     have h1 : ε' = ε := by

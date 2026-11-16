@@ -21,11 +21,6 @@ def Near (u v : ZMod n) : Prop := v = u + 1 ∨ u = v + 1
 
 theorem Near.symm {u v : ZMod n} (h : Near u v) : Near v u := h.elim Or.inr Or.inl
 
-theorem Near.add_left {u v : ZMod n} (h : Near u v) (r : ZMod n) : Near (r + u) (r + v) := by
-  rcases h with h | h
-  · exact Or.inl (by rw [h]; ring)
-  · exact Or.inr (by rw [h]; ring)
-
 /-- The cycle on the residues modulo `n`. -/
 abbrev cyc (n : ℕ) : SimpleGraph (ZMod n) := circulantGraph {1}
 
@@ -49,7 +44,7 @@ theorem cyc_adj [Fact (1 < n)] (u v : ZMod n) : (cyc n).Adj u v ↔ Near u v := 
 theorem cyc_eq_cycleGraph (m : ℕ) : cyc (m+1) = cycleGraph (m+1) :=
   (cycleGraph_eq_circulantGraph m).symm
 
-/-! ## Dials: a cycle maps to itself by a rotation or a reflection -/
+/-! ## A cycle maps to itself by a rotation or a reflection -/
 
 theorem natCast_two_mul_eq_zero (hodd : Odd n) {b : ℕ} (h : ((2*b : ℕ) : ZMod n) = 0) :
     n ∣ b := by
@@ -58,7 +53,7 @@ theorem natCast_two_mul_eq_zero (hodd : Odd n) {b : ℕ} (h : ((2*b : ℕ) : ZMo
   exact hc.dvd_of_dvd_mul_left hd
 
 /-- A map that moves by one step at a time around an odd cycle never turns. -/
-theorem dial [Fact (1 < n)] (hodd : Odd n) (f : ZMod n → ZMod n)
+theorem rotation_or_reflection [Fact (1 < n)] (hodd : Odd n) (f : ZMod n → ZMod n)
     (hf : ∀ x, Near (f x) (f (x+1))) :
     ∃ r ε : ZMod n, (ε = 1 ∨ ε = -1) ∧ ∀ x, f x = r + ε*x := by
   classical

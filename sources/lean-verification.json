@@ -17,7 +17,7 @@
     "TreewidthHom.Decomposition.path_intervals",
     "TreewidthHom.pathWidth_linked_of_bags",
     "TreewidthHom.OddCycle.cyc_eq_cycleGraph",
-    "TreewidthHom.OddCycle.dial",
+    "TreewidthHom.OddCycle.rotation_or_reflection",
     "TreewidthHom.OddCycle.walk_iff_ne",
     "TreewidthHom.OddCycle.target_pathWidth",
     "TreewidthHom.OddCycle.ListReduction.source_hom_iff",
@@ -32,10 +32,13 @@
     "TreewidthHom.OddCycle.ListReduction.removed_card",
     "TreewidthHom.OddCycle.ListReduction.source_card_le",
     "TreewidthHom.OddCycle.ListReduction.reduction",
+    "TreewidthHom.Decomposition.agree_on_walk",
     "TreewidthHom.Decomposition.agree_on_bags",
     "TreewidthHom.Decomposition.hom_iff_bagAssignments",
+    "TreewidthHom.Decomposition.compatible_path_iff",
     "TreewidthHom.Decomposition.hom_iff_pathBagAssignments",
-    "TreewidthHom.Decomposition.two_bag_records_le"
+    "TreewidthHom.Decomposition.two_bag_records_le",
+    "TreewidthHom.Decomposition.bag_domain_card"
   ],
   "axioms": {
     "TreewidthHom.Decomposition.addApices": [
@@ -113,7 +116,7 @@
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.dial": [
+    "TreewidthHom.OddCycle.rotation_or_reflection": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -188,6 +191,11 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.Decomposition.agree_on_walk": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.Decomposition.agree_on_bags": [
       "propext",
       "Classical.choice",
@@ -198,12 +206,22 @@
       "Classical.choice",
       "Quot.sound"
     ],
+    "TreewidthHom.Decomposition.compatible_path_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
     "TreewidthHom.Decomposition.hom_iff_pathBagAssignments": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
     "TreewidthHom.Decomposition.two_bag_records_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.bag_domain_card": [
       "propext",
       "Classical.choice",
       "Quot.sound"

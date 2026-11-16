@@ -12,7 +12,7 @@ variable {I : Type} {n : ℕ} [Fact (1 < n)]
 /-- The two shared vertices, and the private vertices `2,...,n-1` of every copy. -/
 abbrev RefVertex (I : Type) (n : ℕ) := Fin 2 ⊕ (I × Fin (n - 2))
 
-/-- Vertex `d` of the reference cycle of slot `s`. -/
+/-- Vertex `d` of the reference cycle with index `s`. -/
 def ref (s : I) (d : ZMod (n)) : RefVertex I n :=
   if h0 : d.val = 0 then .inl 0 else if h1 : d.val = 1 then .inl 1
   else .inr (s,⟨d.val-2,by have := ZMod.val_lt d; omega⟩)
@@ -54,13 +54,5 @@ theorem ref_private {s s' : I} {d : ZMod (n)}
   have h4 := congrArg (fun x : I × Fin (n - 2) => x.1) h2
   dsimp only at h3 h4
   exact ⟨h4.symm,by omega⟩
-
-theorem ref_shared {s : I} {d : ZMod (n)} {a : Fin 2}
-    (h : ref (n := n) s d = .inl a) : d.val = a.val := by
-  unfold ref at h
-  split_ifs at h with h0 h1
-  · rw [h0,← Sum.inl.inj h]; rfl
-  · rw [h1,← Sum.inl.inj h]; rfl
-
 
 end TreewidthHom.OddCycle.Reference

@@ -1,68 +1,68 @@
-# Homomorphism to an odd cycle
+# Graph homomorphism to an odd cycle is hard for bounded treewidth
 
-A single reduction from List Coloring establishes the complexity of ordinary
-graph homomorphism into an odd cycle whose length is part of the input:
+This repository answers the question
+[Complexity of the homomorphism problem parameterized by treewidth](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth):
+graph homomorphism is not fixed-parameter tractable in the treewidths of the two
+graphs unless FPT = W[1]. The proof is in the paper
+[The parameterized complexity of homomorphism to an odd cycle](paper/odd-cycle-homomorphism.pdf).
 
-| Source parameter | Result |
+## Results
+
+Deciding whether a graph `G` has a homomorphism to an odd cycle `C_n`, with `n`
+part of the input, is:
+
+| Parameter | Result |
 | --- | --- |
-| Width of a supplied path decomposition | XNLP-complete |
-| Width of a supplied tree decomposition | XALP-complete |
-| Feedback vertex number | W[3]-hard |
+| Width of a supplied path decomposition of `G` | XNLP-complete |
+| Width of a supplied tree decomposition of `G` | XALP-complete |
+| Feedback vertex number of `G` | W[3]-hard |
 
-Every target has treewidth and pathwidth exactly 2. The construction also gives
-2-degenerate sources of arbitrarily large prescribed constant girth.
+The hardness results also hold without supplied decompositions, and
+XNLP-hardness implies W[t]-hardness for every t. The target has treewidth 2,
+which is best possible: homomorphism into a forest is polynomial. The hard
+sources can be taken 2-degenerate and of arbitrarily large constant girth.
 
-[Read the paper](paper/odd-cycle-homomorphism.pdf) ·
-[Construction and proof](ODD_CYCLE.md) ·
-[Formalization boundary](FORMALIZATION.md) ·
-[Original question and attribution](PROBLEM.md)
+All three results come from one reduction from List Coloring, which raises
+treewidth, pathwidth and feedback vertex number by constants.
+[ODD_CYCLE.md](ODD_CYCLE.md) summarises the construction.
 
-## Lean certificate
+## What is machine-checked
 
-The principal theorem is
-[`OddCycle.ListReduction.reduction`](TreewidthHom/ListTheorem.lean).
-For a List Coloring instance on `F`, with target length `n` odd and at least 5,
-it proves:
+The reduction is checked in Lean 4
+([`OddCycle.ListReduction.reduction`](TreewidthHom/ListTheorem.lean)): a list
+colouring exists exactly when `G → C_n`, and the source has
 
-- decision equivalence with homomorphism `G → C_n`;
-- source treewidth at most `max(w+2, 4)` from an input width bound `w`;
-- source pathwidth at most `p+6` from an input pathwidth bound `p`;
-- target pathwidth at most 2;
-- a feedback vertex set of size `|S|+2` from any feedback vertex set `S` of `F`;
-- polynomial source size.
+- treewidth at most `max(w+2, 4)` for an input of treewidth `w`;
+- pathwidth at most `p+6` for an input of pathwidth `p`;
+- a feedback vertex set of size `|S|+2` for an input feedback vertex set `S`;
+- polynomial size, with target pathwidth at most 2.
 
-Lean also proves the bag-assignment gluing lemma used by the membership
-arguments. Published List Coloring hardness, machine time and space bounds,
-complexity-class conclusions, degeneracy and girth are **not Lean theorems**.
-The paper proves the remaining construction and resource claims in prose.
-Completeness uses supplied decompositions; membership without them is not claimed.
+The hardness of List Coloring, the time and space bounds of the reduction and
+of the membership algorithms, the complexity-class conclusions, degeneracy and
+girth are **not Lean theorems**; the paper proves or cites them.
+[FORMALIZATION.md](FORMALIZATION.md) states the boundary.
 
 ## Reproduce
 
-Lean **4.35.0** and mathlib **v4.35.0** are pinned, including dependency revisions.
-Requires elan, Python 3, and (for the paper) latexmk with a LaTeX installation.
+Requires [elan](https://github.com/leanprover/elan), Python 3 and, for the
+paper, latexmk. Lean 4.35.0 and mathlib v4.35.0 are pinned.
 
 ```sh
 lake exe cache get
-python3 scripts/check_formalization.py
-python3 scripts/run_list_cycle_checks.py
+python3 scripts/check_formalization.py   # build, then audit 37 declarations
+python3 scripts/run_list_cycle_checks.py # 837 finite instances
 make -C paper
 ```
 
-The formalization check builds the library, rejects proof admissions and audits
-34 declarations. Only `propext`, `Classical.choice` and `Quot.sound` occur.
-The executable checks cover 837 finite instances, including 445 negative cases;
-finite checks are not proofs. Reports are in [sources](sources/).
+The audit rejects proof admissions and any axiom other than `propext`,
+`Classical.choice` and `Quot.sound`. Finite checks are not proofs. Reports are
+in [sources](sources/).
 
-## Attribution and history
+## Prior work
 
-W[1]-hardness for the original two-treewidth parameter was already announced in
-[Amarilli's May 2025 comment](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
-Overlap with that work and novelty have not been established. This repository
-makes no priority claim. Development and manuscript drafting used AI assistance;
-independent review remains pending.
-
-The superseded clique and chained-clique reductions, arithmetic labels, old
-checks and manuscript remain in git history at `c88dabb`. The earlier LCS
-pipeline remains at `4dfb72e`. The current tree keeps the List Coloring
-construction and its supporting lemmas.
+W[1]-hardness of the original question was announced in
+[Amarilli's May 2025 comment](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877),
+without a public proof that we could find. Overlap with that work and novelty
+have not been established, and this repository makes no priority claim. See
+[PROBLEM.md](PROBLEM.md) for the question and its status. Development and
+drafting used AI assistance; independent review is pending.

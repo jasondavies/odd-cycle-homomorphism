@@ -15,7 +15,7 @@ import TreewidthHom
 #print axioms TreewidthHom.Decomposition.path_intervals
 #print axioms TreewidthHom.pathWidth_linked_of_bags
 #print axioms TreewidthHom.OddCycle.cyc_eq_cycleGraph
-#print axioms TreewidthHom.OddCycle.dial
+#print axioms TreewidthHom.OddCycle.rotation_or_reflection
 #print axioms TreewidthHom.OddCycle.walk_iff_ne
 #print axioms TreewidthHom.OddCycle.target_pathWidth
 #print axioms TreewidthHom.OddCycle.ListReduction.source_hom_iff
@@ -30,7 +30,10 @@ import TreewidthHom
 #print axioms TreewidthHom.OddCycle.ListReduction.removed_card
 #print axioms TreewidthHom.OddCycle.ListReduction.source_card_le
 #print axioms TreewidthHom.OddCycle.ListReduction.reduction
+#print axioms TreewidthHom.Decomposition.agree_on_walk
 #print axioms TreewidthHom.Decomposition.agree_on_bags
 #print axioms TreewidthHom.Decomposition.hom_iff_bagAssignments
+#print axioms TreewidthHom.Decomposition.compatible_path_iff
 #print axioms TreewidthHom.Decomposition.hom_iff_pathBagAssignments
 #print axioms TreewidthHom.Decomposition.two_bag_records_le
+#print axioms TreewidthHom.Decomposition.bag_domain_card

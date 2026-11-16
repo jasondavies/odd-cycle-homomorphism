@@ -59,36 +59,4 @@ noncomputable def intervalDecomposition {V : Type*} [DecidableEq V]
       rw [Walk.support_reverse,List.mem_reverse] at hc
       exact convex v b a c (hp c hc).1 (hp c hc).2 hb ha
 
-/-- The path graph has a width-one decomposition. -/
-noncomputable def pathDecomposition (n : ℕ) :
-    Decomposition (pathGraph (n+1)) (pathGraph (n+1)) := by
-  let bag : Fin (n+1) → Finset (Fin (n+1)) := fun b =>
-    Finset.univ.filter (fun v => v.val ≤ b.val ∧ b.val ≤ v.val+1)
-  apply intervalDecomposition (pathGraph (n+1)) n bag
-  · intro v; exact ⟨v,by simp [bag]⟩
-  · intro u v h
-    rcases pathGraph_adj.mp h with h | h
-    · exact ⟨v,by simp [bag]; omega,by simp [bag]⟩
-    · exact ⟨u,by simp [bag],by simp [bag]; omega⟩
-  · intro v a b c hac hcb ha hb
-    simp only [bag,Finset.mem_filter,Finset.mem_univ,true_and] at *
-    change a.val ≤ c.val at hac
-    change c.val ≤ b.val at hcb
-    omega
-
-theorem pathDecomposition_width (n : ℕ) : ∀ b, ((pathDecomposition n).bag b).card ≤ 2 := by
-  intro b
-  change (Finset.univ.filter (fun v : Fin (n+1) => v.val ≤ b.val ∧ b.val ≤ v.val+1)).card ≤ 2
-  let prev : Fin (n+1) := ⟨b.val-1,by have := b.isLt; omega⟩
-  apply le_trans (Finset.card_le_card (t := {b,prev}) ?_) Finset.card_le_two
-  intro v hv
-  simp only [Finset.mem_filter,Finset.mem_univ,true_and] at hv
-  simp only [Finset.mem_insert,Finset.mem_singleton]
-  by_cases h : v.val = b.val
-  · exact Or.inl (Fin.ext h)
-  · right
-    apply Fin.ext
-    dsimp [prev]
-    omega
-
 end TreewidthHom

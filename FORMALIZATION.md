@@ -11,7 +11,7 @@ successor lengths. No source or target lists remain in the output problem.
 
 | Statement | Declaration / module |
 | --- | --- |
-| Odd-cycle endomorphisms are rotations or reflections | `OddCycle.dial`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
+| Odd-cycle endomorphisms are rotations or reflections | `OddCycle.rotation_or_reflection`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Length-`n-2` links enforce distinct images | `OddCycle.walk_iff_ne`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Decision equivalence | `ListReduction.source_hom_iff_colorable`, [ListReduction](TreewidthHom/ListReduction.lean) |
 | Source treewidth `max(w+2,4)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
@@ -61,7 +61,7 @@ python3 scripts/check_formalization.py
 python3 scripts/run_list_cycle_checks.py
 ```
 
-The first command builds the library and audits the 34 declarations listed in
+The first command builds the library and audits the 37 declarations listed in
 [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [sources/lean-verification.json](sources/lean-verification.json).
