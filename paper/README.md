@@ -9,11 +9,10 @@ vertex number.
 make -C paper
 ```
 
-Requires `latexmk` and a LaTeX installation with the standard AMS and Latin Modern
-packages. `make -C paper clean` removes auxiliary files and retains the PDF.
-
-The manuscript follows the single-file LaTeX style of `../euclid-uniform-processes`.
-The author block is Jason Davies, with the email used in that companion manuscript.
+Requires `latexmk` and a LaTeX installation with the AMS, Latin Modern, and
+PGF/TikZ packages. The construction diagram is vector artwork defined directly
+in the manuscript; no external images or shell escape are needed.
+`make -C paper clean` removes auxiliary files and retains the PDF.
 
 The main reduction's equivalence, treewidth, pathwidth, feedback set transfer,
 target pathwidth and polynomial size are Lean-checked. Complexity classes,

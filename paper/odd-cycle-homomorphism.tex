@@ -3,8 +3,15 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,array}
+\usepackage{tikz}
 \usepackage[margin=1in]{geometry}
-\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+\hypersetup{
+  pdftitle={The parameterized complexity of homomorphism to an odd cycle},
+  pdfauthor={Jason Davies},
+  pdfsubject={Parameterized complexity and a Lean-checked List Coloring reduction},
+  pdfkeywords={graph homomorphism, odd cycle, treewidth, pathwidth, feedback vertex set, Lean}
+}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
@@ -44,11 +51,10 @@ The source can additionally be restricted to be 2-degenerate and to have
 arbitrarily large prescribed constant girth.
 \end{abstract}
 
-\noindent\textbf{AI transparency statement.}
-The mathematical development and Lean formalisation were carried out with
-AI assistance under human direction. This manuscript draft was prepared
-by an AI assistant. Appendix~\ref{app:lean} specifies the formal verification
-boundary; independent review and assessment of novelty remain pending.
+\noindent\textbf{AI assistance.}
+Mathematical development, formalisation, and drafting used AI assistance
+under human direction. Appendix~\ref{app:lean} describes its scope, the
+verification boundary, and the review status.
 
 \section{Introduction}
 A homomorphism from a finite simple undirected graph $G$ to another such
@@ -100,6 +106,14 @@ resource bounds. For every feedback vertex set $S$ of $F$, the construction
 specifies a feedback vertex set of $G$ of size $|S|+2$.
 \end{theorem}
 
+The construction removes lists by giving each forbidden color its own
+reference cycle. All reference cycles share an ordered edge, which fixes
+a common coordinate system in every homomorphism. A path of length $n-2$
+then excludes one coordinate from the image of a chosen vertex. Keeping
+the reference copies separate is what makes the feedback vertex bound
+possible: after deleting the shared edge's endpoints, each copy attaches
+to at most one original vertex.
+
 \paragraph{Prior work and attribution.}
 Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
 from workshop participants~\cite{amarilli2016}. The relationship between
@@ -115,6 +129,16 @@ odd cycles parameterized by cutwidth~\cite{pr2021}. Our statements concern
 uniform parameterized hardness and completeness as the target length varies.
 
 \section{Two properties of odd cycles}
+\paragraph{Conventions.}
+All graphs are finite, simple, and undirected. Path length counts edges.
+A tree decomposition consists of a nonempty tree $T$ and bags
+$(B_t)_{t\in V(T)}$ covering the graph's vertices and edges, such that
+the bags containing any given vertex induce a connected subtree of $T$.
+Its width is $\max\{0,\max_t |B_t|-1\}$. A path decomposition has a path as
+its index tree. Thus the empty graph has width zero, witnessed by a single
+empty bag. A feedback vertex set is a set whose
+deletion leaves a forest, and $\fvs$ denotes its minimum cardinality.
+
 We identify $V(C_n)$ with $\Z/n\Z$, with consecutive residues adjacent.
 Throughout this section $n\geq5$ is odd.
 
@@ -173,6 +197,69 @@ links, not edges of $G$. Copies $R_{v,d}$ with $d\in L(v)$ have no domain
 link; retaining these harmless copies makes the finite vertex type in
 Lean uniform.
 
+\begin{figure}[tbp]
+\centering
+\begin{tikzpicture}[x=1.35cm,y=1cm,
+  vertex/.style={circle,draw,fill=white,inner sep=1.6pt,line width=.6pt},
+  link/.style={densely dashed,line width=.85pt},
+  every node/.style={font=\small}]
+  \coordinate (A) at (0,0);
+  \coordinate (B) at (2,0);
+  \coordinate (r2) at (2.4,1.5);
+  \coordinate (r3) at (1,2.3);
+  \coordinate (r4) at (-.4,1.5);
+  \coordinate (s2) at (2.4,-1.5);
+  \coordinate (s3) at (1,-2.3);
+  \coordinate (s4) at (-.4,-1.5);
+  \coordinate (v) at (5,0);
+  \coordinate (u) at (8,0);
+  \draw[line width=1.2pt] (A)--(B);
+  \draw (B)--(r2)--(r3)--(r4)--(A);
+  \draw (B)--(s2)--(s3)--(s4)--(A);
+  \draw[link] (r2)--(3.3,1)--(4.2,.5)--(v);
+  \draw[link] (s3)--(3,-2.3)--(4.5,-1.4)--(v);
+  \draw[link] (v)--(6,0)--(7,0)--(u);
+  \foreach \p in {(3.3,1),(4.2,.5),(3,-2.3),(4.5,-1.4),(6,0),(7,0)}
+    \node[vertex] at \p {};
+  \node[vertex,label=left:{$A\mapsto0$}] at (A) {};
+  \node[vertex,label=below right:{$B\mapsto1$}] at (B) {};
+  \node[vertex,label=above right:{$2$}] at (r2) {};
+  \node[vertex,label=above:{$3$}] at (r3) {};
+  \node[vertex,label=above left:{$4$}] at (r4) {};
+  \node[vertex,label=right:{$2$}] at (s2) {};
+  \node[vertex,label=below:{$3$}] at (s3) {};
+  \node[vertex,label=below left:{$4$}] at (s4) {};
+  \node[vertex,label=above:{$h_v$}] at (v) {};
+  \node[vertex,label=above:{$h_u$}] at (u) {};
+  \node at (1,1.1) {$R_{v,2}$};
+  \node at (1,-1.1) {$R_{v,3}$};
+  \node[align=center] at (4.8,1.65) {domain links\\exclude $2$ and $3$};
+  \node[align=center] at (6.5,-.8) {edge link\\enforces $f(h_v)\ne f(h_u)$};
+\end{tikzpicture}
+\caption{Part of the construction for target $C_5$. Solid edges form two
+reference cycles sharing $AB$. After normalizing $A,B$ to $0,1$, their
+private vertices have the indicated images. Each dashed link has three
+edges and two private internal vertices; it forces its endpoint images
+to differ. The remaining reference copies and domain links are omitted.}
+\label{fig:construction}
+\end{figure}
+
+\paragraph{Example.}
+Let $F$ consist of an edge $uv$, with $L(v)=\{0,1\}$ and
+$L(u)=\{1,2\}$. The palette has size three, so we take $n=5$.
+At $h_v$ the construction excludes $2,3,4$ using three separate reference
+copies; Figure~\ref{fig:construction} shows the first two. For example,
+the link from coordinate $2$ admits endpoint image $0$ via the walk
+$2,3,4,0$, and endpoint image $1$ via $2,1,0,1$, but it cannot have
+endpoint image $2$: there is no closed walk of length three in $C_5$.
+Together the three domain links leave exactly $\{0,1\}$ available at
+$h_v$. Similarly, the links at $h_u$ leave exactly $\{1,2\}$.
+The coloring $c(v)=0$, $c(u)=1$ extends across the original-edge link
+by the walk $0,1,0,1$. Choosing image $1$ at both hubs would satisfy
+their lists but fail this edge link. Repeated images along these walks
+are allowed because homomorphisms need not be injective.
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
 \begin{lemma}\label{lem:equivalence}
 The instance $(F,L)$ is list-colourable if and only if $G\to C_n$.
 \end{lemma}
@@ -189,8 +276,9 @@ reference cycle coordinatewise. Each link has distinct endpoint images,
 so Lemma~\ref{lem:link} extends the map over it. Private interiors make
 these extensions independent.
 \end{proof}
+\end{minipage}\par
 
-\subsection{Treewidth}
+\subsection{Treewidth}\label{sec:treewidth}
 Take a tree decomposition of $F$ of width $w$. Replace each original
 vertex by its hub and put $A,B$ into every bag; these bags have size at
 most $w+3$. They serve as the original tree of bags.
@@ -209,7 +297,7 @@ bags, and every other new vertex belongs to a single attached
 decomposition. Hence occurrence sets remain connected. The resulting
 width is at most $\max\{w+2,4\}$.
 
-\subsection{Pathwidth}
+\subsection{Pathwidth}\label{sec:pathwidth}
 For a convenient modular bound, first consider an auxiliary graph $J$.
 It contains the reference cycles, the hubs with the original edges of
 $F$, and the direct edge from coordinate $d$ of $R_{v,d}$ to $h_v$ for
@@ -254,18 +342,64 @@ $f=\sum_v(n-|L(v)|)$. The exact source size is
  \leq 2+m+mn^2+(mn+m^2)n.
 \end{equation}
 Since $n=O(q+1)$, the output size is polynomial in the explicit input size.
-Vertices and edges can be emitted using counters for original vertices,
-colors, reference positions, and link positions. Testing whether a color
-is forbidden requires rescanning its list. Palette labels can likewise
-be replaced by their ranks in an input ordering using repeated scans.
-These procedures use logarithmic space.
+Here the palette may be taken to contain only colors occurring in the
+lists: order the distinct labels by first occurrence in the input and
+replace each by its rank. Repeated scans compute these ranks in logarithmic
+space, so $q$ is bounded by the input length even if the original labels
+are large binary integers.
 
-For a supplied decomposition, choose the first bag containing the required
-vertex or pair. Its index is found by scanning the input. Output bags can
-be streamed one vertex at a time; the whole bag need not be stored.
-The reference and link sweeps use a fixed number of additional counters.
-The number of output bags is polynomial. This proves the resource claims
-in Theorem~\ref{thm:transfer}.
+\paragraph{Emitting the graph.}
+Let $N$ denote the length of the explicitly encoded input, including any
+supplied decomposition. Give output vertices identifiers consisting of a
+type tag and a constant number of indices: an original vertex, a residue,
+a reference position, or an original edge and a link position. All indices
+are polynomially bounded in $N$, so an identifier occupies $O(\log N)$
+bits. Nested counters enumerate the vertices and edges. List membership
+and original adjacency are decided by rescanning the input; original
+edges are emitted once, in increasing endpoint order. If consecutive
+integer identifiers are required, the rank of a tuple can be recomputed
+by enumerating its predecessors. The target $C_n$ is emitted explicitly.
+Neither an adjacency table nor a list of output vertices is stored.
+
+\paragraph{Emitting a tree decomposition.}
+Fix an order on the input bags. A reference gadget belongs to the first
+bag containing $v$; an original-edge link belongs to the first bag
+containing both endpoints. Such an owning bag exists by vertex or edge
+coverage and can be found by scans.
+
+The forest decomposition used in Section~\ref{sec:treewidth} has a direct
+description. After removing its boundary $D$, root the reference path at
+coordinate $2$, and orient any attached link away from that path. If a
+link instead meets $A$ or $B$, its remaining internal path is a separate
+component, rooted at the end nearest that anchor. An original-edge link
+also leaves a single path. Thus roots and parents follow from positions
+along the explicitly indexed paths; no general forest search is needed.
+For each component root $r$, create bag $D\cup\{r\}$ and attach it to
+the owning input bag. For every other vertex $x$, create
+$D\cup\{x,\operatorname{parent}(x)\}$, with its index-tree parent the
+bag belonging to $\operatorname{parent}(x)$. These formulas describe
+both the bags and every edge of the output decomposition tree.
+
+\paragraph{Emitting a path decomposition.}
+Implement the two stages of Section~\ref{sec:pathwidth} in order.
+For each input bag, emit its enlargement by $A,B$, followed by the
+reference windows for vertices whose first occurrence is that bag.
+Order these windows by vertex, residue, and reference position. This
+is an explicit stream of bags for $J$. For each required link, find
+the first bag of this stream containing its endpoints by regenerating
+the stream. At that bag insert the link's consecutive internal-vertex
+windows, retaining the whole bag of $J$. Order links with the same
+owning bag by their identifiers. The intermediate stream need not be
+stored: its bags and their contents can be recomputed by counters and
+input scans.
+
+If the input decomposition has $b$ bags, either construction uses
+$O(b+mn^2+(e+f)n)$ output bags. Every bag is emitted one vertex at a
+time, and each owning-bag query stores only indices and membership flags.
+The enumerations have a fixed number of nested loops over polynomially
+bounded ranges. Consequently the transducer uses $O(\log N)$ workspace,
+polynomial time, and polynomial output length, independently of the
+input width. This completes the proof of Theorem~\ref{thm:transfer}.
 
 \subsection{Sparse sources and large girth}
 \begin{proposition}\label{prop:sparse}
@@ -305,36 +439,80 @@ available for the supplied-decomposition problems. Proposition~\ref{prop:sparse}
 gives the additional source restrictions. This establishes all hardness
 parts of Theorem~\ref{thm:main}.
 
-\paragraph{Membership with a supplied decomposition.}
-For a path decomposition of width $w$, nondeterministically choose images
-for the vertices of the current bag, check edges whose endpoints lie in
-that bag, and check agreement with the preceding bag on their intersection.
-Then discard the preceding assignment. At most $2(w+1)$ vertex-image
-records are needed, using $O((w+1)\log N)$ space. Since $n$ is unary,
-an image uses $O(\log N)$ bits. Repeated input scans give polynomial total
-time, with an exponent independent of $w$.
+\subsection{Membership with supplied decompositions}
+We first isolate the common correctness argument. A bag assignment is a
+map $a_t:B_t\to V(H)$ that preserves every graph edge with both endpoints
+in $B_t$.
 
-Agreement on adjacent bags implies agreement on every occurrence of a
-vertex, because its occurrence bags form an interval. Coverage then yields
-a global homomorphism. Conversely, any homomorphism supplies accepting
-bag assignments. This proves XNLP membership.
+\begin{lemma}[Gluing bag assignments]\label{lem:bags}
+For a tree decomposition $(T,(B_t))$ of $G$, a homomorphism $G\to H$
+exists if and only if there are bag assignments that agree on
+$B_s\cap B_t$ for every edge $st$ of $T$.
+\end{lemma}
+\begin{proof}
+A homomorphism restricts to such assignments. Conversely, if a vertex
+$v$ occurs in two bags, every bag on the unique path between them also
+contains $v$. Agreement across adjacent bags therefore gives a single
+image for $v$, independent of the chosen occurrence. Vertex coverage
+defines this map on all of $G$, and edge coverage makes it a homomorphism.
+\end{proof}
 
-For a rooted tree decomposition, perform the same checks in depth-first
-order. Save the parent bag assignment and traversal position on the
-auxiliary stack while processing each child subtree. The working space
-is still $O((w+1)\log N)$; every bag is processed a polynomial number of
-times and the total time is polynomial. Connected occurrence subtrees
-provide the same gluing argument, proving XALP membership.
+\paragraph{Paths: two assignments.}
+Process the supplied bags in order. Guess an image in
+$\{0,\ldots,n-1\}$ for each vertex of the next bag. Check its internal
+edges against adjacency in $C_n$, and compare images for every vertex
+shared with the preceding bag. Reject on any failure; otherwise discard
+the preceding assignment and continue. Lemma~\ref{lem:bags} proves
+correctness, including when the source is disconnected.
 
-Invalid decomposition encodings can be rejected within these bounds.
-For a tree given by parent pointers, repeatedly following parents checks
-that every node reaches the root. For each graph vertex, count its
-occurrence bags and the tree edges with both ends in that occurrence set.
-Since the index graph is a tree, the occurrence set is nonempty and
-connected exactly when the latter count is one less than the former.
-Bag sizes and graph-edge coverage are checked by scans. Path decompositions
-admit the analogous interval checks. No decomposition-finding algorithm
-is assumed here.
+There are at most $2(w+1)$ vertex-image records on the work tape at once.
+Both vertex identifiers and images occupy $O(\log N)$ bits, since the
+graph is explicit and $n$ is unary. Scans of the input and of the two
+records suffice for all tests. There are at most $N$ bags and each has
+at most $N$ entries, so even repeated pairwise comparisons take polynomial
+time with an exponent independent of $w$. The working space is
+$O((w+1)\log N)$, proving XNLP membership.
+
+\paragraph{Trees: saved parent assignments.}
+Root the supplied decomposition tree and order children by their input
+indices. Guess and check the root assignment. Keep the current bag index,
+its assignment, and the next-child
+position on the work tape. Before visiting a child, guess and check the
+child assignment and its agreement with the current assignment. Then
+push a frame containing the parent index, the \emph{unchanged} parent
+assignment, and the position of the next child to be visited. Continue
+with the child. On completing its subtree, pop the frame and restore
+the parent state before considering another child. At a leaf, return
+immediately; completion at the root accepts.
+
+This procedure uses only pushes and pops at the top of the auxiliary
+stack. In particular, the parent assignment is restored rather than
+guessed again, so different child subtrees must respect the same choices
+on the parent bag. Every bag receives one assignment and every tree edge
+is checked once, giving correctness by Lemma~\ref{lem:bags}. At most two
+bag assignments and a constant number of counters occupy the work tape;
+each stack frame has $O((w+1)\log N)$ bits. The total stack size need
+not satisfy this working-space bound. Each frame is pushed and popped
+once, and children can be located by input scans, so the total running
+time is polynomial. This proves XALP membership.
+
+\paragraph{Checking the certificate.}
+The algorithms do not assume valid decompositions as a promise.
+We encode a tree by a designated root and one parent
+pointer for every other bag. Reject out-of-range pointers and require
+every bag to reach the root within $b$ steps, where $b$ is the number of
+bags. This checks that the index graph is a tree using counters and
+rescans.
+
+For each graph vertex $v$, count its occurrence bags, say $a_v$, and
+the tree edges with both endpoints among those bags, say $e_v$.
+The induced index subgraph is a forest, so it is nonempty and connected
+exactly when $a_v>0$ and $e_v=a_v-1$. Thus these counts check vertex
+coverage and connected occurrences. Bag entries, duplicate entries,
+bag sizes, and coverage of each graph edge are checked by scans.
+For a path, check that every occurrence set is a nonempty interval.
+These preliminary checks take logarithmic workspace and polynomial time.
+No decomposition-finding algorithm is assumed.
 
 \paragraph{Scope and optimal target width.}
 We do not claim W[3]-membership for feedback vertex number, or XNLP-membership
@@ -389,7 +567,8 @@ forest. It then supplies decreasing parent pointers for every remaining
 reference or link vertex. The decomposition infrastructure checks vertex
 coverage, edge coverage, connected occurrence sets, and bag cardinalities.
 The generic \lean{BagHomomorphism} module proves the local-to-global
-consistency lemma for bag assignments, including its path specialization.
+consistency argument of Lemma~\ref{lem:bags}, including its path
+specialization.
 
 The formal statements do not encode Turing machines or complexity classes.
 The published hardness of List Coloring, the reduction's time and space
