@@ -94,6 +94,12 @@ whether the algorithm retains successive bag assignments or additionally
 uses a stack of saved parent assignments. Section~\ref{sec:complexity}
 gives the machine definitions and membership arguments.
 
+The problem has an equivalent formulation as circular colouring. A graph has
+a homomorphism to $C_{2k+1}$ exactly when its circular chromatic number is
+at most $2+1/k$~\cite{zhu2001}. Theorem~\ref{thm:main} therefore classifies
+the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in unary,
+under the same three parameters.
+
 The main technical statement is an additive structural transfer.
 
 \begin{theorem}\label{thm:transfer}
@@ -126,10 +132,13 @@ makes no priority claim for the original hardness question.
 Our starting results are the XNLP-completeness of List Colouring for
 pathwidth~\cite[Theorem~15]{bgns2024}, its XALP-completeness for
 treewidth~\cite[Theorem~8]{bggpp2022}, and its W[3]-hardness for feedback
-vertex number~\cite[Table~1]{bgp2023}.
+vertex number, which is listed in~\cite[Table~1]{bgp2023} and proved in the
+full version~\cite[Corollary~34]{bgp2023full}.
 Piecyk and Rz\k{a}\.{z}ewski study related fine-grained questions for list
-homomorphism and give SETH-based lower bounds for ordinary homomorphism to
-odd cycles parameterised by cutwidth~\cite{pr2021}. Our statements concern
+homomorphism. For ordinary homomorphism they show, assuming the SETH, that no
+constant $c$ gives an algorithm with running time
+$c^{\operatorname{ctw}(G)}|V(G)|^{O(1)}$ for every fixed odd cycle target,
+where $\operatorname{ctw}$ denotes cutwidth~\cite{pr2021}. Our statements concern
 uniform parameterised hardness and completeness as the target length varies.
 
 \section{Two properties of odd cycles}
@@ -527,18 +536,33 @@ These preliminary checks take logarithmic workspace and polynomial time.
 No decomposition-finding algorithm is assumed.
 
 \paragraph{Feedback vertex number.}
-For membership in W[P], express $G\to C_n$ as Binary CSP: give each vertex
-of $G$ the domain $\Z/n\Z$, and for each edge allow exactly the ordered
-pairs adjacent in $C_n$. The constraint graph is exactly $G$, so its
-feedback vertex number is preserved. The explicit constraint relations
-have polynomial size because $n$ is unary. The W[P] upper bound for
-Binary CSP parameterised by feedback vertex number~\cite[Theorem~2]{bgp2023}
-therefore gives the claimed membership. Together with the reduction,
-this proves the third part of Theorem~\ref{thm:main}.
+A parameterised problem is in W[P] if a nondeterministic Turing machine
+decides it in time $f(k)N^{O(1)}$ with at most $f(k)\log N$ nondeterministic
+steps~\cite[Chapter~3]{flumgrohe2006}. Let $k=\fvs(G)$. Compute a minimum
+feedback vertex set $S$ deterministically in time
+$f(k)N^{O(1)}$~\cite{cygan2015}. Guess an image in $\Z/n\Z$ for every vertex
+of $S$, using $k\lceil\log_2 n\rceil$ nondeterministic bits, and reject
+unless the guess preserves the edges inside $S$. The graph $G-S$ is a
+forest; root each of its trees. For a vertex $x$ of $G-S$ and a residue
+$a$, call $(x,a)$ \emph{feasible} if $a$ is adjacent in $C_n$ to the guessed
+image of every neighbour of $x$ in $S$, and every child $y$ of $x$ has a
+feasible pair $(y,b)$ with $b$ adjacent to $a$. Feasibility is computed from
+the leaves upwards in polynomial time, and the guess extends to a
+homomorphism exactly when every root has a feasible pair. This proves
+membership in W[P].
+
+The same bound also follows from the W[P] upper bound for Binary CSP
+parameterised by feedback vertex number~\cite[Theorem~2]{bgp2023}: give each
+vertex of $G$ the domain $\Z/n\Z$ and, for each edge, allow exactly the
+ordered pairs adjacent in $C_n$. The constraint graph is $G$, and the
+explicit relations have polynomial size because $n$ is unary. Together with
+the reduction, this proves the third part of Theorem~\ref{thm:main}.
 
 \paragraph{Scope and targets of width one.}
 We do not claim W[3]-membership for feedback vertex number, or XNLP-membership
-for treewidth. The two supplied-decomposition completeness statements have
+for treewidth. Binary CSP is W[SAT]-hard for feedback vertex
+number~\cite[Theorem~2]{bgp2023}; whether homomorphism to an odd cycle is
+hard for a class above W[3] under this parameter is open. The two supplied-decomposition completeness statements have
 different parameters and different machine models.
 
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
@@ -619,9 +643,7 @@ search, validate returned homomorphisms, tree and path decompositions,
 feedback vertex sets, the size bound, and 2-degeneracy. Targeted cases
 include positive cyclic inputs with feedback vertex number one and two,
 a branching decomposition, and an independent breadth-first-search girth
-check. Validation remains active under Python's optimised execution modes;
-the Lean audit report records the project revision and working-tree status.
-These executable checks corroborate
+check. These executable checks corroborate
 but do not replace the universal proofs. The direct executable path sweep
 satisfies a slightly sharper $p+5$ bound; the formal theorem and the main
 statements use $p+6$.
@@ -672,12 +694,29 @@ In \emph{50th International Colloquium on Automata, Languages, and Programming
 (ICALP 2023)}, LIPIcs, vol.~261, pp.~27:1--27:20. Schloss Dagstuhl, 2023.
 \href{https://doi.org/10.4230/LIPIcs.ICALP.2023.27}{doi:10.4230/LIPIcs.ICALP.2023.27}.
 
+\bibitem{bgp2023full}
+Hans L. Bodlaender, Carla Groenland and Micha{\l} Pilipczuk.
+Parameterized complexity of Binary CSP: vertex cover, treedepth, and
+related parameters.
+Full version, arXiv:2208.12543v5, 2023.
+\url{https://arxiv.org/abs/2208.12543}.
+
+\bibitem{cygan2015}
+Marek Cygan, Fedor V. Fomin, {\L}ukasz Kowalik, Daniel Lokshtanov,
+D\'aniel Marx, Marcin Pilipczuk, Micha{\l} Pilipczuk and Saket Saurabh.
+\emph{Parameterized Algorithms}. Springer, 2015.
+
 \bibitem{deMouraUllrich2021}
 Leonardo de Moura and Sebastian Ullrich.
 The Lean~4 theorem prover and programming language.
 In \emph{Automated Deduction -- CADE~28}, LNCS, vol.~12699,
 pp.~625--635. Springer, 2021.
 \href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
+
+\bibitem{flumgrohe2006}
+J\"org Flum and Martin Grohe.
+\emph{Parameterized Complexity Theory}.
+Texts in Theoretical Computer Science. Springer, 2006.
 
 \bibitem{mathlib2020}
 The mathlib Community.
@@ -693,5 +732,10 @@ In \emph{38th International Symposium on Theoretical Aspects of Computer
 Science (STACS 2021)}, LIPIcs, vol.~187, pp.~56:1--56:17.
 Schloss Dagstuhl, 2021.
 \href{https://doi.org/10.4230/LIPIcs.STACS.2021.56}{doi:10.4230/LIPIcs.STACS.2021.56}.
+
+\bibitem{zhu2001}
+Xuding Zhu.
+Circular chromatic number: a survey.
+\emph{Discrete Mathematics} 229(1--3):371--410, 2001.
 \end{thebibliography}
 \end{document}
