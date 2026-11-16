@@ -1,0 +1,687 @@
+\pdfoutput=1
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,array}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\DeclareMathOperator{\tw}{tw}
+\DeclareMathOperator{\pw}{pw}
+\DeclareMathOperator{\fvs}{fvs}
+\newcommand{\XNLP}{\mathsf{XNLP}}
+\newcommand{\W}[1]{\mathsf{W}[#1]}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Hom}{\operatorname{Hom}}
+\newcommand{\lean}[1]{\nolinkurl{#1}}
+\makeatletter\g@addto@macro\UrlBreaks{\do\_}\makeatother
+\emergencystretch=2em
+\title{Homomorphism to an odd cycle is XNLP-complete\newline
+parameterized by pathwidth}
+% Author block follows the companion manuscript in euclid-uniform-processes.
+\author{Jason Davies\thanks{\href{mailto:jason@jasondavies.com}{\nolinkurl{jason@jasondavies.com}}}}
+\date{Draft --- November 16, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove that deciding whether a finite simple undirected graph admits a
+homomorphism to an odd cycle given in the input is XNLP-complete when a path
+decomposition of the source is supplied and its width is the parameter.
+The reduction from Chained Multicoloured Clique with $k$ colours produces
+source pathwidth at most $2k+4$ and treewidth at most $2k+3$, independently of
+the number of layers. Consequently, graph homomorphism parameterized by
+the maximum of the two input treewidths is XNLP-hard and W[$t$]-hard for
+every fixed positive $t$, even when the target has treewidth two.
+A simpler reduction proves W[1]-hardness parameterized by the feedback
+vertex number of the source. Both constructions use only copies of an odd
+cycle and paths: cycle automorphisms encode choices, and paths of length
+$n-2$ enforce distinct images in $C_n$.
+Decision equivalence, the treewidth bounds, and polynomial size bounds for
+the two reductions are checked in Lean~4. The pathwidth bounds and the
+complexity-theoretic conclusions are proved in the text.
+\end{abstract}
+
+\noindent\textbf{AI transparency statement.}
+The mathematical development and Lean formalisation were carried out with
+AI assistance under human direction. This manuscript draft was prepared
+by an AI assistant. The scope of formal verification is stated in
+Appendix~\ref{app:lean}; further disclosure appears at the end of the paper.
+
+\section{Introduction}\label{sec:intro}
+
+A graph homomorphism from $G$ to $H$ is a map on vertices that preserves
+adjacency. When a tree decomposition of $G$ of width $w$ is available,
+the usual dynamic programme decides whether such a map exists in time
+$|V(H)|^{O(w+1)}$ times a polynomial in the input size. This is polynomial
+for every fixed $w$, but the exponent depends on $w$.
+Amarilli asked whether bounding the treewidth of the target as well makes
+the problem fixed-parameter tractable: is homomorphism parameterized by
+$\max\{\tw(G),\tw(H)\}$ FPT or W[1]-hard~\cite{amarilli2016}?
+
+We give an explicit hardness construction whose target is a single odd
+cycle. Its length varies with the input; it is not a fixed target and is
+not included in the parameter. Thus the target has treewidth and pathwidth
+exactly two, while the source width is bounded by a function of the
+parameter of the starting problem.
+
+\begin{theorem}\label{thm:main}
+Given a finite simple undirected graph $G$, an odd integer $n\geq5$ in unary,
+and a path decomposition of $G$ of width at most $w$, deciding whether
+$G\to C_n$ is XNLP-complete parameterized by $w$.
+\end{theorem}
+
+We use parameterized logspace reductions. As in the standard treatment of
+pathwidth-parameterized XNLP problems~\cite[Section~2.4]{bgns2024}, the
+decomposition is supplied. Membership without this extra input is not
+established here.
+
+\begin{theorem}\label{thm:plain}
+Homomorphism to an input odd cycle is W[1]-hard parameterized by the
+feedback vertex number of the source. A reduction from Multicoloured
+Clique with $k$ classes produces a graph $G$ satisfying
+\[
+ \fvs(G)\leq k+1,\qquad \tw(G)\leq k+2,\qquad \pw(G)\leq k+3.
+\]
+\end{theorem}
+
+\begin{corollary}\label{cor:both}
+Graph homomorphism parameterized by $\max\{\tw(G),\tw(H)\}$ is XNLP-hard
+and W[$t$]-hard for every fixed positive integer $t$, even when $H$ is an
+odd cycle. The same hardness holds with pathwidth in place of treewidth.
+\end{corollary}
+
+The target bound two is best possible for hardness of this form unless
+FPT${}={}$W[1]. For a nonempty forest $H$ containing an edge, $G\to H$ holds
+exactly when $G$ is bipartite: map its two parts to the endpoints of any
+edge of $H$. If $H$ is nonempty and edgeless, the condition is that $G$ be
+edgeless; if $H$ is empty, $G$ must be empty. These cases are polynomial-time
+decidable.
+
+\paragraph{Construction.}
+Every endomorphism of an odd cycle $C_n$ is a rotation or reflection.
+We use a source copy of $C_n$ as a \emph{dial}: the image of its designated
+vertex records a choice. A path of length $n-2$ between two source vertices
+can be mapped into $C_n$ exactly when their images are different.
+Adding such paths forbids individual values and differences of values.
+An elementary labelling makes a permitted difference determine exactly
+one pair of choices, even in the presence of reflections.
+
+For a chain of instances, a single global reference cycle would obstruct
+the intended width argument. We instead give each choice its own reference
+cycle, with all reference cycles sharing the same edge. Their maps to the
+target necessarily agree in coordinates. This lets us process the layers
+in order, keeping only two layers of choice hubs and the shared edge.
+
+\paragraph{Prior work and attribution.}
+The W[1]-hardness answer to Amarilli's question was already announced in
+his comment of May~30, 2025~\cite{amarilli2016}. We make no priority claim
+for that answer. The relationship between the construction here and those
+unpublished reductions has not been established.
+Our XNLP-hardness starting point is the Chained Multicoloured Clique
+theorem of Bodlaender, Groenland, Nederlof and
+Swennenhuis~\cite[Theorem~11]{bgns2024}.
+Related fine-grained work by Piecyk and Rz\k{a}\.{z}ewski studies list
+homomorphisms parameterized by feedback vertex number and cutwidth, and
+also obtains lower bounds for ordinary homomorphisms to odd cycles
+parameterized by cutwidth~\cite{pr2021}. Those bounds concern the base of
+an exponential running time; the present statements concern uniform
+parameterized hardness with the cycle included in the input.
+
+\section{Preliminaries}\label{sec:prelim}
+
+All graphs are finite, simple, undirected and explicitly represented.
+We write $G\to H$ when there is a homomorphism from $G$ to $H$.
+For odd $n\geq3$, the graph $C_n$ has vertex set $\Z/n\Z$ and edges
+$\{x,x+1\}$. Arithmetic in coordinates is modulo $n$ unless stated
+otherwise. A walk may repeat vertices and edges.
+
+A tree decomposition consists of bags indexed by a tree, covering every
+vertex and every edge, such that the bags containing a given vertex induce
+a connected subtree. Its width is the largest bag size minus one.
+A path decomposition uses a path as its indexing tree; equivalently, the
+bags containing any fixed vertex form an interval in the bag sequence.
+The minima of these widths are $\tw(G)$ and $\pw(G)$. The feedback vertex
+number $\fvs(G)$ is the minimum size of a vertex set whose deletion leaves
+a forest.
+
+The class $\XNLP$ consists of parameterized problems decidable in
+nondeterministic time $f(k)L^{O(1)}$ and space $f(k)\log L$, simultaneously,
+where $L$ is the input length and $f$ is computable. Parameterized logspace
+reductions use $g(k)+O(\log L)$ work space and bound the output parameter by
+a computable function of $k$. Our reductions in fact use ordinary
+logarithmic space and polynomial time. XNLP-hardness implies W[$t$]-hardness
+for each fixed positive $t$~\cite[Lemma~2]{bgns2024}.
+
+In \emph{Multicoloured Clique}, the vertices of an input graph are
+partitioned into $k$ classes and one asks for a clique choosing one vertex
+per class. Its W[1]-hardness follows directly from that of Clique: replace
+each vertex by one copy in each of $k$ classes, and join copies in distinct
+classes exactly when the original vertices are adjacent. An empty class
+is a no-instance. The case $k=1$ is directly decidable. In the remaining
+cases, padding classes by isolated vertices gives a common class size
+$N\geq1$ without changing the answer.
+
+In \emph{Chained Multicoloured Clique}, there are $r$ layers, each
+partitioned into $k$ colour classes. A solution chooses one vertex per
+class so that the chosen vertices of every consecutive pair of layers
+form a clique. This problem is XNLP-complete parameterized by
+$k$~\cite[Theorem~11]{bgns2024}. We use $r\geq2$, $k\geq1$; the omitted
+degenerate cases are directly decidable. Empty classes give no-instances,
+and isolated vertices again equalise all class sizes to $N\geq1$.
+
+\section{Two odd-cycle gadgets}\label{sec:gadgets}
+
+\begin{lemma}[Dials]\label{lem:dial}
+Every homomorphism $C_n\to C_n$, for odd $n\geq3$, has the form
+\[
+ x\longmapsto r+\varepsilon x,
+ \qquad r\in\Z/n\Z,\quad \varepsilon\in\{1,-1\}.
+\]
+\end{lemma}
+\begin{proof}
+The image of the source cycle is a closed walk of length $n$ in the target.
+Each step has displacement $+1$ or $-1$. If $s$ steps are negative, the
+total displacement is $n-2s$, a multiple of $n$ in $[-n,n]$. It is odd,
+so it is $n$ or $-n$. Thus every step has the same sign.
+\end{proof}
+
+\begin{lemma}[Links]\label{lem:link}
+For odd $n\geq3$, two vertices $x,y$ of $C_n$ are joined by a walk of
+length $n-2$ if and only if $x\ne y$.
+\end{lemma}
+\begin{proof}
+The possible displacements are
+\[
+ -(n-2),\;-(n-4),\;\ldots,\;-1,\;1,\;\ldots,\;n-4,\;n-2.
+\]
+Modulo $n$, the positive terms give all odd nonzero residues and the
+negative terms give all even nonzero residues. These are exactly the
+$n-1$ nonzero residues. Each displacement is realised by taking the
+appropriate number of positive and negative steps.
+\end{proof}
+
+We call a path of length $n-2$ with fresh internal vertices a \emph{link}.
+By Lemma~\ref{lem:link}, attaching a link between two vertices imposes
+exactly the constraint that their images be distinct. All links in what
+follows have pairwise disjoint interiors, also disjoint from the dials.
+
+\section{Labels that distinguish ordered pairs}\label{sec:labels}
+
+Let $K,N\geq1$, and index $K$ classes by $s\in\{0,\ldots,K-1\}$.
+For the $a$th vertex of class $s$, with $1\leq a\leq N$, set
+\begin{equation}\label{eq:labels}
+ Q=2NK+1,\qquad p_s=Q+s,\qquad \lambda_s(a)=a p_s,
+ \qquad M=N(Q+K)+2,\qquad n=2M+1.
+\end{equation}
+In particular $n\geq5$ is odd, $1\leq\lambda_s(a)\leq M-2$, and
+$n=O(N^2K)$.
+
+\begin{lemma}[Signed differences]\label{lem:labels}
+Fix $s<u$ and $a,a',b,b'\in\{1,\ldots,N\}$. If
+\[
+ \delta\bigl(\lambda_u(b')-\lambda_s(a')\bigr)
+ \equiv \lambda_u(b)-\lambda_s(a)\pmod n,
+ \qquad \delta\in\{1,-1\},
+\]
+then $\delta=1$, $a'=a$ and $b'=b$.
+\end{lemma}
+\begin{proof}
+Each side has absolute value less than $M$, so the congruence is an
+equality of integers. We first observe that
+\begin{equation}\label{eq:arithmetic}
+ x p_u=y p_s\quad\text{and}\quad |ys-xu|<Q
+ \quad\Longrightarrow\quad x=y=0.
+\end{equation}
+Indeed, $(x-y)Q=ys-xu$, whence $x=y$; then $x(u-s)=0$.
+
+For $\delta=1$, take $x=b'-b$ and $y=a'-a$. Both have absolute value
+at most $N-1$, and
+$|ys-xu|\leq2(N-1)(K-1)<Q$.
+Equation~\eqref{eq:arithmetic} gives $a'=a$ and $b'=b$.
+For $\delta=-1$, take $x=b'+b$ and $y=a'+a$. Now $2\leq x,y\leq2N$,
+so both $ys$ and $xu$ lie in $[0,2N(K-1)]$; again $|ys-xu|<Q$.
+Equation~\eqref{eq:arithmetic} would give $x=0$, a contradiction.
+\end{proof}
+
+For an input graph on these classes, write
+\begin{align}
+ \Lambda_s&=\{\lambda_s(a):1\leq a\leq N\},\label{eq:lambda}\\
+ D_{su}&=\{\lambda_u(b)-\lambda_s(a)\bmod n:
+                \text{the vertices $(s,a)$ and $(u,b)$ are adjacent}\}.
+ \label{eq:differences}
+\end{align}
+Lemma~\ref{lem:labels} shows that membership in $D_{su}$ identifies an
+actual input edge, and cannot be satisfied by reversing a different pair
+of choices.
+
+\section{The plain reduction}\label{sec:plain}
+
+Apply~\eqref{eq:labels} with $K=k$ to a Multicoloured Clique instance.
+Take a reference dial $R=C_n$ and disjoint choice dials
+$F_0,\ldots,F_{k-1}$, also copies of $C_n$. Let $r_d$ denote coordinate
+$d$ of $R$, and $f^s_d$ coordinate $d$ of $F_s$. Its hub is $h_s=f^s_0$.
+Construct $G$ by adding the following links:
+\begin{enumerate}
+\item for each $s$ and each $d\notin\Lambda_s$, a link from $r_d$ to $h_s$;
+\item for each $s<u$ and each $d\notin D_{su}$, a link from $f^s_d$ to $h_u$.
+\end{enumerate}
+The target is $C_n$.
+
+\begin{proposition}\label{prop:plain-correct}
+The constructed graph $G$ admits a homomorphism to $C_n$ if and only if
+the input has a multicoloured clique.
+\end{proposition}
+\begin{proof}
+Given a clique selecting vertex $a_s$ in class $s$, map $r_d$ to $d$ and
+$f^s_d$ to $\lambda_s(a_s)+d$. These maps preserve the dial edges.
+A class link has distinct endpoint images since $d\notin\Lambda_s$.
+An edge link also has distinct endpoint images: equality would imply
+$d=\lambda_u(a_u)-\lambda_s(a_s)\in D_{su}$. Every link therefore extends
+by Lemma~\ref{lem:link}.
+
+Conversely, suppose $\phi:G\to C_n$. By Lemma~\ref{lem:dial} and a target
+automorphism, we may assume $\phi(r_d)=d$ for every $d$. The class links
+exclude every residue outside $\Lambda_s$, so
+$\phi(h_s)=\lambda_s(a_s)$ for some $a_s$. On $F_s$ the map has the form
+\[
+ \phi(f^s_d)=\lambda_s(a_s)+\varepsilon_s d,
+ \qquad \varepsilon_s\in\{1,-1\}.
+\]
+For $s<u$, all edge links can map only if
+\begin{equation}\label{eq:allowed-difference}
+ \varepsilon_s\bigl(\lambda_u(a_u)-\lambda_s(a_s)\bigr)\in D_{su}.
+\end{equation}
+To see this, the residue on the left is the unique $d$ for which
+$\phi(f^s_d)=\phi(h_u)$; it cannot be a forbidden residue.
+By~\eqref{eq:differences} and Lemma~\ref{lem:labels}, the chosen vertices
+in classes $s$ and $u$ are adjacent. This holds for every pair of classes.
+\end{proof}
+
+\begin{proposition}\label{prop:plain-width}
+The graph $G$ has feedback vertex number at most $k+1$, treewidth at most
+$k+2$, and pathwidth at most $k+3$.
+\end{proposition}
+\begin{proof}
+Delete the coordinate-zero vertex of each of the $k+1$ dials. Each dial
+becomes a path. Every link loses its hub endpoint, leaving a pendant path
+at its other endpoint, or a separate path if both endpoints were deleted.
+The remaining graph is a forest, proving the feedback vertex bound.
+Add the deleted vertices to every bag of a width-one decomposition of
+this forest to obtain the treewidth bound.
+
+Each component of the forest is a path with pendant paths attached, or
+is itself a path. For a path decomposition, traverse the main path and
+process the pendant paths at each vertex one at a time. Retain the current
+main-path vertex and at most two consecutive vertices of the pendant path.
+Between successive main-path vertices use a two-vertex bag. This has width
+at most two. Concatenate the component decompositions and add the $k+1$
+deleted vertices to all bags, obtaining width at most $k+3$.
+\end{proof}
+
+The number of vertices is at most
+\[
+ (k+1)n+\left(k+\binom{k}{2}\right)n(n-3)\leq(k+1)^2n^2.
+\]
+All links and their interiors can be enumerated in polynomial time.
+Propositions~\ref{prop:plain-correct} and~\ref{prop:plain-width} therefore
+prove Theorem~\ref{thm:plain}.
+
+\section{The chained reduction}\label{sec:chained}
+
+Consider a Chained Multicoloured Clique instance with $r\geq2$ layers and
+$k\geq1$ colours per layer. Index its $K=rk$ classes, or \emph{slots},
+by $s=0,\ldots,K-1$, with layer $\lfloor s/k\rfloor$.
+A pair $s<u$ is \emph{required} when
+\begin{equation}\label{eq:required}
+ \left\lfloor\frac{u}{k}\right\rfloor
+ \leq \left\lfloor\frac{s}{k}\right\rfloor+1.
+\end{equation}
+Use~\eqref{eq:labels} with these $K$ slots.
+
+\subsection{Synchronised reference cycles}
+
+For each slot $s$, take a reference dial $R_s$ and a choice dial $F_s$.
+Identify coordinate zero of every $R_s$ to one vertex $A$, and coordinate
+one of every $R_s$ to one vertex $B$. Thus the reference cycles share
+exactly the edge $AB$. Their remaining vertices, and all choice cycles,
+are disjoint. Write $r^s_d$ and $f^s_d$ for their coordinates and
+$h_s=f^s_0$ for a choice hub.
+
+Add a class link from $r^s_d$ to $h_s$ for every $d\notin\Lambda_s$.
+For each required pair $s<u$, add an edge link from $f^s_d$ to $h_u$ for
+every $d\notin D_{su}$. There are no edge links for nonrequired pairs.
+All interiors are fresh. Denote the resulting graph by $G$.
+
+\begin{proposition}\label{prop:chained-correct}
+The graph $G$ admits a homomorphism to $C_n$ if and only if the input has
+a chained multicoloured clique.
+\end{proposition}
+\begin{proof}
+In any homomorphism, the adjacent vertices $A,B$ have adjacent images.
+Compose with a target automorphism so that their images are $0,1$.
+The restriction to each reference cycle is an automorphism by
+Lemma~\ref{lem:dial}; these two images force that automorphism to be the
+coordinate identity. Hence $\phi(r^s_d)=d$ simultaneously for all $s,d$.
+
+Class links force each choice hub to a vertex label. For every required
+pair, the argument establishing~\eqref{eq:allowed-difference} applies
+unchanged. Lemma~\ref{lem:labels} forces the selected pair to be an input
+edge. Thus all required pairs are edges and the selection is a chained
+multicoloured clique.
+
+Conversely, map each reference cycle by identity and each choice cycle by
+rotation through its selected label. The selected vertices are adjacent
+for every required pair, so the same endpoint argument as in
+Proposition~\ref{prop:plain-correct} extends the map over all links.
+\end{proof}
+
+\subsection{Width bounds}\label{sec:chained-width}
+
+For layer $t\in\{0,\ldots,r-1\}$, retain the set
+\begin{equation}\label{eq:retained}
+ S_t=\{A,B\}\cup
+ \{h_s:\lfloor s/k\rfloor\in\{t,t+1\}\}.
+\end{equation}
+Then $|S_t|\leq2k+2$. All vertices other than $A,B$ and the choice hubs
+are assigned to one phase: the private vertices of $R_s,F_s$ belong to
+phase $\lfloor s/k\rfloor$, as do the internal vertices of every link
+starting on one of those cycles.
+
+\begin{proposition}\label{prop:chained-width}
+The chained source satisfies $\tw(G)\leq2k+3$ and $\pw(G)\leq2k+4$.
+Both decompositions can be explicitly constructed.
+\end{proposition}
+\begin{proof}
+After removing all retained vertices, the remaining graph is a forest.
+Each reference cycle has lost $A,B$, each choice cycle has lost its hub,
+and each link has lost its destination hub. Its components lie within
+single phases. Moreover, a nonretained vertex in phase $t$ has retained
+neighbours only in $S_t$, by~\eqref{eq:required}.
+
+For a tree decomposition, make a path of bags $S_0,\ldots,S_{r-1}$.
+For each component of the nonretained forest, root it arbitrarily and
+attach its usual width-one decomposition to its phase bag, adding $S_t$
+to every bag of that component. The resulting bags have size at most
+$2k+4$. Every nonretained edge is covered within its component, every
+mixed edge is covered by the added $S_t$, and the only possible edge
+between retained vertices is $AB$. Retained vertices occur in intervals
+of the phase path and in the trees attached to those intervals; all
+occurrence sets are connected. This proves the treewidth bound.
+
+For a path decomposition, process phases in increasing order, retaining
+$S_t$ throughout phase $t$. Traverse each reference and choice cycle of
+that layer in coordinate order. At its current vertex $x$, process all
+links designated to start at that occurrence of $x$, one at a time.
+Their destination hubs belong to $S_t$. For a link with vertices
+$x,z_1,\ldots,z_{n-3},h$, use bags
+\[
+ S_t\cup\{x,z_1\},\qquad
+ S_t\cup\{x,z_i,z_{i+1}\},\qquad
+ S_t\cup\{x,z_{n-3},h\}.
+\]
+Use $S_t\cup\{x,x_{\rm next}\}$ for consecutive cycle edges. The closing
+edge of a choice cycle meets its retained hub; both reference anchors
+are retained. At a phase boundary, forget the older hubs before
+introducing the following layer's hubs; the common hubs remain present.
+
+Every edge is covered. A private link vertex appears during its traversal,
+and a private cycle vertex appears during its visit and the adjacent
+cycle-edge bags. Each hub occurs in one or two consecutive phases, while
+$A,B$ occur throughout. Thus vertex occurrences are intervals.
+The largest bags have at most $|S_t|+3\leq2k+5$ vertices, proving the
+pathwidth bound.
+\end{proof}
+
+\subsection{Reduction resources}\label{sec:resources}
+
+There are $K$ reference cycles and $K$ choice cycles. Their union has
+$2+K(n-2)+Kn$ vertices. The number of required pairs is
+\[
+ r\binom{k}{2}+(r-1)k^2.
+\]
+Together with the $K=rk$ class constraints, this gives $O(rk^2n)$ links
+and $O(rk^2n^2)$ total vertices and edges. Since $n=O(N^2rk)$, this size
+is polynomial in the input size. A convenient coarser vertex bound,
+used in the formalisation, is $2(K+1)^2n^2$.
+
+The graph and its path decomposition can be emitted in logarithmic space.
+Use a constant number of counters for slots, residues and link positions.
+All these values have polynomial magnitude in the explicit input size.
+Labels are computed by integer arithmetic. To test $d\in D_{su}$, rescan
+the input edges and test their label differences; no set of differences
+is stored. Identify output vertices by tuples of the generating indices,
+or recompute sequential numbers by rescanning the same enumeration.
+Output each bag of Proposition~\ref{prop:chained-width} vertex by vertex;
+in particular, enumerate its retained hubs instead of storing the bag.
+Only a constant number of nested polynomial loops and input scans is
+required, so the time is polynomial as well.
+
+An empty input class is mapped to the fixed no-instance $K_3\to C_5$,
+with its width-two source decomposition. This is a no-instance because
+$C_5$ has no triangle. Padding and indexing nonempty classes can be
+performed by input scans in the same space bound. The output parameter is
+at most $2k+4$, independently of $r$ and $N$.
+
+Propositions~\ref{prop:chained-correct} and~\ref{prop:chained-width} now give
+XNLP-hardness in Theorem~\ref{thm:main}. They also give the hardness
+claims of Corollary~\ref{cor:both}, using
+\cite[Lemma~2]{bgns2024}. A target decomposition of width two is available
+explicitly, with bags $\{0,d,d+1\}$ for $d=1,\ldots,n-2$.
+
+\section{Membership in XNLP}\label{sec:membership}
+
+We give the membership argument for an arbitrary explicitly represented
+target graph $H$; it applies in particular to $C_n$ with $n$ given in unary.
+Let $L\geq2$ be the total input length, and let $B_1,\ldots,B_\ell$ be a
+supplied path decomposition of width at most $w$, with $\ell\geq1$.
+Use vertex identifiers that index the explicit vertex lists.
+
+\begin{lemma}\label{lem:gluing}
+There is a homomorphism $G\to H$ if and only if there are assignments
+$a_i:B_i\to V(H)$ such that each $a_i$ preserves source edges within its
+bag, and $a_i,a_{i+1}$ agree on $B_i\cap B_{i+1}$ for every $i$.
+\end{lemma}
+\begin{proof}
+A homomorphism restricts to such assignments. Conversely, a vertex occurs
+in an interval of bags, so agreement across consecutive overlaps makes
+all its assigned images equal. Vertex coverage therefore defines one
+map on $V(G)$. Each edge is contained in a bag, where the local edge
+condition proves that its endpoints map to adjacent vertices.
+\end{proof}
+
+Process the bags from left to right. Guess an image for each vertex of the
+current bag, retaining the preceding bag's assignments. Check agreement
+on the overlap and check all edges whose endpoints lie in the current bag.
+Then discard the preceding assignments. By Lemma~\ref{lem:gluing}, an
+accepting branch exists exactly when a homomorphism exists.
+The algorithm never constructs a table of all assignments.
+
+There are at most $2(w+1)$ stored vertex-image pairs, each using
+$O(\log L)$ bits. Counters and adjacency checks require an additional
+$O(\log L)$ bits. The work space is consequently
+$O((w+1)\log L)$. Guess an image using a binary index and reject indices
+outside the target vertex range. As all bags and edges are explicitly
+listed, repeated scans and comparisons take polynomial time with an
+exponent independent of $w$.
+
+This may be formulated as a total decision problem rather than a promise
+problem. Reject malformed inputs and invalid decompositions first.
+For each vertex, scan the bag sequence and check that its occurrence set
+is a nonempty interval. For each edge, find a bag containing both
+endpoints. Check valid vertex identifiers, no repeated entries in a bag,
+and the width bound. These checks need only logarithmic space and
+polynomial time: a constant number of counters and an occurrence flag
+suffice for each repeated scan. An oversized binary width bound can be
+capped at $L$, since no explicitly listed bag has more than $L$ entries.
+For an empty source graph, allow one empty bag.
+
+Thus the time and space bounds required for XNLP hold simultaneously.
+This completes the proof of Theorem~\ref{thm:main}.
+
+\section{Scope and further questions}\label{sec:scope}
+
+The main theorem assumes a supplied path decomposition. The reduction
+also proves XNLP-hardness when that decomposition is omitted, but the
+membership argument does not find one within the required resources.
+Similarly, the treewidth result is a hardness statement; we do not claim
+XNLP-completeness parameterized by treewidth.
+
+The plain reduction has a feedback vertex set of size $k+1$. The chained
+construction does not preserve that stronger restriction: its $rk$
+choice cycles are vertex-disjoint, so any feedback vertex set has size
+at least $rk$. Accordingly Theorem~\ref{thm:plain} remains a separate
+structural refinement of the main result.
+
+For each fixed source width, the usual dynamic programme remains
+polynomial. In particular, these results do not assert hardness when
+both source and target have pathwidth two. Only the target width is fixed
+at two; the source bound grows with the source parameter.
+
+\appendix
+\section{Formal verification}\label{app:lean}
+
+The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
+mathlib release v4.35.0~\cite{mathlib2020}. The targets in the final
+reduction statements are mathlib's \lean{SimpleGraph.cycleGraph}.
+The repository defines a tree-decomposition certificate by vertex
+coverage, edge coverage and connected occurrence bags; \lean{HasWidth}
+asserts the existence of such a certificate with bounded bag size.
+Table~\ref{tab:lean} records the main correspondence.
+
+\begin{table}[ht]
+\centering\small
+\caption{Principal checked statements. Names are relative to
+\texttt{TreewidthHom}.}
+\label{tab:lean}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.34\textwidth}>{\raggedright\arraybackslash}p{0.62\textwidth}@{}}
+\toprule
+Mathematical statement & Lean declaration(s)\\\midrule
+Dial rigidity, Lemma~\ref{lem:dial} & \lean{OddCycle.dial}\\
+Link constraint, Lemma~\ref{lem:link} & \lean{OddCycle.walk_iff_ne}, \lean{linked_hom_iff}\\
+Signed-difference decoding & \lean{OddCycle.label_solve}\\
+Plain correctness, treewidth and size & \lean{OddCycle.reduction_cycleGraph}\\
+Chained correctness, treewidth and size & \lean{OddCycle.Chained.reduction}\\
+Local-to-global membership lemma & \lean{Decomposition.hom_iff_pathBagAssignments}\\
+Two-bag record bound & \lean{Decomposition.two_bag_records_le}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The plain theorem gives source treewidth at most $k+2$, target treewidth
+at most two, and at most $(k+1)^2n^2$ source vertices. The chained theorem
+gives source treewidth at most $2k+3$ and at most $2(K+1)^2n^2$ source
+vertices, for any number $K$ of slots and any positive layer size $k$.
+Taking $K=rk$ gives the instances used here. The label-solving theorem
+states equality of the decoded choices; its proof eliminates the negative
+orientation as in Lemma~\ref{lem:labels}.
+
+The pathwidth bounds are proved in this paper but are not stated by the
+Lean reduction theorems. Nor does Lean state the feedback vertex number
+bound as a separate theorem. It checks the parent-pointer forest
+construction used for the corresponding treewidth proof.
+The membership lemmas formalise the consistency argument and the number
+of stored vertex-image records; they do not implement a machine model.
+The published hardness starting points, polynomial-time and logspace
+resource analyses, and parameterized-complexity conclusions remain
+external to Lean.
+
+The axiom audit allows only \lean{propext}, \lean{Classical.choice} and
+\lean{Quot.sound}, and rejects proof admissions. The development can be
+built and audited from the repository root by
+\begin{verbatim}
+lake build
+python3 scripts/check_formalization.py
+\end{verbatim}
+The precise theorem map and trust boundary are recorded in
+\lean{FORMALIZATION.md}; machine-readable audit output is in
+\lean{sources/lean-verification.json}.
+
+\section{Finite verification}\label{app:finite}
+
+The repository also implements both reductions in Python. For each test,
+it compares direct clique search with a graph-homomorphism search that
+uses arc consistency and backtracking on dial vertices. After these
+vertices are assigned, the remaining graph is a forest. Every returned
+homomorphism is checked on all edges.
+
+The recorded plain suite covers 4,382 instances, including 1,798
+no-instances. The recorded chained suite covers 361 instances, including
+124 no-instances, with up to 1,265,582 source vertices. On each chained
+instance it checks an explicit path decomposition for vertex coverage,
+edge coverage, interval occurrences and width at most $2k+4$. One test
+has feasible consecutive layer pairs individually but no choice in the
+middle layer that works for both; it is correctly rejected.
+These finite checks supplement the general proofs and do not establish
+their correctness on arbitrary inputs.
+
+\begin{verbatim}
+python3 scripts/run_odd_cycle_checks.py
+python3 scripts/run_odd_cycle_chained_checks.py
+\end{verbatim}
+The corresponding reports are:
+\begin{verbatim}
+sources/odd-cycle-results.json
+sources/odd-cycle-chained-results.json
+\end{verbatim}
+
+\section*{Declaration of AI-assisted research and writing}
+
+AI systems assisted in developing the reductions, writing and checking
+the Lean formalisation, and preparing this manuscript under the direction
+of the human author. This initial manuscript draft was written by an AI
+assistant. This disclosure does not assert that the draft has received
+independent human review. Kernel checking supplies the guarantees stated
+in Appendix~\ref{app:lean}; it does not certify novelty or the mathematical
+claims left outside the formal development.
+
+\begin{thebibliography}{10}
+\raggedright
+
+\bibitem{amarilli2016}
+Antoine Amarilli.
+Complexity of the homomorphism problem parameterized by treewidth.
+\emph{Theoretical Computer Science Stack Exchange}, question~34877,
+June~2, 2016; comment announcing W[1]-hardness, May~30, 2025.
+\url{https://cstheory.stackexchange.com/q/34877}.
+
+\bibitem{bgns2024}
+Hans L. Bodlaender, Carla Groenland, Jesper Nederlof and C\'eline Swennenhuis.
+Parameterized problems complete for nondeterministic FPT time and
+logarithmic space.
+\emph{Information and Computation} 300:105195, 2024.
+\href{https://doi.org/10.1016/j.ic.2024.105195}{doi:10.1016/j.ic.2024.105195}.
+
+\bibitem{deMouraUllrich2021}
+Leonardo de Moura and Sebastian Ullrich.
+The Lean~4 theorem prover and programming language.
+In \emph{Automated Deduction -- CADE~28}, Lecture Notes in Computer Science,
+vol.~12699, pp.~625--635. Springer, 2021.
+\href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
+
+\bibitem{mathlib2020}
+The mathlib Community.
+The Lean mathematical library.
+In \emph{Proceedings of the 9th ACM SIGPLAN International Conference on
+Certified Programs and Proofs (CPP 2020)}, pp.~367--381. ACM, 2020.
+\href{https://doi.org/10.1145/3372885.3373824}{doi:10.1145/3372885.3373824}.
+
+\bibitem{pr2021}
+Marta Piecyk and Pawe{\l} Rz\k{a}\.{z}ewski.
+Fine-grained complexity of the list homomorphism problem: feedback vertex
+set and cutwidth.
+In \emph{38th International Symposium on Theoretical Aspects of Computer
+Science (STACS 2021)}, LIPIcs, vol.~187, pp.~56:1--56:17.
+Schloss Dagstuhl, 2021.
+\href{https://doi.org/10.4230/LIPIcs.STACS.2021.56}{doi:10.4230/LIPIcs.STACS.2021.56}.
+
+\end{thebibliography}
+\end{document}
