@@ -39,15 +39,14 @@ Deciding whether a graph admits a homomorphism to an odd cycle given in the
 input is XNLP-complete parameterised by the width of a supplied path
 decomposition, and XALP-complete parameterised by the width of a supplied
 tree decomposition. It is also W[3]-hard and in W[P] parameterised by the
-feedback vertex number of the source. A single reduction from List Colouring proves
-all three hardness statements, increasing treewidth, pathwidth, and feedback
-vertex number by constants.
-The construction uses reference cycles sharing one edge and paths of length
-$n-2$, which enforce unequal images in the target $C_n$.
-The reduction's decision equivalence, parameter upper bounds, target
-pathwidth two, and a polynomial size bound are checked in Lean~4.
-The source can additionally be restricted to be 2-degenerate and to have
-arbitrarily large prescribed constant girth; both properties are also checked.
+feedback vertex number of the source. One reduction from List Colouring proves
+all three hardness statements, increasing the three parameters by constants;
+treewidth and feedback vertex number increase by exactly two when the input
+graph contains an edge. The same classifications hold for recognising graphs
+whose core is an odd cycle, with no target supplied. Hardness holds on connected,
+2-degenerate sources of arbitrarily large prescribed constant girth.
+The reduction's decision equivalence, parameter upper bounds, polynomial size,
+and source sparsity and girth properties are checked in Lean~4.
 \end{abstract}
 
 \noindent\textbf{AI assistance.}
@@ -121,12 +120,18 @@ $\tw(G)=\tw(F)+2$ and $\fvs(G)=\fvs(F)+2$.
 
 The construction removes lists by giving each forbidden occurrence $(v,d)$
 its own reference cycle and a single domain link. All reference cycles
-share an ordered edge, which fixes
+share an ordered edge $AB$, whose endpoints serve as anchors fixing
 a common coordinate system in every homomorphism. A path of length $n-2$
 then excludes one coordinate from the image of a chosen vertex. After
 deleting $A,B$, each reference cycle becomes a path joined to the rest
 of the graph through at most one link, so it cannot create a new cycle.
 This single-link property is the reason for keeping the copies separate.
+
+Deleting the anchors exposes a subdivision of $F$ with attached trees and
+separate tree components; contracting selected reference gadgets instead
+produces $F$ with two adjacent vertices each joined to every vertex of $F$.
+These two descriptions give the matching upper and lower bounds on treewidth
+and feedback vertex number when $F$ contains an edge.
 
 \paragraph{Prior work and attribution.}
 Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
@@ -202,28 +207,6 @@ appropriate sequence of forward and backward steps.
 
 A \emph{link} below means a path of length $n-2$ whose internal vertices
 are private. Different links may share endpoints, but no internal vertices.
-
-\begin{lemma}[Capping the target length]\label{lem:cap}
-Let $m=|V(G)|$. If $n>m$, then $G\to C_n$ if and only if $G$ is bipartite.
-For every odd $n\geq5$, setting $n'=\min\{n,2m+5\}$ preserves whether
-$G\to C_n$. The binary encoding of $n$ can be transformed to the unary
-encoding of $n'$ in logarithmic space, leaving $G$ unchanged.
-\end{lemma}
-\begin{proof}
-An odd closed walk of length $t$ in $C_n$ has an odd integer displacement
-that is a multiple of $n$, so $t\geq n$. A nonbipartite graph on $m$
-vertices contains an odd cycle of length at most $m$, precluding a
-homomorphism to $C_n$ when $n>m$. Conversely, a bipartition maps to any
-edge of $C_n$.
-
-If the cap changes the target, both $n$ and $n'$ exceed $m$, so the
-preceding equivalence applies to both. The cap is odd and at least five.
-Scan the binary digits of $n$ with an accumulator saturated at $2m+5$;
-then emit its value in unary. The counter uses $O(\log(m+2))$ bits and
-the output has $O(m+1)$ symbols. Input validity, including oddness, can
-also be checked by scans. No source parameter or supplied decomposition
-changes.
-\end{proof}
 
 \section{The reduction}\label{sec:reduction}
 An instance of List Colouring consists of a graph $F$ and lists
@@ -301,8 +284,8 @@ $L(u)=\{1,2\}$. The palette has size three, so we take $n=5$.
 At $h_v$ the construction excludes $2,3,4$ using three separate reference
 copies; Figure~\ref{fig:construction} shows the first two. For example,
 the link from coordinate $2$ admits endpoint image $0$ via the walk
-$2,3,4,0$, and endpoint image $1$ via $2,1,0,1$, but it cannot have
-endpoint image $2$: there is no closed walk of length three in $C_5$.
+$2,3,4,0$, but it cannot have endpoint image $2$: there is no closed
+walk of length three in $C_5$.
 Together the three domain links leave exactly $\{0,1\}$ available at
 $h_v$. Similarly, the links at $h_u$ leave exactly $\{1,2\}$.
 The colouring $c(v)=0$, $c(u)=1$ extends across the original-edge link
@@ -433,10 +416,8 @@ Also $k\leq m-2$, by retaining the endpoints of an edge. Thus the displayed
 minimum is $k+2$. Feedback vertex number is minor-monotone, so the existing
 upper bound $\fvs(G)\leq k+2$ is exact.
 \end{proof}
-The missing-colour hypothesis is essential to this minor argument. It is
-provided by palette padding, but need not hold for arbitrary lists of
-residues in the generic formal constructor. The equalities are proved here
-for inputs with an edge; the upper bounds also cover edgeless and empty inputs.
+The minor argument uses a common missing colour, supplied by palette padding.
+The upper bounds also cover edgeless and empty inputs.
 
 \subsection{Size and construction resources}
 Write $m=|V(F)|$, $e=|E(F)|$, and
@@ -551,7 +532,32 @@ available for the supplied-decomposition problems. Proposition~\ref{prop:sparse}
 gives the additional source restrictions. This establishes all hardness
 parts of Theorem~\ref{thm:main}.
 
-\subsection{Membership with supplied decompositions}
+\subsection{Membership}
+We first bound the target length so that binary encoding does not increase
+the resources needed by the algorithms.
+
+\begin{lemma}[Capping the target length]\label{lem:cap}
+Let $m=|V(G)|$ and let $n\geq5$ be odd. If $n>m$, then $G\to C_n$ if and
+only if $G$ is bipartite. Setting $n'=\min\{n,2m+5\}$ preserves whether
+$G\to C_n$. The binary encoding of $n$ can be transformed to the unary
+encoding of $n'$ in logarithmic space, leaving $G$ unchanged.
+\end{lemma}
+\begin{proof}
+An odd closed walk of length $t$ in $C_n$ has an odd integer displacement
+that is a multiple of $n$, so $t\geq n$. A nonbipartite graph on $m$
+vertices contains an odd cycle of length at most $m$, precluding a
+homomorphism to $C_n$ when $n>m$. Conversely, a bipartition maps to any
+edge of $C_n$.
+
+If the cap changes the target, both $n$ and $n'$ exceed $m$, so the
+preceding equivalence applies to both. The cap is odd and at least five.
+Scan the binary digits of $n$ with an accumulator saturated at $2m+5$;
+then emit its value in unary. The counter uses $O(\log(m+2))$ bits and
+the output has $O(m+1)$ symbols. Input validity, including oddness, can
+also be checked by scans. No source parameter or supplied decomposition
+changes.
+\end{proof}
+
 By Lemma~\ref{lem:cap}, first replace a binary target length by its
 linear-size cap. In the membership arguments below, $n$ denotes this
 capped length, so target vertices have $O(\log N)$-bit identifiers and
@@ -652,13 +658,11 @@ bound~\cite[Theorem~2]{bgp2023}, since the standard encoding preserves the
 constraint graph. Together with the reduction, this proves the third part
 of Theorem~\ref{thm:main}.
 
-\paragraph{Scope and targets of width one.}
+\subsection{Scope and targets of width one}
 For feedback vertex number, the present arguments establish W[3]-hardness
 and W[P]-membership, leaving a gap between the lower and upper bounds.
 For comparison, Binary CSP is W[SAT]-hard for feedback vertex
-number~\cite[Theorem~2]{bgp2023}. The two supplied-decomposition completeness
-statements have different parameters and different machine models; we do not
-claim XNLP-membership for treewidth.
+number~\cite[Theorem~2]{bgp2023}.
 
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
 If a target forest has an edge, a source maps to it exactly when the source is bipartite:
@@ -670,10 +674,15 @@ fixing the target cycle itself would make the source-width problem FPT
 by the usual dynamic programme; variability of $n$ is essential.
 
 \subsection{Recognising odd-cycle cores}
+The same construction gives a classification with no target supplied:
+recognising graphs whose core is an odd cycle.
 A finite graph's \emph{core} is its smallest homomorphically equivalent
 subgraph, unique up to isomorphism. Every odd cycle is a core by rigidity
 (the same proof applies to $C_3$). Mapping a graph to its own shortest odd
 cycle is a classical question studied by Gerards~\cite{gerards1988}.
+The length of a shortest odd cycle is the graph's \emph{odd girth}.
+For nonbipartite graphs, the recognition problem equivalently asks whether
+the circular chromatic number attains the lower bound imposed by odd girth.
 
 \begin{corollary}\label{cor:core}
 Recognising graphs whose core is an odd cycle is XNLP-complete for the width
