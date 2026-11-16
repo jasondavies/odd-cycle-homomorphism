@@ -48,7 +48,7 @@ structure Pair where
 
 def Pair.Accepts (p : Pair) : Prop := Nonempty (p.source.graph →g p.target.graph)
 def Pair.WidthBound (p : Pair) (k : ℕ) : Prop :=
-  HasWidth p.source.graph (max (2*k) 12) ∧ HasWidth p.target.graph 12
+  HasWidth p.source.graph (max (2*k) 3) ∧ HasWidth p.target.graph 3
 
 def Pair.SizeBound (p : Pair) (s : ℕ) : Prop :=
   p.source.order ≤ 1000000000000*(s+1)^12 ∧ p.target.order ≤ 1000000000000*(s+1)^12
@@ -82,7 +82,7 @@ theorem raw_width {k : ℕ} (words : Fin k → List Bool) (ℓ : ℕ) : (raw wor
       (untyped_width _ ⟨inferInstance,_,_,queryDecomposition _ _ _,query_width _ _ _⟩)
       (relationalGraphIso _ _).symm
   · obtain ⟨B,T,D,h⟩ := target_width words
-    have hh := untyped_width (target words) (w := 4) ⟨inferInstance,B,T,D,h⟩
+    have hh := untyped_width (target words) (w := 3) ⟨inferInstance,B,T,D,h⟩
     exact hh.of_iso (relationalGraphIso _ _).symm
 
 theorem presentation_order {V : Type} [DecidableEq V] [Fintype V]

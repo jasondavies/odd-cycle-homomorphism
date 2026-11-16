@@ -127,7 +127,7 @@ def full_pipeline(words, length, result):
     gn, ge, gd, gcopies = remove_directions(sn, sa, sd)
     hn, he, hd, hcopies = remove_directions(tn, ta, td)
     gw, hw = check_decomposition(gn, ge, gd), check_decomposition(hn, he, hd)
-    assert gw <= max(len(words) + 1, 12) and hw <= 12
+    assert gw <= max(len(words) + 1, 3) and hw <= 3
     if result is not None:
         gm = list(fm) + [-1] * (gn - sn)
         for (u, v), vertices in gcopies.items():
@@ -159,6 +159,16 @@ def main():
     rng = random.Random(320026)
     instances += [(["".join(rng.choice("01") for _ in range(rng.randint(3, 6)))
                     for _ in range(k)], rng.randint(1, 3)) for k in (2, 3, 4) for _ in range(20)]
+    binary_instances = len(instances)
+    # Larger alphabets: letters become blocks of two or three bits.
+    ternary = ["".join(letters) for n in range(1, 4) for letters in product("abc", repeat=n)]
+    instances += [([w], length) for w in ternary for length in range(1, len(w) + 1)]
+    instances += [(list(ws), length) for ws in product(ternary, repeat=2)
+                  for length in range(1, min(map(len, ws)) + 1)]
+    for alphabet in ("abc", "abcd", "abcde", "abcdefgh"):
+        instances += [(["".join(rng.choice(alphabet) for _ in range(rng.randint(2, 5)))
+                        for _ in range(k)], rng.randint(1, 3)) for k in (2, 3) for _ in range(25)]
+    instances = [(ws, min(length, min(map(len, ws)))) for ws, length in instances]
     for ws, length in instances:
         common = set.intersection(*(subsequences(w) for w in ws))
         truth = any(len(w) >= length for w in common)
@@ -239,13 +249,16 @@ def main():
     pipelines = []
     for ws, length in [(["0", "1"], 1), (["00", "0"], 1),
                        (["010", "101"], 2), (["010", "101"], 3),
-                       (["010", "101", "110"], 2)]:
+                       (["010", "101", "110"], 2),
+                       (["ab", "cb"], 1), (["abc", "cab"], 2), (["abc", "cab"], 3)]:
         q, t, _, _ = lcs_instance(ws, length)
         pipelines.append(full_pipeline(ws, length, relational_hom(q, t)))
         print("Full reduction checked", ws, length, flush=True)
 
-    result = {"date": "2026-11-12", "scope": "Finite audits supplement the general written proof",
+    result = {"date": "2026-11-16", "scope": "Finite audits supplement the general written proof",
               "lcs_relational_comparisons": cases, "positive_cases": yes,
+              "binary_alphabet_comparisons": binary_instances,
+              "larger_alphabet_comparisons": cases - binary_instances,
               "max_query_width": max_qwidth, "max_target_width": max_twidth,
               "arrow_endomorphisms": endos,
               "arrow_cycle_lengths": sorted(map(len, cycles)),

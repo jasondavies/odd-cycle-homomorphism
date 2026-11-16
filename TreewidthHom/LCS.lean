@@ -7,16 +7,16 @@ public import TreewidthHom.PaddedSteps
 /-! # Common subsequences and the padded position constraints -/
 namespace TreewidthHom
 
-/-- The standard list-theoretic decision problem, with Boolean alphabet. -/
-def CommonSubsequence {K : Type*} (words : K → List Bool) (ℓ : ℕ) : Prop :=
-  ∃ z : List Bool, z.length = ℓ ∧ ∀ i, z.Sublist (words i)
+/-- The standard list-theoretic decision problem, over any alphabet. -/
+def CommonSubsequence {K α : Type*} (words : K → List α) (ℓ : ℕ) : Prop :=
+  ∃ z : List α, z.length = ℓ ∧ ∀ i, z.Sublist (words i)
 
 /-- Increasing position selections in each input word, sharing the same letters. -/
-def CommonEmbedding {K : Type*} (words : K → List Bool) (ℓ : ℕ) : Prop :=
-  ∃ z : Fin ℓ → Bool, ∀ i, ∃ e : Fin ℓ ↪o Fin (words i).length,
+def CommonEmbedding {K α : Type*} (words : K → List α) (ℓ : ℕ) : Prop :=
+  ∃ z : Fin ℓ → α, ∀ i, ∃ e : Fin ℓ ↪o Fin (words i).length,
     ∀ j, z j = (words i).get (e j)
 
-theorem commonSubsequence_iff_embedding {K : Type*} (words : K → List Bool) (ℓ : ℕ) :
+theorem commonSubsequence_iff_embedding {K α : Type*} (words : K → List α) (ℓ : ℕ) :
     CommonSubsequence words ℓ ↔ CommonEmbedding words ℓ := by
   constructor
   · rintro ⟨z, rfl, hz⟩

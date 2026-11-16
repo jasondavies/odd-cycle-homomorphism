@@ -24,6 +24,13 @@
     "TreewidthHom.Digraph.directionReduction_iff",
     "TreewidthHom.Digraph.directionReduction_card",
     "TreewidthHom.leafTree.isTree",
+    "TreewidthHom.Graft.running_of_tops",
+    "TreewidthHom.Graft.extend",
+    "TreewidthHom.Graft.forestDecomposition",
+    "TreewidthHom.Graft.forest_width",
+    "TreewidthHom.Arrow.gadgetBag_top",
+    "TreewidthHom.Arrow.Assembly.extendDecomposition",
+    "TreewidthHom.Arrow.Assembly.extended_width",
     "TreewidthHom.Digraph.directionReduction_width",
     "TreewidthHom.Relational.incidence_iff",
     "TreewidthHom.cycle_rank_constant",
@@ -56,6 +63,37 @@
     "TreewidthHom.LCSInstance.reduce_width",
     "TreewidthHom.LCSInstance.reduce_size",
     "TreewidthHom.LCSInstance.full_reduction",
+    "TreewidthHom.BlockLCS.blockCommon_hom",
+    "TreewidthHom.BlockLCS.Decode.blockCommon",
+    "TreewidthHom.BlockLCS.block_relational_iff",
+    "TreewidthHom.BlockLCS.block_graph_iff",
+    "TreewidthHom.BlockLCS.query_width",
+    "TreewidthHom.BlockLCS.target_width",
+    "TreewidthHom.BlockLCS.blockCommon_iff",
+    "TreewidthHom.BlockLCS.reduce_correct",
+    "TreewidthHom.BlockLCS.reduce_width",
+    "TreewidthHom.BlockLCS.reduce_size",
+    "TreewidthHom.BlockLCS.full_reduction",
+    "TreewidthHom.BlockLCS.commonSubsequence_map",
+    "TreewidthHom.BlockLCS.exists_code",
+    "TreewidthHom.BlockLCS.alphabet_reduction",
+    "TreewidthHom.BlockLCS.alphabet_full_reduction",
+    "TreewidthHom.OddCycle.cyc_eq_cycleGraph",
+    "TreewidthHom.OddCycle.dial",
+    "TreewidthHom.OddCycle.walk_iff_ne",
+    "TreewidthHom.linked_hom_iff",
+    "TreewidthHom.Decomposition.comap",
+    "TreewidthHom.hasWidth_of_apex_forest",
+    "TreewidthHom.OddCycle.label_solve",
+    "TreewidthHom.OddCycle.source_hom_iff",
+    "TreewidthHom.OddCycle.hom_of_clique",
+    "TreewidthHom.OddCycle.clique_of_hom",
+    "TreewidthHom.OddCycle.source_hom_iff_clique",
+    "TreewidthHom.OddCycle.target_width",
+    "TreewidthHom.OddCycle.source_width",
+    "TreewidthHom.OddCycle.source_card_le",
+    "TreewidthHom.OddCycle.reduction",
+    "TreewidthHom.OddCycle.reduction_cycleGraph",
     "TreewidthHom.Executable.markers_bound",
     "TreewidthHom.Executable.Presentation.iso",
     "TreewidthHom.Executable.arcOfCode_injective",
@@ -191,6 +229,41 @@
       "Quot.sound"
     ],
     "TreewidthHom.leafTree.isTree": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.running_of_tops": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.extend": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.forestDecomposition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.forest_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.gadgetBag_top": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.Assembly.extendDecomposition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Arrow.Assembly.extended_width": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -350,6 +423,161 @@
       "Quot.sound"
     ],
     "TreewidthHom.LCSInstance.full_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.blockCommon_hom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.Decode.blockCommon": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.block_relational_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.block_graph_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.query_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.target_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.blockCommon_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.reduce_correct": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.reduce_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.reduce_size": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.full_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.commonSubsequence_map": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.exists_code": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.alphabet_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.BlockLCS.alphabet_full_reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.cyc_eq_cycleGraph": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.dial": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.walk_iff_ne": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.linked_hom_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.comap": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.hasWidth_of_apex_forest": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.label_solve": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.source_hom_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.hom_of_clique": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.clique_of_hom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.source_hom_iff_clique": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.target_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.source_width": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.source_card_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.reduction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.reduction_cycleGraph": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -578,5 +806,5 @@
     "TreewidthHom.Executable.EnumRun.output_eq": []
   },
   "build_passed": true,
-  "scope": "Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,12), target width 12, and polynomial output size. The complete measured constructor is proved equal to the verified edge-list output and has a fixed polynomial bound in a stated traversal/comparison model with supplied primitive cost q. Primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result."
+  "scope": "Reduction from Multicoloured Clique to homomorphism into an odd cycle, with decision equivalence, source width k+2, target width 2 and polynomial size (OddCycle.reduction_cycleGraph). Combinatorial reduction from LCS over any finite alphabet to simple graph homomorphism, with decision equivalence, source width max(2k,3), target width 3 and polynomial vertex count (BlockLCS.alphabet_full_reduction). Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,3), target width 3, and polynomial output size. The complete measured constructor is proved equal to the verified edge-list output and has a fixed polynomial bound in a stated traversal/comparison model with supplied primitive cost q. Primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result."
 }

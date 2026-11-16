@@ -1,8 +1,10 @@
 {
-  "date": "2026-11-12",
+  "date": "2026-11-16",
   "scope": "Finite audits supplement the general written proof",
-  "lcs_relational_comparisons": 5482,
-  "positive_cases": 2976,
+  "lcs_relational_comparisons": 9330,
+  "positive_cases": 4988,
+  "binary_alphabet_comparisons": 5482,
+  "larger_alphabet_comparisons": 3848,
   "max_query_width": 5,
   "max_target_width": 3,
   "arrow_endomorphisms": [
@@ -55,8 +57,8 @@
       "target_vertices": 9,
       "simple_source_vertices": 13998,
       "simple_target_vertices": 19082,
-      "simple_source_width": 12,
-      "simple_target_width": 12,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
       "positive_map_checked": false
     },
     {
@@ -70,8 +72,8 @@
       "target_vertices": 9,
       "simple_source_vertices": 16630,
       "simple_target_vertices": 25042,
-      "simple_source_width": 12,
-      "simple_target_width": 12,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
       "positive_map_checked": true
     },
     {
@@ -85,8 +87,8 @@
       "target_vertices": 13,
       "simple_source_vertices": 34066,
       "simple_target_vertices": 43066,
-      "simple_source_width": 12,
-      "simple_target_width": 12,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
       "positive_map_checked": true
     },
     {
@@ -100,8 +102,8 @@
       "target_vertices": 13,
       "simple_source_vertices": 48870,
       "simple_target_vertices": 43066,
-      "simple_source_width": 12,
-      "simple_target_width": 12,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
       "positive_map_checked": false
     },
     {
@@ -116,9 +118,54 @@
       "target_vertices": 18,
       "simple_source_vertices": 50866,
       "simple_target_vertices": 64366,
-      "simple_source_width": 12,
-      "simple_target_width": 12,
+      "simple_source_width": 4,
+      "simple_target_width": 3,
       "positive_map_checked": true
+    },
+    {
+      "words": [
+        "ab",
+        "cb"
+      ],
+      "length": 1,
+      "answer": true,
+      "query_vertices": 19,
+      "target_vertices": 15,
+      "simple_source_vertices": 27842,
+      "simple_target_vertices": 53138,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
+      "positive_map_checked": true
+    },
+    {
+      "words": [
+        "abc",
+        "cab"
+      ],
+      "length": 2,
+      "answer": true,
+      "query_vertices": 41,
+      "target_vertices": 19,
+      "simple_source_vertices": 61754,
+      "simple_target_vertices": 76162,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
+      "positive_map_checked": true
+    },
+    {
+      "words": [
+        "abc",
+        "cab"
+      ],
+      "length": 3,
+      "answer": false,
+      "query_vertices": 59,
+      "target_vertices": 19,
+      "simple_source_vertices": 90402,
+      "simple_target_vertices": 76162,
+      "simple_source_width": 3,
+      "simple_target_width": 3,
+      "positive_map_checked": false
     }
   ]
 }

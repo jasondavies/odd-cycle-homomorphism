@@ -14,7 +14,7 @@ Sources:
 - [a3nm: Complexity of query evaluation parameterized by treewidth](https://a3nm.net/work/research/questions/#complexity-of-query-evaluation-parameterized-by-treewidth)
 - [Graph-homomorphism formulation on cstheory](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth)
 
-The written solution gives W[1]-hardness, even with target treewidth at most 12.
+The written solution gives W[1]-hardness, even with target treewidth at most 3.
 It does not establish W[1]-membership or W[1]-completeness. The source width
 still depends on the parameter; the result does not assert hardness with both
 widths fixed constants.

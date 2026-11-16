@@ -1,10 +1,11 @@
 # Homomorphism is W[1]-hard when both treewidths are bounded by the parameter
 
-**Lean status, 2026-11-12:** the complete combinatorial reduction is now checked,
+**Lean status, 2026-11-16:** the complete combinatorial reduction is checked,
 including all input cases, both width bounds, and polynomial output size.
-The formal proof uses the sufficient source bound `max(2k,12)`, intermediate
-target width four, and a coarse degree-12 size bound. This written argument
-retains its sharper bounds. The formal machine-time and W[1]-hardness conclusion
+The formal proof has the same target bound three as this written argument. It
+uses the sufficient source bound `max(2k,3)` and a coarse degree-12 size bound;
+this written argument retains its sharper source and size bounds. The
+arbitrary-alphabet reduction of Section 9 is checked in the same way. The formal machine-time and W[1]-hardness conclusion
 remain outside the library; see [FORMALIZATION.md](FORMALIZATION.md).
 
 **Public-status check, 2026-11-12:** Still in the main source list and the
@@ -25,7 +26,8 @@ novelty assessment pending.
 **The answer to the FPT-versus-W[1]-hardness question is W[1]-hard.** This
 holds for ordinary simple undirected graphs, with no colors, directions,
 lists, constants, or designated vertices in the final instance. In fact,
-the target graph can always have treewidth at most 12.
+the target graph can always have treewidth at most 3. (An earlier version of
+this write-up stated 12, from a cruder decomposition of the same graphs.)
 
 Thus an algorithm taking time f(t) N^c, for a computable f and a constant c,
 where t bounds both input treewidths and N is the input size, would imply
@@ -33,6 +35,10 @@ FPT=W[1]. This resolves the alternative posed in the
 [linked graph-homomorphism question](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth)
 and gives the same negative FPT answer to the
 [main query-evaluation entry](https://a3nm.net/work/research/questions/#complexity-of-query-evaluation-parameterized-by-treewidth).
+[Section 9](#9-arbitrary-alphabets-hardness-beyond-w1) strengthens this: starting
+from LCS over an arbitrary alphabet, the same construction gives W[t]-hardness
+for every t, and XNLP-hardness, still with target treewidth at most 3. The
+combinatorial reduction behind that extension is checked in Lean as well.
 We do **not** claim W[1]-membership or W[1]-completeness. The standard
 tree-decomposition algorithm supplies an XP upper bound.
 
@@ -47,11 +53,10 @@ The 13-vertex direction gadget below is G_1 from
 (2024), which credits Hell–Nešetřil. We give the needed gadget proof here.
 Neither the hardness theorem nor the gadget is claimed as new.
 
-**Formalisation boundary:** Lean now verifies the complete composition from
-relational homomorphisms to simple undirected graph homomorphisms, plus the
-last stage's width and vertex-count bounds. The LCS relational front end,
-earlier width bounds, and full complexity conclusion remain outside Lean.
-See [FORMALIZATION.md](FORMALIZATION.md).
+**Formalisation boundary:** Lean verifies the complete combinatorial reduction
+from LCS to simple undirected graph homomorphism, with width and vertex-count
+bounds. The machine-time claim and the complexity conclusion remain outside
+Lean. See [FORMALIZATION.md](FORMALIZATION.md).
 
 ## 1. The reduction and parameter bounds
 
@@ -68,7 +73,7 @@ We construct, in succession:
 | Fixed-schema relational structures Q,I | <=k+1 | <=3 |
 | Typed incidence digraphs | <=max(k+1,2) | <=3 |
 | Uncolored, loopless digraphs D_Q,D_I | <=max(k+1,2) | <=3 |
-| Simple undirected graphs G,H | <=max(k+1,12) | <=12 |
+| Simple undirected graphs G,H | <=max(k+1,3) | <=3 |
 
 Each stage preserves existence of a homomorphism in both directions. For
 digraphs and relational structures, width means the treewidth of the
@@ -273,13 +278,34 @@ preserves every directed arc. Consequently
 
     G -> H  iff  D_Q -> D_I  iff  Q -> I  iff  LCS >= ell.
 
-These are simple undirected loopless graphs. To extend a decomposition
-of an underlying digraph, attach one bag containing all 13 vertices of
-each gadget to a bag containing the endpoints of its replaced arc.
-All new vertices occur in their one gadget bag, and each old vertex's
-bags stay connected. Width is at most max(old width,12). Therefore
+These are simple undirected loopless graphs. The gadget F is a subdivision
+of K_4 and has the following tree decomposition of width three, whose root
+bag contains both ports:
 
-    tw(G) <= max(k+1,12),    tw(H) <= 12.
+    {a,A,b,C}                      root
+    ├─ {u,a,C}
+    └─ {b,A,C,D}
+       ├─ {w,b,D} ── {v,b,w}
+       ├─ {t,C,D}
+       └─ {A,B,C,D}
+          ├─ {y,B,C} ── {x,B,y}
+          └─ {z,B,D}
+
+Each of the 15 edges lies in a bag, and each vertex's bags form a subtree.
+To extend a decomposition of an underlying digraph, take for every replaced
+arc (r,s) a copy of this bag tree, with a,b renamed to r,s, and attach its
+root to an existing bag containing r and s. Private gadget vertices occur
+only inside their copy. An old vertex occurs in a copy only as a port; its
+bags there form a subtree containing the copy's root, which is adjacent to
+an old bag containing it. So each old vertex's bags stay connected, and the
+width is at most max(old width,3). Therefore
+
+    tw(G) <= max(k+1,3),    tw(H) <= 3.
+
+Because G and H contain F, and hence a K_4 minor, this construction cannot
+give less than three. We do not claim that three is optimal for the problem:
+a target of treewidth one is a forest, for which homomorphism is polynomial,
+so two is the least width a hard target could have.
 
 This is a polynomial-time, parameter-preserving many-one reduction from
 binary LCS parameterized by k. Pietrzak's theorem proves the claimed
@@ -301,14 +327,17 @@ endomorphisms and simple cycles, checks prime-cycle encodings, tests maps
 into composite gadget graphs, and verifies the final graph decompositions
 and extensions of positive homomorphisms.
 
-The retained run passes 5,482 LCS/relational-homomorphism comparisons,
-including all ordered one-, two-, and three-string binary instances with
+The retained run passes 9,330 LCS/relational-homomorphism comparisons. Of
+these 5,482 are binary: all ordered one-, two-, and three-string instances with
 nonempty strings of length at most three and all nontrivial required lengths,
-plus 60 larger seeded cases. It also checks 36 prime-encoding pairs and
+plus 60 larger seeded cases. The other 3,848 use the block encoding of
+Section 9: all one- and two-string instances over three letters with strings
+of length at most three, plus 200 seeded cases over three to eight letters. It also checks 36 prime-encoding pairs and
 all 192 gadget maps into the replacements of 63 nonempty three-vertex
-digraphs. Five complete constructions have their final decompositions
-validated, including graphs of up to 64,366 vertices. Positive maps are
-extended and checked edge by edge; the two complete negative examples rely
+digraphs. Eight complete constructions, three of them over a three-letter
+alphabet, have their final decompositions validated, including graphs of up
+to 90,402 vertices. Positive maps are
+extended and checked edge by edge; the three complete negative examples rely
 on the proved converse, rather than an infeasible unrestricted search over
 their large final graphs.
 
@@ -341,3 +370,140 @@ This proves confinement for arbitrary assemblies, without a size bound. It is
 formalised in [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean), using
 [the finite quotient certificate](TreewidthHom/ArrowQuotient.lean). It does not
 change the graph construction or the width constants in the written reduction.
+
+## 9. Arbitrary alphabets: hardness beyond W[1]
+
+For LCS over a fixed alphabet, parameterized by the number of strings, only
+W[1]-hardness is known to us. When the alphabet is part of the input, the same
+problem is much harder:
+
+- it is W[t]-hard for every t
+  (Bodlaender, Downey, Fellows, Wareham, *The parameterized complexity of
+  sequence alignment and consensus*, Theoretical Computer Science 147 (1995)
+  31–54);
+- it is XNLP-complete (Elberfeld, Stockhusen, Tantau, *On the space and circuit
+  complexity of parameterized problems: classes and completeness*,
+  [Algorithmica 71 (2015) 661–701](https://doi.org/10.1007/s00453-014-9944-y),
+  as stated in
+  [Bodlaender, Groenland, Nederlof, Swennenhuis](https://arxiv.org/abs/2105.14882),
+  Sections 2.4 and 5.1). XNLP-hardness implies W[t]-hardness for every t
+  (their Lemma 2).
+
+A larger alphabet cannot simply be added to Section 2: one letter vertex per
+symbol would put the target width at |Sigma|+1. No parameter-preserving
+reduction from general to binary LCS is known to us either. Instead we encode
+letters in binary *inside* the target rows. The schema, the 18 types, all
+later stages and both width bounds stay as they are.
+
+### Construction
+
+Let Sigma be the set of letters that occur, L = max(1, ceil(log_2 |Sigma|)),
+and fix an injective code c : Sigma -> {0,1}^L. Replace every string w_i by
+the bit string w'_i = c(w_i[1]) ... c(w_i[n_i]) of length L n_i. Bits
+(a-1)L+1,...,aL form *block* a. Call a position p_(i,m) a *boundary* if L
+divides m; the sentinel p_(i,0) is a boundary.
+
+The target I' is the structure I of Section 2 for w'_1,...,w'_k, with one
+change to the facts on each row edge (p_(i,m-1), p_(i,m)):
+
+- Step is present on every row edge, and as a loop at every position, as before;
+- Advance is present only when p_(i,m-1) is a boundary, so it *enters* a block;
+- Begin is present when p_(i,m-1) is not a boundary, so it moves *inside* a block.
+
+Letter(p_(i,m), b) holds for the bit b = w'_i[m], with at most two bit
+vertices b_0, b_1. Reusing Begin avoids a new relation; a fresh relation
+would work equally well.
+
+The query Q' keeps the anchor path and the initial variables x_(i,0). For each
+j = 1,...,ell it has L shared variables z_(j,1),...,z_(j,L). For every string i
+it joins x_(i,j-1) to x_(i,j) by
+
+- a chain of exactly N = L max_i n_i Step edges, then
+- one Advance edge to a new vertex y_(i,j,1), then
+- L-1 Begin edges y_(i,j,1) -> ... -> y_(i,j,L) = x_(i,j),
+
+with Letter(y_(i,j,t), z_(j,t)) for t = 1,...,L. For L = 1 this is exactly the
+construction of Section 2.
+
+### Correctness
+
+The anchors are forced as before: Root and Next do not occur on rows, and the
+only Begin-successor of a_i is p_(i,0). So x_(i,0) maps to p_(i,0).
+
+Suppose x_(i,j-1) maps to the boundary p_(i,aL). The Step chain stays on row i
+and ends at some p_(i,m) with m >= aL. An Advance edge leaves only a boundary,
+so m = bL with b >= a, and y_(i,j,1) maps to p_(i,bL+1). A non-boundary
+position p_(i,m') has exactly one Begin-successor, p_(i,m'+1). Hence
+y_(i,j,t) maps to p_(i,bL+t), and x_(i,j) maps to the boundary p_(i,(b+1)L).
+The query thus selects in each string strictly increasing blocks, and reads
+all L bits of each selected block. The Letter facts force z_(j,t) to the t-th
+bit of the selected letter's code, for every string i. As c is injective, all
+strings select the same letter at step j. So a homomorphism yields a common
+subsequence of length ell.
+
+Conversely, map each x_(i,j) to the end of the block of the chosen occurrence
+and each z_(j,t) to the corresponding code bit. Moving on by d >= 1 blocks
+takes (d-1)L forward Step moves, padded with stays to exactly N, then Advance
+and L-1 Begin moves. Therefore
+
+    Q' -> I'  iff  the strings have a common subsequence of length ell.
+
+### Widths and size
+
+Deleting the bit vertices from the Gaifman graph of I' leaves the same kind of
+tree as before, with longer rows. So tw(I') <= 3.
+
+For Q', keep one current vertex per string. For each j, first run the k Step
+chains one at a time; bags have at most k+1 vertices. Then for t = 1,...,L add
+z_(j,t), move every string's current vertex one edge forward, and forget
+z_(j,t); bags have at most k+2 vertices. Hence pathwidth(Q') <= k+1.
+
+Q' has O(k ell (N+L)) elements and I' has O(k + L sum_i n_i), both polynomial
+in the input length since L <= log_2 of it. Sections 3 to 6 apply unchanged:
+
+    tw(G) <= max(k+1,3),    tw(H) <= 3.
+
+### Consequences
+
+**Theorem.** Graph homomorphism parameterized by the larger of the two
+treewidths is W[t]-hard for every t, even when the target has treewidth at
+most 3.
+
+This follows from the first cited result, since the reduction runs in
+polynomial time and its parameter max(k+1,3) depends on k alone.
+
+**XNLP-hardness.** XNLP-hardness is defined through reductions computable in
+space O(g(k) + log n). Every vertex of G and H has an explicit name built
+from a bounded number of indices, each polynomially bounded: a string, a
+position or step counter, a bit index, a relation and argument position, a
+position on a prime cycle, and a gadget coordinate. Whether two named vertices
+are adjacent depends on a comparison of such indices and on single input
+symbols, where a symbol's code is its rank among the distinct letters. All of
+this is computable in logarithmic space. We therefore claim that the reduction
+is a parameterized logspace reduction, and that the problem is XNLP-hard. This
+paragraph is a proof sketch; it has not been formalised or written out in a
+machine model.
+
+**Pathwidth (not worked out).** The source is built from a path decomposition,
+and each later stage attaches pieces of bounded size. We expect that the same
+argument with path decompositions gives pathwidth k+O(1) for G and O(1) for H.
+Together with membership of bounded-pathwidth binary CSP in XNLP (Bodlaender et
+al., Theorem 14) that would make homomorphism parameterized by pathwidth
+XNLP-complete, with targets of constant pathwidth. We have not checked the
+constants and do not claim this.
+
+### Status
+
+Lean checks the combinatorial reduction of this section for every finite
+alphabet: decision equivalence, source width at most max(2k,3), target width at
+most 3, and a polynomial vertex bound
+([`BlockLCS.alphabet_full_reduction`](TreewidthHom/BlockReduction.lean)). As in
+the binary case, the source bound k+1, the polynomial-time and logarithmic-space
+claims, and the cited hardness theorems are outside Lean. The construction is
+also implemented in
+[bounded_width_hom_hardness.py](scripts/bounded_width_hom_hardness.py) for any
+alphabet. The finite checks of Section 7 compare it with direct enumeration on
+3,848 instances over three to eight letters, validate the width bounds k+1 and
+3 on each, and run three complete constructions. We have not located this
+strengthening in the literature, but our search was limited and we make no
+novelty claim.

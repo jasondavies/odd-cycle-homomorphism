@@ -1,8 +1,9 @@
 # Formalisation boundary
 
 The **complete combinatorial reduction is checked**. The machine-level
-polynomial-time reduction and the W[1]-hardness conclusion are not yet formal
-complexity theorems. These are distinct claims.
+polynomial-time reduction and the hardness conclusions (W[1] for binary strings;
+W[t] for all t and XNLP for arbitrary alphabets) are not yet formal complexity
+theorems. These are distinct claims.
 
 ## Main checked statement
 
@@ -12,8 +13,8 @@ For any `words : Fin k → List Bool` and natural requested length `ell`,
 
 - `Nonempty (G →g H)` if and only if there is a list of length `ell` that is a
   `List.Sublist` of every input word (the standard common-subsequence definition).
-- `G` has a tree-decomposition certificate of width at most `max(2k,12)`.
-- `H` has a tree-decomposition certificate of width at most `12`.
+- `G` has a tree-decomposition certificate of width at most `max(2k,3)`.
+- `H` has a tree-decomposition certificate of width at most `3`.
 - Each graph has at most `10^12 * (s+1)^12` vertices, where
   `s = k + sum_i length(words i) + 1`.
 
@@ -85,21 +86,48 @@ branches and full constructions; the general equality is proved in Lean.
 | [LCSEncode.lean](TreewidthHom/LCSEncode.lean), [LCSDecode.lean](TreewidthHom/LCSDecode.lean) | `commonSubsequence_hom`, `Decode.commonSubsequence` | Both directions of the relational front end. |
 | [LCSReduction.lean](TreewidthHom/LCSReduction.lean) | `lcs_graph_iff` | Decision equivalence for the actual final simple graphs, including zero words and empty subsequences. |
 | [LCSQueryWidth.lean](TreewidthHom/LCSQueryWidth.lean) | `query_width` | Source path-decomposition bags have size at most `2k+1`. |
-| [LCSTargetWidth.lean](TreewidthHom/LCSTargetWidth.lean) | `target_width` | Target Gaifman bags have size at most five. |
-| [Incidence.lean](TreewidthHom/Incidence.lean), [IncidenceWidth.lean](TreewidthHom/IncidenceWidth.lean) | `incidence_iff`, `incidence_width` | Typed incidence preserves homomorphisms; unary/binary facts extend width to at most `max(w,4)`. |
+| [LCSTargetWidth.lean](TreewidthHom/LCSTargetWidth.lean) | `target_width` | Target Gaifman bags have size at most four: a width-one forest decomposition plus the two letter vertices. |
+| [Incidence.lean](TreewidthHom/Incidence.lean), [IncidenceWidth.lean](TreewidthHom/IncidenceWidth.lean) | `incidence_iff`, `incidence_width` | Typed incidence preserves homomorphisms; unary/binary facts extend width to at most `max(w,2)`. |
 | [ColorEncoding.lean](TreewidthHom/ColorEncoding.lean), [ColorWidth.lean](TreewidthHom/ColorWidth.lean) | `colorEncoding_iff`, `colorEncoding_width` | Prime-cycle type erasure preserves homomorphisms and extends width to at most `max(w,2)`. |
 | [ArrowConfinement.lean](TreewidthHom/ArrowConfinement.lean) | `Assembly.confinement` | Every gadget map into an arbitrary assembly is the coordinate-preserving inclusion of one copy. |
-| [DirectionReduction.lean](TreewidthHom/DirectionReduction.lean), [DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) | `directionReduction_iff`, `directionReduction_width` | Direction erasure preserves homomorphisms and extends width to at most `max(w,12)`; exact count is `|V|+11|E|`. |
+| [DirectionReduction.lean](TreewidthHom/DirectionReduction.lean), [DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) | `directionReduction_iff`, `directionReduction_width` | Direction erasure preserves homomorphisms and extends width to at most `max(w,3)`; exact count is `|V|+11|E|`. |
 | [Schema.lean](TreewidthHom/Schema.lean) | `schema_tags_card`, `standardMarkers_bound` | The 18 incidence types use distinct primes at most 67. |
 | [ReductionWidth.lean](TreewidthHom/ReductionWidth.lean) | `lcs_bounded_graph_reduction` | Composed correctness with final source and target width certificates. |
 | [FiniteEncoding.lean](TreewidthHom/FiniteEncoding.lean), [ReductionSize.lean](TreewidthHom/ReductionSize.lean) | `schema_graph_card_le`, `graph_bound_of_domain` | Finite graph types and polynomial vertex counts. |
 | [FullReduction.lean](TreewidthHom/FullReduction.lean) | `full_reduction` | All input cases, decision equivalence, widths, and polynomial size in one theorem. |
 
 Reusable infrastructure includes arbitrary leaf attachment (`LeafTree`,
-`LeafExtension`), well-founded tree grafting (`GraftTree`), fan decompositions
+`LeafExtension`), well-founded tree grafting (`GraftTree`), grafted bag trees
+with a local connectedness criterion (`GraftDecomposition`), fan decompositions
 (`ConeDecomposition`, `ChainGraft`), relabeling and edge deletion
 (`DecompositionMaps`), and interval/path decompositions (`IntervalDecomposition`).
 The earlier `PaddedSteps` and `PrimeCycles` lemmas remain checked as well.
+
+## Width three for the direction gadget
+
+The gadget is a subdivision of K4, so its treewidth is three. With the vertex
+numbering `B,A,x,z,y,D,C,t,a,u,b,v,w` (ports a,b are 8,10),
+[DirectionWidth.lean](TreewidthHom/DirectionWidth.lean) fixes ten bags
+
+```
+{a,A,b,C} {b,A,C,D} {A,B,C,D} {u,a,C} {w,b,D} {v,b,w} {y,B,C} {x,B,y} {z,B,D} {t,C,D}
+```
+
+with parent bags `-,0,1,0,1,4,2,6,2,1`. The root bag contains both ports. Kernel
+evaluation checks that every gadget edge lies in a bag, that bags have at most
+four vertices, and that every vertex has a unique topmost bag. For each replaced
+arc, a copy of this bag tree is grafted below an existing bag containing both
+endpoints. `Graft.running_of_tops` in
+[GraftDecomposition.lean](TreewidthHom/GraftDecomposition.lean) turns the
+"unique topmost bag" property into the connected-occurrence condition, for
+arbitrary (possibly infinite) families of grafted copies. The same lemma gives
+the incidence bags `{v,w,t}`, `{v,t,u_1}`, `{w,t,u_2}` of the written proof and
+the two-element bags of the target's underlying forest.
+
+Three is the best this construction can give: both final graphs contain the
+gadget, hence a K4 minor. It is not claimed optimal for the problem. Targets of
+treewidth one are forests, for which the problem is polynomial, so the least
+conceivable hard target width is two.
 
 ## General confinement from a finite quotient certificate
 
@@ -140,6 +168,56 @@ A cross-type source arc must therefore map to a cross-component target arc.
 Projecting images to their components recovers a typed homomorphism. This even
 works for isolated vertices of the original typed graph.
 
+## Odd-cycle targets: target width two
+
+[`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean) is a
+separate reduction, from Multicoloured Clique, whose target is mathlib's
+`cycleGraph n` for an odd `n`. For every graph `Γ` on `Fin k × Fin N` it proves:
+
+- `Nonempty (source Γ →g cycleGraph n)` if and only if `Γ` has a clique with one
+  vertex in each of the `k` classes;
+- a tree-decomposition certificate of width at most `k+2` for the source and of
+  width at most `2` for the cycle;
+- `n` is odd, and the source has at most `(k+1)^2 * n^2` vertices, where
+  `n = 2*(N*(2*N*k+1+k)+2)+1`.
+
+[ODD_CYCLE.md](ODD_CYCLE.md) has the written proof and the file map. This
+result does not depend on the LCS constructions below; it shares only the
+tree-decomposition infrastructure. Multicoloured Clique's W[1]-hardness is an
+external input.
+
+## Arbitrary alphabets
+
+[`BlockLCS.alphabet_full_reduction`](TreewidthHom/BlockReduction.lean) proves, for
+words over **any nonempty finite alphabet** `α`, that there is a finite simple
+graph pair `(G,H)` with
+
+- `Nonempty (G →g H)` if and only if the words have a common subsequence of
+  length `ell` (`CommonSubsequence` is now stated for an arbitrary alphabet);
+- the same width certificates: at most `max(2k,3)` for `G` and `3` for `H`;
+- at most `10^12 * (s+1)^12` vertices in each graph, where
+  `s = k + (clog_2 |α| + 1) * sum_i length(words i) + 1`.
+
+This is the block construction of
+[SOLUTION.md, Section 9](SOLUTION.md#9-arbitrary-alphabets-hardness-beyond-w1).
+`BlockLCS.full_reduction` is the same statement for letters that are vectors of
+`L+1` bits, and `alphabet_reduction` transfers it through any injective code.
+The Lean block length is `L+1`, written `L` in the prose. The Lean padding bound
+is the total bit length of all words; any bound at least the longest row works.
+
+| File | Principal result | Meaning |
+| --- | --- | --- |
+| [BlockInstance.lean](TreewidthHom/BlockInstance.lean) | `query`, `target`, `BlockCommon` | Block-encoded structures over the unchanged schema. `Advance` leaves block boundaries only; `Begin` moves inside a block. |
+| [BlockEncode.lean](TreewidthHom/BlockEncode.lean), [BlockDecode.lean](TreewidthHom/BlockDecode.lean) | `blockCommon_hom`, `Decode.blockCommon` | Both directions of the relational front end. |
+| [BlockWidth.lean](TreewidthHom/BlockWidth.lean) | `query_width`, `target_width` | Source bags of size at most `2k+1`. The target's Gaifman graph is a subgraph of a binary target's, so its bags have size at most four. |
+| [BlockReduction.lean](TreewidthHom/BlockReduction.lean) | `blockCommon_iff`, `full_reduction`, `alphabet_full_reduction` | Bit blocks express LCS over the letters; all input cases, widths and size; arbitrary finite alphabets. |
+
+The incidence, prime-cycle and direction stages and their width lemmas are
+reused unchanged. This front end is a second, parallel instance: the binary
+`LCSInstance` files remain, because the executable constructor and the measured
+cost model are built on them. **The executable and cost layers cover binary
+words only.**
+
 ## Remaining complexity obligations
 
 The combinatorial reduction has no remaining correctness, width, finiteness,
@@ -153,12 +231,16 @@ formal theorem:
    these implementations' physical costs yet. Polynomial output size and
    abstract operation counts do not by themselves close this obligation.
 2. Instantiate a formal parameterized-reduction framework and derive the
-   W[1]-hardness conclusion. Pietrzak's binary-LCS hardness theorem remains an
-   explicitly external published input, not a project axiom.
-3. Optionally sharpen the checked source bound from `2k` to the written `k+1`,
-   the intermediate target bound from four to three, and the coarse size bound
-   to the written sparse quadratic bound. None of these improvements changes
-   the intended parameterized-hardness conclusion or final target width 12.
+   hardness conclusions. The published hardness theorems for LCS remain
+   explicitly external inputs, not project axioms: Pietrzak for binary strings
+   (W[1]), and Bodlaender–Downey–Fellows–Wareham and Elberfeld–Stockhusen–Tantau
+   for alphabets given in the input (W[t] for all t, and XNLP). XNLP-hardness
+   further needs the reduction to be computable in logarithmic space, which is
+   argued in prose only.
+3. Optionally sharpen the checked source bound from `2k` to the written `k+1`
+   and the coarse size bound to the written sparse quadratic bound. Neither
+   improvement changes the intended parameterized-hardness conclusion or the
+   final target width 3.
 
 The tree-decomposition certificates use mathlib trees and walks, require vertex
 and edge coverage and connected occurrence bags, and bound every finite bag by
@@ -169,7 +251,7 @@ instance in this package is bookkeeping for finite sets, not a graph assumption.
 ## Reproduction and trust
 
 Run `python3 scripts/check_formalization.py`. It builds the library and audits
-99 principal declarations in
+137 principal declarations in
 [AxiomAudit.lean](AxiomAudit.lean), allowing only `propext`, `Classical.choice`,
 and `Quot.sound`. It also scans project modules for proof admissions. Both finite
 searches use kernel reduction, without `native_decide` or project axioms.

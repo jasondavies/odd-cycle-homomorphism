@@ -2,15 +2,18 @@
 
 A reduction from binary longest common subsequence to simple undirected graph
 homomorphism, with a Lean 4 proof of the complete combinatorial reduction.
-The checked construction has source treewidth at most `max(2k,12)` and target
-treewidth at most `12`, where `k` is the number of input strings.
+The checked construction has source treewidth at most `max(2k,3)` and target
+treewidth at most `3`, where `k` is the number of input strings.
 
 **Status: the Lean constructor is executable and verified.**
 [`Executable.compile_spec`](TreewidthHom/ExecutableReduction.lean) proves decision
 equivalence, both width bounds, all input cases, and polynomial size for its
 actual integer-numbered edge-list output. The earlier mathematical statement is
 [`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean).
-All 99 principal-declaration axiom audits pass without proof admissions.
+[`BlockLCS.alphabet_full_reduction`](TreewidthHom/BlockReduction.lean) proves the
+same decision equivalence, width bounds and polynomial size for LCS over any
+finite alphabet. All 137 principal-declaration axiom audits pass without proof
+admissions.
 
 The complete measured constructor now returns provably identical graph data and
 has a fixed polynomial bound in an explicit traversal/comparison model. This
@@ -22,8 +25,24 @@ A formal machine-level running-time proof and parameterized-complexity framework
 are still absent. The written polynomial-time argument and Pietrzak's published
 LCS hardness theorem yield W[1]-hardness; that complexity conclusion is **not a
 Lean theorem in this repository**. The written proof also gives the sharper
-source bound `max(k+1,12)` and a sharper size bound than the checked construction.
+source bound `max(k+1,3)` and a sharper size bound than the checked construction.
 [FORMALIZATION.md](FORMALIZATION.md) records the exact boundary.
+
+**Beyond W[1]:** [SOLUTION.md, Section 9](SOLUTION.md#9-arbitrary-alphabets-hardness-beyond-w1)
+extends the reduction to LCS over arbitrary alphabets by encoding letters as
+binary blocks. With published hardness results for that problem, this gives
+W[t]-hardness for every t and, by a proof sketch, XNLP-hardness, with the same
+target treewidth 3. The combinatorial reduction for arbitrary alphabets is
+checked in Lean. The executable constructor and cost model still cover binary
+strings only, and the logarithmic-space claim behind XNLP-hardness is prose.
+
+**Target treewidth 2:** [ODD_CYCLE.md](ODD_CYCLE.md) gives a separate, much
+shorter reduction from Multicoloured Clique in which the target is a single odd
+cycle. It shows W[1]-hardness with target treewidth 2, which is optimal, and a
+source with a feedback vertex set of k+1 vertices. The reduction is checked in
+Lean ([`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean)) and
+by finite checks (`python3 scripts/run_odd_cycle_checks.py`). It is not
+independently reviewed.
 
 **Prior work:** W[1]-hardness was already announced in
 [Amarilli's comment of 2025-05-30](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
@@ -32,13 +51,15 @@ proof, have not been established. This repository makes no priority claim.
 
 - [Problem statement and public status](PROBLEM.md)
 - [Written solution, including all reduction stages](SOLUTION.md)
+- [Odd-cycle targets: hardness with target treewidth 2](ODD_CYCLE.md)
 - [Lean theorem map and remaining obligations](FORMALIZATION.md)
 - [Executable reduction](scripts/bounded_width_hom_hardness.py)
 
 The construction first expresses a shared subsequence using padded paths in a
 fixed relational schema. Typed incidence graphs remove relation names; distinct
 prime cycles enforce types; an asymmetric undirected gadget encodes directions.
-Explicit decompositions bound the widths at each step.
+Explicit decompositions bound the widths at each step; the gadget is a
+subdivision of K4, which is where the final width three comes from.
 
 ## Reproduce
 

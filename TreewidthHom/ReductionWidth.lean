@@ -21,7 +21,7 @@ theorem HasWidth.mono {V : Type} {G : SimpleGraph V} {a b : ℕ}
 /-- All three encodings preserve a supplied width bound up to the fixed gadget constant. -/
 theorem UnaryBinary.untyped_width {V : Type} (A : UnaryBinary V) {w : ℕ}
     (h : HasWidth A.gaifman w) :
-    HasWidth (A.asRelational.untypedGraph schemaMarkers) (max w 12) := by
+    HasWidth (A.asRelational.untypedGraph schemaMarkers) (max w 3) := by
   classical
   obtain ⟨d,B,T,D,hw⟩ := h
   let := d
@@ -37,21 +37,21 @@ theorem UnaryBinary.untyped_width {V : Type} (A : UnaryBinary V) {w : ℕ}
 
 namespace LCSInstance
 
-theorem source_width (k N ℓ : ℕ) : HasWidth (sourceGraph k N ℓ) (max (2*k) 12) := by
+theorem source_width (k N ℓ : ℕ) : HasWidth (sourceGraph k N ℓ) (max (2*k) 3) := by
   classical
   exact (query k N ℓ).untyped_width ⟨inferInstance,_,_,queryDecomposition k N ℓ,query_width k N ℓ⟩
 
 theorem final_target_width {k : ℕ} (words : Fin k → List Bool) :
-    HasWidth (targetGraph words) 12 := by
+    HasWidth (targetGraph words) 3 := by
   obtain ⟨B,T,D,hw⟩ := target_width words
-  have h : HasWidth (target words).gaifman 4 := ⟨inferInstance,B,T,D,hw⟩
+  have h : HasWidth (target words).gaifman 3 := ⟨inferInstance,B,T,D,hw⟩
   exact (target words).untyped_width h
 
 /-- The concrete reduction, with both treewidth certificates. -/
 theorem lcs_bounded_graph_reduction {k N ℓ : ℕ} (words : Fin k → List Bool)
     (hN : ∀ i, (words i).length ≤ N) :
     (Nonempty (sourceGraph k N ℓ →g targetGraph words) ↔ CommonSubsequence words ℓ) ∧
-    HasWidth (sourceGraph k N ℓ) (max (2*k) 12) ∧ HasWidth (targetGraph words) 12 :=
+    HasWidth (sourceGraph k N ℓ) (max (2*k) 3) ∧ HasWidth (targetGraph words) 3 :=
   ⟨lcs_graph_iff words hN,source_width k N ℓ,final_target_width words⟩
 
 end LCSInstance

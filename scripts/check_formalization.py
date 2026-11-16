@@ -31,7 +31,7 @@ report = {
     "axioms": {name: [s.strip() for s in axioms.split(",") if s.strip()]
                for name, axioms in entries} | {name: [] for name in empty},
     "build_passed": True,
-    "scope": "Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,12), target width 12, and polynomial output size. The complete measured constructor is proved equal to the verified edge-list output and has a fixed polynomial bound in a stated traversal/comparison model with supplied primitive cost q. Primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result.",
+    "scope": "Reduction from Multicoloured Clique to homomorphism into an odd cycle, with decision equivalence, source width k+2, target width 2 and polynomial size (OddCycle.reduction_cycleGraph). Combinatorial reduction from LCS over any finite alphabet to simple graph homomorphism, with decision equivalence, source width max(2k,3), target width 3 and polynomial vertex count (BlockLCS.alphabet_full_reduction). Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,3), target width 3, and polynomial output size. The complete measured constructor is proved equal to the verified edge-list output and has a fixed polynomial bound in a stated traversal/comparison model with supplied primitive cost q. Primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result.",
 }
 (ROOT / "sources").mkdir(exist_ok=True)
 (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")

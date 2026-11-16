@@ -4,7 +4,7 @@ public import TreewidthHom.EdgeList
 namespace TreewidthHom.Executable
 theorem untyped_width {V : Type} (A : UnaryBinary V) {w : ℕ}
     (h : HasWidth A.gaifman w) :
-    HasWidth (A.asRelational.untypedGraph markers) (max w 12) := by
+    HasWidth (A.asRelational.untypedGraph markers) (max w 3) := by
   classical
   obtain ⟨d,B,T,D,hw⟩ := h
   let := d

@@ -20,7 +20,7 @@ attribute [instance] GraphPair.sourceFinite GraphPair.targetFinite
 
 def GraphPair.Accepts (P : GraphPair) : Prop := Nonempty (P.source →g P.target)
 def GraphPair.WidthBound (P : GraphPair) (k : ℕ) : Prop :=
-  HasWidth P.source (max (2*k) 12) ∧ HasWidth P.target 12
+  HasWidth P.source (max (2*k) 3) ∧ HasWidth P.target 3
 
 def GraphPair.SizeBound (P : GraphPair) (s : ℕ) : Prop :=
   Fintype.card P.Source ≤ 1000000000000*(s+1)^12 ∧

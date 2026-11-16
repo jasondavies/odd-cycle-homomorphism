@@ -34,31 +34,44 @@ class Structure:
                 for u, v in combinations(fact, 2) if u != v}
 
 
+def letter_codes(words):
+    """Fixed-length binary codes for the letters. Binary inputs keep their bits."""
+    alphabet = sorted(set("".join(words)))
+    if set(alphabet) <= {"0", "1"}:
+        return 1, {a: a for a in alphabet}
+    block = max(1, (len(alphabet) - 1).bit_length())
+    return block, {a: format(i, "0%db" % block) for i, a in enumerate(alphabet)}
+
+
 def lcs_instance(words, length):
     """Nontrivial inputs only; trivial yes/no instances are preprocessed separately.
 
+    Words may use any alphabet. Each letter becomes a block of `block` bits on
+    its row. Advance enters a block, Begin reads on inside it, and Step skips
+    forward anywhere. For a binary alphabet blocks have length one.
     Return query, target, and certified-width decompositions (bags, tree edges).
     """
     assert words and 1 <= length <= min(map(len, words))
-    k, bound = len(words), max(map(len, words))
+    block, code = letter_codes(words)
+    rows = ["".join(code[a] for a in word) for word in words]
+    k, bound = len(words), max(map(len, rows))
     query, target = Structure(), Structure()
     anchors = [target.vertex(("anchor", i)) for i in range(k + 1)]
-    letters = {a: target.vertex(("letter", a)) for a in sorted(set("".join(words)))}
+    letters = {a: target.vertex(("bit", a)) for a in sorted(set("".join(rows)))}
     target.add("Root", anchors[0])
-    positions = []
-    for i, word in enumerate(words, 1):
+    for i, bits in enumerate(rows, 1):
         target.add("Next", anchors[i - 1], anchors[i])
-        row = [target.vertex((i, j)) for j in range(len(word) + 1)]
-        positions.append(row)
+        row = [target.vertex((i, j)) for j in range(len(bits) + 1)]
         target.add("Begin", anchors[i], row[0])
         for j, v in enumerate(row):
             target.add("Step", v, v)
             if j:
                 target.add("Step", row[j - 1], v)
-                target.add("Advance", row[j - 1], v)
-                target.add("Letter", v, letters[word[j - 1]])
+                # Position j-1 is a block boundary exactly when block divides it.
+                target.add("Advance" if (j - 1) % block == 0 else "Begin", row[j - 1], v)
+                target.add("Letter", v, letters[bits[j - 1]])
 
-    # Removing the letter vertices leaves a tree. Add them to its edge bags.
+    # Removing the bit vertices leaves a tree. Add them to its edge bags.
     apex = set(letters.values())
     forest_edges = target.edges() - {edge for edge in target.edges() if set(edge) & apex}
     adjacent = {v: [] for v in range(len(target.names)) if v not in apex}
@@ -88,16 +101,24 @@ def lcs_instance(words, length):
         qbags.append(set(frontier) | {qanchors[i + 1]})
     qbags.append(set(frontier))
     for j in range(1, length + 1):
-        z = query.vertex(("common letter", j))
-        qbags.append(set(frontier) | {z})
+        # Skip forward in every string, keeping one current vertex per string.
         for i in range(k):
-            for step in range(bound + 1):
-                x = query.vertex((i, j, step))
-                qbags.append(set(frontier) | {z, x})
-                query.add("Step" if step < bound else "Advance", frontier[i], x)
+            for step in range(bound):
+                x = query.vertex((i, j, "skip", step))
+                qbags.append(set(frontier) | {x})
+                query.add("Step", frontier[i], x)
                 frontier[i] = x
-            query.add("Letter", x, z)
-        qbags.append(set(frontier))
+        # Read the chosen block bit by bit; bit t is shared by all strings.
+        for t in range(block):
+            z = query.vertex(("common bit", j, t))
+            qbags.append(set(frontier) | {z})
+            for i in range(k):
+                x = query.vertex((i, j, "read", t))
+                qbags.append(set(frontier) | {z, x})
+                query.add("Advance" if t == 0 else "Begin", frontier[i], x)
+                query.add("Letter", x, z)
+                frontier[i] = x
+            qbags.append(set(frontier))
     return query, target, (qbags, list(zip(range(len(qbags) - 1), range(1, len(qbags))))), (tbags, ttree)
 
 
@@ -180,6 +201,11 @@ ARROW_PATHS = [(0, 1), (0, 4, 5, 2), (0, 6, 7, 8, 3),
                (1, 9, 10, 2), (1, 11, 3), (2, 12, 3)]
 ARROW_EDGES = {tuple(sorted(e)) for path in ARROW_PATHS for e in zip(path, path[1:])}
 ARROW_N, PORT_A, PORT_B = 13, 4, 6
+# A width-three tree decomposition of the gadget whose root bag holds both ports.
+# Bag i > 0 hangs below bag ARROW_BAG_PARENT[i]. The Lean proof uses the same bags.
+ARROW_BAGS = [{4, 0, 6, 2}, {6, 0, 2, 3}, {0, 1, 2, 3}, {5, 4, 2}, {8, 6, 3},
+              {7, 6, 8}, {10, 1, 2}, {9, 1, 10}, {11, 1, 3}, {12, 2, 3}]
+ARROW_BAG_PARENT = [None, 0, 1, 0, 1, 4, 2, 6, 2, 1]
 
 
 def remove_directions(n, arcs, decomposition):
@@ -195,8 +221,10 @@ def remove_directions(n, arcs, decomposition):
                 vertices[x] = n
                 n += 1
         parent = containing[tuple(sorted((u, v)))]
-        tree.append((parent, len(bags)))
-        bags.append(set(vertices.values()))
+        first = len(bags)
+        for i, bag in enumerate(ARROW_BAGS):
+            tree.append((parent if i == 0 else first + ARROW_BAG_PARENT[i], first + i))
+            bags.append({vertices[x] for x in bag})
         out.update(tuple(sorted((vertices[a], vertices[b]))) for a, b in ARROW_EDGES)
         copies[u, v] = vertices
     return n, out, (bags, tree), copies
@@ -205,11 +233,11 @@ def remove_directions(n, arcs, decomposition):
 def reduce_lcs_to_graphs(words, length):
     """Return (G,H), each as (number of vertices, edge set, decomposition).
 
-    Accepts every nonempty list of binary strings and nonnegative target length.
-    G -> H iff the strings have a common subsequence of at least that length.
+    Accepts every nonempty list of strings over any alphabet and nonnegative
+    target length. G -> H iff the strings have a common subsequence of at least
+    that length.
     """
     assert words and isinstance(length, int) and length >= 0
-    assert all(set(word) <= {"0", "1"} for word in words)
     singleton = (1, set(), ([{0}], []))
     if length == 0:
         return singleton, singleton
