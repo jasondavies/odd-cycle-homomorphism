@@ -39,6 +39,13 @@ including allowed colors. A domain link exists only for forbidden colors.
 Each original edge is represented once, using increasing vertex indices.
 The executable constructor follows the same graph up to vertex renaming.
 
+The reference adjacency lemmas live with the construction in `ListReduction`,
+so the feedback proof does not depend on the treewidth proof. The generic
+[ChainGraft](TreewidthHom/ChainGraft.lean) module supplies predecessor chains,
+unique topmost bags, and consecutive-vertex coverage for both treewidth
+constructions. The pathwidth proofs share the division lemma
+`TreewidthHom.mul_add_div_of_lt` for their position encodings.
+
 ## Outside Lean
 
 The following are not formalized as machine-level theorems:

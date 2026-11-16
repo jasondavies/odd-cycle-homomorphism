@@ -1,6 +1,6 @@
 module
 
-public import TreewidthHom.ListWidth
+public import TreewidthHom.ListReduction
 public import TreewidthHom.ForestOrientation
 public import TreewidthHom.ApexForest
 
@@ -74,11 +74,11 @@ noncomputable def height : SourceVertex F L → ℕ
 noncomputable def parent (hn : 5 ≤ n) : SourceVertex F L → Option (SourceVertex F L)
   | .inl (.inl (.inl _)) => none
   | .inl (.inr v) =>
-      if h : ∃ u, oldParent F S O v=some u then
-        let u := h.choose
-        let l := edgeLink F L v u (oldParent_spec F S O h.choose_spec).2.2.1
+      match h : oldParent F S O v with
+      | none => none
+      | some u =>
+        let l := edgeLink F L v u (oldParent_spec F S O h).2.2.1
         some (.inr (l,if v<u then ⟨0,by omega⟩ else ⟨n-4,by omega⟩))
-      else none
   | .inl (.inl (.inr ((v,d),c))) =>
       if h : c.val < center d then
         some (.inl (.inl (.inr ((v,d),⟨c.val+1,by have := ZMod.val_lt d; dsimp [center] at h; omega⟩))))
@@ -103,11 +103,14 @@ theorem parent_hub (hn : 5 ≤ n) {v u : Fin m} (h : oldParent F S O v=some u) :
       some (.inr (edgeLink F L v u (oldParent_spec F S O h).2.2.1,
         if v<u then ⟨0,by omega⟩ else ⟨n-4,by omega⟩)) := by
   classical
-  have hex : ∃ u, oldParent F S O v=some u := ⟨u,h⟩
-  have he : hex.choose=u := Option.some.inj (hex.choose_spec.symm.trans h)
-  simp only [parent,dite_eq_left hex]
-  subst he
-  rfl
+  simp only [parent]
+  split
+  · rename_i hp
+    simp [h] at hp
+  · rename_i u' hp
+    have he : u' = u := Option.some.inj (hp.symm.trans h)
+    subst u'
+    rfl
 
 theorem away_start {u v : Fin m} (h : F.Adj u v) (hu : u ∉ S)
     (hf : towardStart F S O u v=false) : oldParent F S O u=some v := by
@@ -158,8 +161,11 @@ theorem parent_cases (hn : 5 ≤ n) {x y : SourceVertex F L}
           simp only [height,Nat.dist]
           omega
         · simp [parent,h1,h2,hd] at h
-  · by_cases hex : ∃ u, oldParent F S O v=some u
-    · obtain ⟨u,hu⟩ := hex
+  · cases hu : oldParent F S O v with
+    | none =>
+      simp only [parent] at h
+      split at h <;> simp_all
+    | some u =>
       rw [parent_hub F L S O hn hu] at h
       have he := Option.some.inj h
       subst y
@@ -175,7 +181,6 @@ theorem parent_cases (hn : 5 ≤ n) {x y : SourceVertex F L}
         simp only [edgeLink,dite_eq_right hvu',height,htrue,↓reduceIte]
         rw [hr,heq]
         omega
-    · simp [parent,hex] at h
   · by_cases hc : c.val+1 < n-3
     · have he : y=.inr (⟨.inl (v,d),hl⟩,⟨c.val+1,hc⟩) := by simpa [parent,hc] using h.symm
       subst y

@@ -58,13 +58,6 @@ theorem rotation_or_reflection [Fact (1 < n)] (hodd : Odd n) (f : ZMod n → ZMo
     ∃ r ε : ZMod n, (ε = 1 ∨ ε = -1) ∧ ∀ x, f x = r + ε*x := by
   classical
   have hn : NeZero n := ⟨by have := Fact.out (p := 1 < n); omega⟩
-  have h2 : (2 : ZMod n) ≠ 0 := by
-    intro h
-    have h' : ((2*1 : ℕ) : ZMod n) = 0 := by simpa using h
-    have hd := natCast_two_mul_eq_zero hodd h'
-    have := Nat.le_of_dvd (by omega) hd
-    have := Fact.out (p := 1 < n)
-    omega
   -- every step is forward or backward, never both
   let fwd : ZMod n → Prop := fun x => f (x+1) = f x + 1
   have hstep : ∀ x, f (x+1) - f x = if fwd x then 1 else -1 := by

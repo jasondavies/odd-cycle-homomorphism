@@ -103,12 +103,7 @@ theorem hom_iff_pathBagAssignments {n : ℕ} (D : Decomposition G (pathGraph (n+
         ∀ (a b : Fin (n+1)), a.val+1 = b.val →
           ∀ (v : V) (ha : v ∈ D.bag a) (hb : v ∈ D.bag b),
             σ a ⟨v,ha⟩ = σ b ⟨v,hb⟩ := by
-  rw [D.hom_iff_bagAssignments H]
-  constructor
-  · rintro ⟨σ,hc,he⟩
-    exact ⟨σ,he,(D.compatible_path_iff σ).mp hc⟩
-  · rintro ⟨σ,he,hc⟩
-    exact ⟨σ,(D.compatible_path_iff σ).mpr hc,he⟩
+  simp only [D.hom_iff_bagAssignments H, D.compatible_path_iff, and_comm]
 
 /-- A width-w bag has at most w+1 vertex-image records. -/
 theorem bag_domain_card (D : Decomposition G T) (b : B) :

@@ -18,6 +18,7 @@ open SimpleGraph Reference
 variable {m n : ℕ} [Fact (1 < n)]
 
 abbrev Copies (m n : ℕ) := Fin m × ZMod n
+abbrev Private (m n : ℕ) := Copies m n × Fin (n-2)
 abbrev BaseVertex (m n : ℕ) := RefVertex (Copies m n) n ⊕ Fin m
 abbrev Code (m n : ℕ) := Copies m n ⊕ (Fin m × Fin m)
 
@@ -63,6 +64,35 @@ theorem base_ref_adj (i : Copies m n) (d : ZMod n) :
     (base m n).Adj (.inl (ref i d)) (.inl (ref i (d+1))) := by
   refine (fromRel_adj _ _ _).mpr ⟨?_,Or.inl (Or.inr ⟨i,d,rfl,rfl⟩)⟩
   exact fun h => ref_ne i d (Sum.inl.inj h)
+
+theorem private_step {i j : Copies m n} {a b : Fin (n-2)} {d : ZMod n}
+    (ha : ref i d = .inr (i,a)) (hb : ref i (d+1) = .inr (j,b)) :
+    i = j ∧ b.val = a.val+1 := by
+  obtain ⟨_,hda⟩ := ref_private ha
+  obtain ⟨hij,hdb⟩ := ref_private hb
+  have hv : (d+1).val = (d.val+1)%n := by rw [ZMod.val_add,ZMod.val_one]
+  have hd := ZMod.val_lt d
+  refine ⟨hij.symm,?_⟩
+  rcases Nat.lt_or_ge (d.val+1) n with hh | hh
+  · rw [Nat.mod_eq_of_lt hh] at hv; omega
+  · have : d.val+1=n := by omega
+    rw [this,Nat.mod_self] at hv; omega
+
+theorem private_adj {p r : Private m n}
+    (h : (base m n).Adj (.inl (.inr p)) (.inl (.inr r))) :
+    p.1 = r.1 ∧ (r.2.val = p.2.val+1 ∨ p.2.val = r.2.val+1) := by
+  have step : ∀ p r : Private m n, BaseRel (.inl (.inr p)) (.inl (.inr r)) →
+      p.1 = r.1 ∧ r.2.val = p.2.val+1 := by
+    intro p r hh
+    rcases hh with ⟨h,_⟩ | ⟨i,d,hp,hr⟩
+    · cases h
+    · have hi := (ref_private hp.symm).1
+      have hp' : ref p.1 d = .inr (p.1,p.2) := by simpa [← hi] using hp.symm
+      have hr' : ref p.1 (d+1) = .inr (r.1,r.2) := by simpa [← hi] using hr.symm
+      exact private_step hp' hr'
+  obtain ⟨_,h | h⟩ := (fromRel_adj _ _ _).mp h
+  · obtain ⟨he,hh⟩ := step p r h; exact ⟨he,Or.inl hh⟩
+  · obtain ⟨he,hh⟩ := step r p h; exact ⟨he.symm,Or.inr hh⟩
 
 theorem source_hom_iff (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     (hodd : Odd n) (hn : 5 ≤ n) :

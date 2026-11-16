@@ -37,7 +37,7 @@ theorem reduction (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
       ((source F L).induce {v | ¬ removed S v}).IsAcyclic ∧
       Nat.card {v : SourceVertex F L // removed S v}=S.card+2) ∧
     Nat.card (SourceVertex F L) ≤ 2+m+m*n*n+(m*n+m*m)*n := by
-  refine ⟨?_,fun _ hw => source_width F L hn hw,fun _ hw => source_pathWidth F L hn hw,?_,?_,source_card_le F L⟩
+  refine ⟨?_,fun _ hw => source_width F L hw,fun _ hw => source_pathWidth F L hn hw,?_,?_,source_card_le F L⟩
   · exact source_hom_iff_colorable F L hodd hn
   · exact target_pathWidth n (by omega)
   · intro S hS

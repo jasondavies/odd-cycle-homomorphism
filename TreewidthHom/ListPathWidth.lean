@@ -27,24 +27,16 @@ theorem privateRank_lt (p : Private m n) : privateRank p < m*n*(n-2) := by
 
 theorem privateRank_injective : Function.Injective (privateRank (m := m) (n := n)) := by
   intro p r h
-  have divmod : ∀ a b c : ℕ, b<c → (a*c+b)/c=a := by
-    intro a b c hbc
-    apply Nat.div_eq_of_lt_le
-    · omega
-    · have : (a+1)*c=a*c+c := by ring
-      omega
   have hp := p.2.isLt
   have hr := r.2.isLt
-  have hn : 0 < n-2 := by omega
   have he : p.1.1.val*n+p.1.2.val = r.1.1.val*n+r.1.2.val := by
     have he := congrArg (fun a => a/(n-2)) h
-    simpa only [privateRank,divmod _ _ _ hp,divmod _ _ _ hr] using he
+    simpa only [privateRank,mul_add_div_of_lt hp,mul_add_div_of_lt hr] using he
   have hpn := ZMod.val_lt p.1.2
   have hrn := ZMod.val_lt r.1.2
-  have hn' : 0 < n := by have := Fact.out (p := 1<n); omega
   have he1 : p.1.1.val = r.1.1.val := by
     have hh := congrArg (fun a => a/n) he
-    simpa only [divmod _ _ _ hpn,divmod _ _ _ hrn] using hh
+    simpa only [mul_add_div_of_lt hpn,mul_add_div_of_lt hrn] using hh
   have he2 : p.1.2.val = r.1.2.val := by rw [he1] at he; omega
   have he3 : p.2.val=r.2.val := by dsimp [privateRank] at h; rw [he1,he2] at h; omega
   exact Prod.ext (Prod.ext (Fin.ext he1) (ZMod.val_injective _ he2)) (Fin.ext he3)

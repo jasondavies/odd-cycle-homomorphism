@@ -32,46 +32,25 @@ theorem HasPathWidth.mono {V : Type} {G : SimpleGraph V} {a b : ℕ}
   obtain ⟨d,n,D,hw⟩ := h
   exact ⟨d,n,D,fun c => (hw c).trans (Nat.add_le_add_right hab 1)⟩
 
-/-- Position of a time, when every position lasts `J*(q+1)` time units. -/
+/-- Recover the leading index when the final offset is smaller than the block. -/
+theorem mul_add_div_of_lt {a b c : ℕ} (hc : c < b) : (a*b+c)/b=a := by
+  simpa [Nat.add_comm, Nat.div_eq_of_lt hc] using
+    Nat.add_mul_div_right c a (Nat.zero_lt_of_lt hc)
+
+/-- Position of a time, when every position lasts `J*a` time units. -/
 theorem time_div {J a p s c : ℕ} (hs : s < J) (hc : c < a) :
     ((p*J+s)*a+c) / (J*a) = p := by
-  apply Nat.div_eq_of_lt_le
-  · have h : p*(J*a) = p*J*a := by ring
-    have h2 : (p*J+s)*a = p*J*a + s*a := by ring
-    omega
-  · have h : (p+1)*(J*a) = p*J*a + J*a := by ring
-    have h2 : (p*J+s)*a = p*J*a + s*a := by ring
-    have h3 : (s+1)*a ≤ J*a := Nat.mul_le_mul_right a hs
-    have h4 : (s+1)*a = s*a + a := by ring
-    omega
+  rw [Nat.mul_comm J a, ← Nat.div_div_eq_div_mul]
+  rw [mul_add_div_of_lt hc, mul_add_div_of_lt hs]
 
 /-- The sweep of a link determines the link. -/
 theorem time_slot {J a p s c p' s' c' : ℕ} (hs : s < J) (hs' : s' < J) (hc : c < a) (hc' : c' < a)
     (h : (p*J+s)*a+c = (p'*J+s')*a+c') : p = p' ∧ s = s' := by
-  have h1 : ((p*J+s)*a+c)/a = p*J+s := by
-    apply Nat.div_eq_of_lt_le
-    · omega
-    · have : (p*J+s+1)*a = (p*J+s)*a + a := by ring
-      omega
-  have h2 : ((p'*J+s')*a+c')/a = p'*J+s' := by
-    apply Nat.div_eq_of_lt_le
-    · omega
-    · have : (p'*J+s'+1)*a = (p'*J+s')*a + a := by ring
-      omega
-  have h3 : p*J+s = p'*J+s' := by rw [← h1,← h2,h]
-  have h4 : (p*J+s)/J = p := by
-    apply Nat.div_eq_of_lt_le
-    · omega
-    · have : (p+1)*J = p*J + J := by ring
-      omega
-  have h5 : (p'*J+s')/J = p' := by
-    apply Nat.div_eq_of_lt_le
-    · omega
-    · have : (p'+1)*J = p'*J + J := by ring
-      omega
-  have hp : p = p' := by rw [← h4,← h5,h3]
-  subst hp
-  exact ⟨rfl,by omega⟩
+  have hslot := congrArg (fun x => x/a) h
+  simp only [mul_add_div_of_lt hc, mul_add_div_of_lt hc'] at hslot
+  have hp := congrArg (fun x => x/J) hslot
+  simp only [mul_add_div_of_lt hs, mul_add_div_of_lt hs'] at hp
+  exact ⟨hp, by rw [hp] at hslot; omega⟩
 
 /-- A path decomposition of a graph with attached paths. Base vertex `x` occupies
 the positions `lo x,...,hi x`. Link `l` is swept at position `pos l`, in slot
