@@ -8,10 +8,14 @@ Chained Multicolored Clique with `k` colors per layer.
 
 This note gives both the membership algorithm and the chained reduction.
 The ordinary-clique reduction is in [ODD_CYCLE.md](ODD_CYCLE.md).
-The local-to-global correctness lemma for membership is checked in
-[BagHomomorphism.lean](TreewidthHom/BagHomomorphism.lean). The chained
-construction and the machine time/space bounds below are mathematical proofs,
-not Lean complexity theorems.
+Lean checks the combinatorial parts of both directions. For hardness:
+decision equivalence of the chained reduction and a path decomposition of its
+source of width at most `2k+4`
+([`OddCycle.Chained.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean)).
+For membership: the local-to-global lemma behind the algorithm
+([BagHomomorphism.lean](TreewidthHom/BagHomomorphism.lean)). The machine time
+and space bounds below, and the hardness of the starting problem, are
+mathematical arguments and citations, not Lean theorems.
 
 ## Exact problem and theorem
 
@@ -40,7 +44,9 @@ XNLP-hardness when only the graph and its source-pathwidth parameter are
 given, but does not establish membership for that version. It also does not
 claim XNLP-membership for the source-treewidth parameterization. The standard
 XNLP reference adopts the same supplied-decomposition convention
-([Bodlaender et al., Section 2.4 and Theorem 13][bgns]).
+([Bodlaender et al., Section 2.6 and Theorem 13][bgns]; theorem numbers in
+this note are those of the journal version, which are one lower than in the
+arXiv version from Theorem 11 on).
 
 ## Membership in XNLP
 
@@ -144,15 +150,15 @@ and checked in `OddCycleTarget.lean`.
 For each class `s` make a private choice cycle `F_s=C_n`, with coordinate
 vertices `f^s_d` and hub `h_s=f^s_0`.
 
-For each layer `t` make a reference cycle `R_t=C_n`. Identify coordinate
+For each class `s` also make a reference cycle `R_s=C_n`. Identify coordinate
 zero of every reference cycle to a single vertex `A`, and coordinate one
 of every reference cycle to a single vertex `B`. Apart from this shared edge
 `AB`, the reference cycles are disjoint. They are disjoint from the choice
-cycles.
+cycles. (One reference cycle per layer would suffice. One per class is what
+the Lean proof and the Python reference use.)
 
-For class `s=(t,c)`, let `Lambda_s` contain its vertex labels. For every
-residue `d` outside `Lambda_s`, add a link from coordinate `d` of `R_t` to
-`h_s`.
+For class `s`, let `Lambda_s` contain its vertex labels. For every residue `d`
+outside `Lambda_s`, add a link from coordinate `d` of `R_s` to `h_s`.
 
 For each required pair `s<u`, let
 
@@ -194,8 +200,8 @@ Process layers in order. During phase `t`, retain
 
     S_t = {A,B} union {h_(u,c) : u=t or u=t+1, u<=r, 1<=c<=k}.
 
-This set has size at most `2k+2`. Traverse `R_t`, then the choice cycles of
-layer `t`, each in coordinate order. At each current cycle vertex `x`,
+This set has size at most `2k+2`. For each class `s` of layer `t` in turn,
+traverse `R_s` and then `F_s`, each in coordinate order. At each current cycle vertex `x`,
 process all links whose designated start is that occurrence of `x`. Their
 other endpoints are hubs in `S_t`. Process the links one at a time, using
 bags containing `S_t`, `x`, and two consecutive vertices of the link.
@@ -216,7 +222,7 @@ at most `2k+4`. The target has the width-two path decomposition with bags
 
 ### Size and reduction space
 
-There are `rk` choice cycles, `r` reference cycles sharing two vertices,
+There are `rk` choice cycles, `rk` reference cycles sharing two vertices,
 `rk` class constraints, and
 `r*binom(k,2)+(r-1)*k^2` required pairs. Each constraint adds at most `n`
 links, each of size `O(n)`. Source size is `O(r k^2 n^2)`. Since
@@ -242,7 +248,16 @@ for every fixed positive `t`.
 
 ## Formalization boundary and verification
 
-`Decomposition.hom_iff_bagAssignments` proves that a homomorphism exists
+For hardness, `OddCycle.Chained.reduction_pathWidth` proves that the source
+maps to `cycleGraph n` exactly when the instance has a chained multicoloured
+clique, that the source has a path decomposition of width at most `2k+4`, and
+that the cycle has one of width at most `2`. `OddCycle.Chained.reduction` adds
+a polynomial bound on the number of source vertices. The input there is a
+graph on `Fin K × Fin N` with layer size `k`, slot `(t,c)` being numbered
+`t*k+c`. Lean does not prove that the reduction runs in logarithmic space, nor
+the XNLP-hardness of Chained Multicolored Clique.
+
+For membership, `Decomposition.hom_iff_bagAssignments` proves that a homomorphism exists
 exactly when there are bag assignments that preserve local edges and agree
 on overlaps of adjacent decomposition nodes.
 `Decomposition.hom_iff_pathBagAssignments` specializes this equivalence to
@@ -256,18 +271,21 @@ does not give XNLP membership parameterized by treewidth: checking a
 branching decomposition with the same time and space bounds needs an
 additional algorithm, which is not supplied here.
 
-The previous review's chained prototype checked 373 instances, comparing
-full-graph homomorphism with exhaustive clique choices and checking explicit
-path decompositions. It used parity-reused prime labels, which satisfy the
-same signed-difference property; the present elementary labels align with
-the existing Lean reduction. Those finite checks support the construction
-but do not establish its general correctness or its complexity bounds.
+`scripts/run_odd_cycle_chained_checks.py` builds the construction described
+here, with one reference cycle per class and the elementary labels, on 361
+instances. It compares full-graph homomorphism with exhaustive clique choices
+and checks an explicit path decomposition of width at most `2k+4` on each. An
+earlier prototype with one reference cycle per layer and prime labels passed
+373 further instances. Finite checks support the construction; the general
+correctness and the width bound are the Lean theorems above, and the
+complexity bounds are the arguments in this note.
 
-Reproduce the membership lemma's checks with:
+Reproduce the Lean checks with:
 
 ```sh
-lake build TreewidthHom.BagHomomorphism
+lake build
 lake env lean BagHomomorphismAudit.lean
+python3 scripts/check_formalization.py
 ```
 
 No novelty or priority claim is made here; see the attribution in

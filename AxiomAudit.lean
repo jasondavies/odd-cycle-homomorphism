@@ -36,3 +36,12 @@ import TreewidthHom
 #print axioms TreewidthHom.Decomposition.hom_iff_bagAssignments
 #print axioms TreewidthHom.Decomposition.hom_iff_pathBagAssignments
 #print axioms TreewidthHom.Decomposition.two_bag_records_le
+#print axioms TreewidthHom.HasPathWidth.hasWidth
+#print axioms TreewidthHom.hasPathWidth_linked
+#print axioms TreewidthHom.acyclic_of_apex_forest
+#print axioms TreewidthHom.OddCycle.source_feedback
+#print axioms TreewidthHom.OddCycle.target_pathWidth
+#print axioms TreewidthHom.OddCycle.source_pathWidth
+#print axioms TreewidthHom.OddCycle.Chained.source_pathWidth
+#print axioms TreewidthHom.OddCycle.reduction_pathWidth
+#print axioms TreewidthHom.OddCycle.Chained.reduction_pathWidth

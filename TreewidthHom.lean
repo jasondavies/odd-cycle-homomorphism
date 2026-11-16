@@ -11,4 +11,6 @@ public import TreewidthHom.ApexForest
 public import TreewidthHom.Links
 public import TreewidthHom.OddCycleTarget
 public import TreewidthHom.OddCycleReduction
+public import TreewidthHom.PathWidth
 public import TreewidthHom.OddCycleChained
+public import TreewidthHom.OddCyclePathWidth

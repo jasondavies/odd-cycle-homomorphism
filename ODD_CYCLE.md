@@ -1,8 +1,10 @@
 # Homomorphism into an odd cycle is W[1]-hard
 
-**Status, 2026-11-16.** The reduction is checked in Lean: decision equivalence,
-both width bounds and polynomial size
-([`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean)). As
+**Status, 2026-11-16.** The reductions are checked in Lean: decision
+equivalence, treewidth and pathwidth bounds, the feedback vertex set of the
+plain reduction, and polynomial size
+([`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean),
+[`OddCycle.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean)). As
 elsewhere in this repository, the hardness of the starting problem, the
 polynomial running time and the W[1]-hardness conclusion itself are not Lean
 theorems. Not independently reviewed. We have not found this statement in the
@@ -226,20 +228,21 @@ argued in [XNLP_COMPLETENESS.md](XNLP_COMPLETENESS.md).
 | [Links.lean](TreewidthHom/Links.lean) | `linked_hom_iff` | A homomorphism out of a graph with attached paths is a homomorphism of the base graph with a walk of the right length for every path. |
 | [ApexForest.lean](TreewidthHom/ApexForest.lean) | `hasWidth_of_apex_forest`, `hasWidth_of_phased_forest` | Hubs whose removal leaves parent pointers covering every edge: width at most the number of hubs plus one. The phased version keeps at most `m` retained vertices per phase along a path and gives width at most `m+1`. |
 | [OddCycleReduction.lean](TreewidthHom/OddCycleReduction.lean) | `label_solve`, `source_hom_iff_clique`, `source_width`, `target_width`, `reduction_cycleGraph` | The arithmetic claim, decision equivalence, width at most k+2 for the source and 2 for the cycle, and at most (k+1)^2 n^2 source vertices. |
+| [PathWidth.lean](TreewidthHom/PathWidth.lean), [OddCyclePathWidth.lean](TreewidthHom/OddCyclePathWidth.lean) | `hasPathWidth_linked`, `target_pathWidth`, `source_pathWidth`, `Chained.source_pathWidth`, `reduction_pathWidth`, `Chained.reduction_pathWidth` | Path decompositions: width 2 for the cycle, k+3 for the plain source and 2k+4 for the chained source. |
 | [OddCycleChained.lean](TreewidthHom/OddCycleChained.lean) | `Chained.source_hom_iff_clique`, `Chained.source_width`, `Chained.reduction` | The chained variant: decision equivalence, source width at most 2k+3 for any number of slots, target width 2, and at most 2(K+1)^2 n^2 source vertices. |
 
 For the chained variant the input is a graph on `Fin K × Fin N` and a layer
 size `k > 0`; `ChainedClique` asks for one vertex per slot, adjacent for every
-required pair. Lean proves the treewidth bound 2k+3. The path decomposition of
-width 2k+4, the logarithmic-space claim and XNLP membership are not Lean
-theorems.
+required pair. Lean proves the treewidth bound 2k+3 and a path decomposition
+of width at most 2k+4. The logarithmic-space claim and XNLP membership are
+not Lean theorems.
 
 The input of the plain reduction is a graph on `Fin k × Fin N`, and `MulticolouredClique` asks for a
 choice of one vertex per class that is pairwise adjacent. The statement holds
 for all k and N, including zero. The width bounds use the repository's
-tree-decomposition certificates (`HasWidth`). The pathwidth bound k+3 and the
-feedback-vertex-set formulation are not stated in Lean; the width proof does
-delete exactly the k+1 hubs. All declarations pass the axiom audit with only
+tree-decomposition certificates (`HasWidth`) and path-decomposition
+certificates (`HasPathWidth`). `source_feedback` states that deleting the k+1
+hubs leaves an acyclic graph. All declarations pass the axiom audit with only
 `propext`, `Classical.choice` and `Quot.sound`.
 
 ## Finite checks

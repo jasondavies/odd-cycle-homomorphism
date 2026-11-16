@@ -492,6 +492,15 @@ theorem source_width : HasWidth (source Γ) (k+2) := by
       (parent_eq_some Γ p q).mpr (parent_eq_some Γ q p).mpr)
   rwa [hub_card] at h
 
+/-- The `k+1` hubs form a feedback vertex set of the source. -/
+theorem source_feedback :
+    Fintype.card {v : SourceVertex Γ // hub Γ v} = k+1 ∧
+    ((source Γ).induce {v | ¬ hub Γ v}).IsAcyclic :=
+  ⟨hub_card Γ,acyclic_of_apex_forest (source Γ) (hub Γ) (parent Γ) (fun p => ht Γ p.val)
+    (fun p q hpq => par_ht Γ ((parent_eq_some Γ p q).mp hpq))
+    (fun p q hadj => (par_edge Γ p.prop q.prop hadj).imp
+      (parent_eq_some Γ p q).mpr (parent_eq_some Γ q p).mpr)⟩
+
 /-! ## Size -/
 
 noncomputable instance linkFintype : Fintype (Link Γ) := by

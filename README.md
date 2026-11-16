@@ -6,13 +6,14 @@ treewidth or pathwidth of the source. The target has treewidth and pathwidth 2,
 so graph homomorphism parameterized by both treewidths is hard even at target
 treewidth 2. That is optimal: homomorphism into a forest is polynomial.
 
-Two reductions are checked in Lean 4. Each proves decision equivalence, a width
-bound for the source, width 2 for the target, and polynomial size.
+Two reductions are checked in Lean 4. Each proves decision equivalence,
+treewidth and pathwidth bounds for the source, width 2 for the target, and
+polynomial size.
 
 | Reduction | From | Source width | Lean theorem |
 | --- | --- | --- | --- |
-| Plain | Multicoloured Clique, `k` classes | at most `k+2`; a feedback vertex set of `k+1` vertices | [`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean) |
-| Chained | Chained Multicoloured Clique, `k` colours, any number of layers | at most `2k+3` | [`OddCycle.Chained.reduction`](TreewidthHom/OddCycleChained.lean) |
+| Plain | Multicoloured Clique, `k` classes | treewidth at most `k+2`, pathwidth at most `k+3`, a feedback vertex set of `k+1` vertices | [`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean), [`OddCycle.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean) |
+| Chained | Chained Multicoloured Clique, `k` colours, any number of layers | treewidth at most `2k+3`, pathwidth at most `2k+4` | [`OddCycle.Chained.reduction`](TreewidthHom/OddCycleChained.lean), [`OddCycle.Chained.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean) |
 
 With the published hardness of the two starting problems these give:
 
@@ -24,9 +25,9 @@ With the published hardness of the two starting problems these give:
 **What Lean does and does not check.** Lean checks the two combinatorial
 reductions. The hardness of the starting problems, the running time and space
 of the reductions, membership in XNLP, and therefore the complexity conclusions
-themselves are **not Lean theorems**. The pathwidth bounds are proved in prose
-and checked on finite instances; Lean states treewidth. See
-[FORMALIZATION.md](FORMALIZATION.md).
+themselves are **not Lean theorems**. Closing those would need a formal model
+of space-bounded computation and formal definitions of the complexity classes,
+which this repository does not have. See [FORMALIZATION.md](FORMALIZATION.md).
 
 **Prior work:** W[1]-hardness of homomorphism parameterized by both treewidths
 was announced in

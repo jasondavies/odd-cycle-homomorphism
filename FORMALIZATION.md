@@ -7,7 +7,8 @@ conclusions are not formal theorems. These are distinct claims.
 ## Checked statements
 
 The target of both reductions is mathlib's `SimpleGraph.cycleGraph n` for an
-odd `n`. Width means a tree-decomposition certificate (`HasWidth`, below).
+odd `n`. Width means a tree-decomposition certificate (`HasWidth`), and a path
+decomposition means `HasPathWidth`; both are described below.
 
 **Plain reduction.** For every graph `Γ` on `Fin k × Fin N`,
 [`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean) proves:
@@ -15,6 +16,10 @@ odd `n`. Width means a tree-decomposition certificate (`HasWidth`, below).
 - `Nonempty (source Γ →g cycleGraph n)` if and only if `Γ` has a clique with one
   vertex in each of the `k` classes (`MulticolouredClique`);
 - the source has width at most `k+2` and the cycle has width at most `2`;
+- deleting `k+1` vertices of the source leaves an acyclic graph
+  (`source_feedback`);
+- the source has a path decomposition of width at most `k+3`, and the cycle one
+  of width at most `2` ([`OddCycle.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean));
 - `n` is odd, and the source has at most `(k+1)^2 * n^2` vertices, where
   `n = cycleLength k N = 2*(N*(2*N*k+1+k)+2)+1`.
 
@@ -27,6 +32,8 @@ odd `n`. Width means a tree-decomposition certificate (`HasWidth`, below).
   `r` layers and `k` colours, slot `(t,c)` being numbered `t*k+c`;
 - the source has width at most `2k+3`, independently of `K`, and the cycle has
   width at most `2`;
+- the source has a path decomposition of width at most `2k+4`, independently
+  of `K` ([`OddCycle.Chained.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean));
 - `n = cycleLength K N` is odd, and the source has at most `2*(K+1)^2 * n^2`
   vertices.
 
@@ -46,39 +53,49 @@ and empty classes. They depend only on `propext`, `Classical.choice` and
 | [DecompositionMaps.lean](TreewidthHom/DecompositionMaps.lean), [IntervalDecomposition.lean](TreewidthHom/IntervalDecomposition.lean) | `mapEquiv`, `intervalDecomposition` | Relabelling, and decompositions over a path of bags. |
 | [GraftTree.lean](TreewidthHom/GraftTree.lean), [GraftDecomposition.lean](TreewidthHom/GraftDecomposition.lean) | `Graft.isTree`, `Graft.running_of_tops`, `Graft.extend` | Grafting trees of bags by parent pointers, with a local criterion for connected occurrences. |
 | [BagHomomorphism.lean](TreewidthHom/BagHomomorphism.lean) | `hom_iff_bagAssignments`, `hom_iff_pathBagAssignments`, `two_bag_records_le` | A homomorphism exists exactly when there are assignments on the bags that preserve the edges inside each bag and agree on neighbouring bags. This is the correctness of the membership algorithm in [XNLP_COMPLETENESS.md](XNLP_COMPLETENESS.md), not a machine model of it. |
-| [ApexForest.lean](TreewidthHom/ApexForest.lean) | `hasWidth_of_apex_forest`, `hasWidth_of_phased_forest` | Width from a few hubs plus a forest, and from boundedly many retained vertices per phase along a path. |
+| [ApexForest.lean](TreewidthHom/ApexForest.lean) | `hasWidth_of_apex_forest`, `acyclic_of_apex_forest`, `hasWidth_of_phased_forest` | Width from a few hubs plus a forest, acyclicity after deleting the hubs, and width from boundedly many retained vertices per phase along a path. |
+| [PathWidth.lean](TreewidthHom/PathWidth.lean) | `HasPathWidth`, `hasPathWidth_linked` | Path-decomposition certificates, and a path decomposition for a graph with attached paths swept one at a time. |
+| [OddCyclePathWidth.lean](TreewidthHom/OddCyclePathWidth.lean) | `target_pathWidth`, `source_pathWidth`, `Chained.source_pathWidth`, `reduction_pathWidth`, `Chained.reduction_pathWidth` | Pathwidth 2 for the cycle, `k+3` for the plain source and `2k+4` for the chained source. |
 
-## The width notion
+## The width notions
 
 `Decomposition G T` uses mathlib trees and walks. It requires vertex coverage,
 edge coverage and, for every vertex, a walk between any two of its bags that
 stays inside its bags. `HasWidth G w` packages such a certificate with every
-bag of size at most `w+1`. A minimisation-based treewidth function is not
-defined, and there is no separate notion of path decomposition: Lean states
-treewidth bounds only.
+bag of size at most `w+1`. `HasPathWidth G w` is the same with the bags arranged
+along mathlib's `pathGraph`; it implies `HasWidth G w`. Minimisation-based
+treewidth and pathwidth functions are not defined: the theorems exhibit
+decompositions.
 
 ## Outside Lean
 
+Three things remain outside Lean. They share one cause: each is a statement
+about computation or about complexity classes, and neither mathlib nor this
+repository has a formal model of space-bounded computation or definitions of
+W[1] and XNLP.
+
 1. **Hardness of the starting problems.** W[1]-hardness of Multicoloured
    Clique, and XNLP-completeness of Chained Multicoloured Clique (Bodlaender,
-   Groenland, Nederlof, Swennenhuis), are external published inputs, not
-   project axioms.
+   Groenland, Nederlof, Swennenhuis, Theorem 11), are external published
+   inputs, not project axioms. Formalising them means formalising those
+   papers' proofs on top of formal definitions of the classes.
 2. **Resources of the reductions.** That they run in polynomial time, and in
    logarithmic space as XNLP-hardness requires, is argued in prose. Lean proves
-   polynomial bounds on the number of source vertices only.
-3. **Pathwidth.** The bounds `k+3` and `2k+4`, and the explicit path
-   decompositions, are proved in prose. The chained decomposition is checked on
-   finite instances by the Python runner.
-4. **Membership in XNLP** with a supplied path decomposition, and hence
+   polynomial bounds on the number of source vertices only. A proof needs a
+   machine model with a work-tape space measure and the reduction programmed
+   in it.
+3. **Membership in XNLP** with a supplied path decomposition, and hence
    XNLP-completeness, is a prose argument in
-   [XNLP_COMPLETENESS.md](XNLP_COMPLETENESS.md). Lean checks only the
-   combinatorial lemma behind it (`hom_iff_pathBagAssignments`), not the
-   time and space bounds.
-5. **The complexity conclusions**, since no parameterized-complexity framework
-   is formalised.
-6. **Feedback vertex number.** The plain width proof deletes exactly the `k+1`
-   hubs, but the statement "feedback vertex number at most `k+1`" is not a Lean
-   theorem.
+   [XNLP_COMPLETENESS.md](XNLP_COMPLETENESS.md). Lean checks the combinatorial
+   lemma behind it (`hom_iff_pathBagAssignments`), not the time and space
+   bounds of the algorithm. A proof needs a nondeterministic machine model
+   with simultaneous time and space bounds.
+
+Consequently the complexity conclusions themselves (W[1]-hardness,
+W[t]-hardness for every t, XNLP-hardness and XNLP-completeness) are not Lean
+theorems. What Lean does establish is every combinatorial fact those
+conclusions rest on: correctness of both reductions, their width and size
+bounds, and the gluing lemma for membership.
 
 ## Reproduction and trust
 
