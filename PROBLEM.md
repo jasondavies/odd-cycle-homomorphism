@@ -14,7 +14,8 @@ Sources:
 - [a3nm: Complexity of query evaluation parameterized by treewidth](https://a3nm.net/work/research/questions/#complexity-of-query-evaluation-parameterized-by-treewidth)
 - [Graph-homomorphism formulation on cstheory](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth)
 
-The written solution gives W[1]-hardness, even with target treewidth at most 3.
+The written solution gives W[1]-hardness even when the target is an odd cycle,
+which has treewidth 2, and W[t]-hardness for every t by a chained variant.
 It does not establish W[1]-membership or W[1]-completeness. The source width
 still depends on the parameter; the result does not assert hardness with both
 widths fixed constants.
@@ -28,8 +29,8 @@ already announced W[1]-hardness reductions from workshop participants. A public
 proof was not located in that check. Lack of a posted answer is not evidence
 that the result is unclaimed or new.
 
-This repository preserves our local reduction and begins its formalisation;
-it does not claim to be the first resolution. The imported LCS hardness theorem
-and direction gadget are established prior work. Independent assessment of
-correctness, overlap with the announced reductions, and publication value
+This repository preserves our reductions and their formalisation; it does not
+claim to be the first resolution. The hardness of Multicoloured Clique and of
+Chained Multicoloured Clique is established prior work. Independent assessment
+of correctness, overlap with the announced reductions, and publication value
 remains outstanding.

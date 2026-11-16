@@ -2,88 +2,21 @@
   "toolchain": "leanprover/lean4:v4.35.0",
   "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
   "theorems_audited": [
-    "TreewidthHom.paddedAdvance_iff",
-    "TreewidthHom.commonSubsequence_iff_embedding",
-    "TreewidthHom.commonSubsequence_iff_paddedSelection",
-    "TreewidthHom.cycleHom_dvd",
-    "TreewidthHom.prime_cycleHom_eq",
-    "TreewidthHom.cycleHom_rotation",
-    "TreewidthHom.markerPrimes_length",
-    "TreewidthHom.markerPrimes_nodup",
-    "TreewidthHom.markerPrimes_prime",
-    "TreewidthHom.Arrow.adj_iff_edges",
-    "TreewidthHom.Arrow.assignments_complete",
-    "TreewidthHom.Arrow.assignments_thirteen",
-    "TreewidthHom.Arrow.rigid_hom",
-    "TreewidthHom.Arrow.ports_separated",
     "TreewidthHom.Decomposition.addApices",
-    "TreewidthHom.Decomposition.two_apex_width",
-    "TreewidthHom.Arrow.Quotient.connectivity_certificate",
-    "TreewidthHom.Arrow.Assembly.embed_adj_iff",
-    "TreewidthHom.Arrow.Assembly.confinement",
-    "TreewidthHom.Digraph.directionReduction_iff",
-    "TreewidthHom.Digraph.directionReduction_card",
-    "TreewidthHom.leafTree.isTree",
+    "TreewidthHom.Decomposition.mapEquiv",
+    "TreewidthHom.Decomposition.comap",
+    "TreewidthHom.intervalDecomposition",
+    "TreewidthHom.Graft.isTree",
     "TreewidthHom.Graft.running_of_tops",
     "TreewidthHom.Graft.extend",
     "TreewidthHom.Graft.forestDecomposition",
     "TreewidthHom.Graft.forest_width",
-    "TreewidthHom.Arrow.gadgetBag_top",
-    "TreewidthHom.Arrow.Assembly.extendDecomposition",
-    "TreewidthHom.Arrow.Assembly.extended_width",
-    "TreewidthHom.Digraph.directionReduction_width",
-    "TreewidthHom.Relational.incidence_iff",
-    "TreewidthHom.cycle_rank_constant",
-    "TreewidthHom.TypedDag.EncodedHom.component",
-    "TreewidthHom.TypedDag.EncodedHom.colors",
-    "TreewidthHom.TypedDag.colorEncoding_iff",
-    "TreewidthHom.TypedDag.encoded_noIsolated",
-    "TreewidthHom.Relational.relationalReduction_iff",
-    "TreewidthHom.Relational.schema_tags_card",
-    "TreewidthHom.standardMarkers_bound",
-    "TreewidthHom.UnaryBinary.hom_iff_relational",
-    "TreewidthHom.LCSInstance.lcs_relational_iff",
-    "TreewidthHom.LCSInstance.lcs_graph_iff",
-    "TreewidthHom.Graft.isTree",
-    "TreewidthHom.RootedGraft.decomposition",
-    "TreewidthHom.RootedGraft.width",
-    "TreewidthHom.Relational.incidence_width",
-    "TreewidthHom.TypedDag.colorEncoding_width",
-    "TreewidthHom.LCSInstance.query_width",
-    "TreewidthHom.LCSInstance.target_width",
-    "TreewidthHom.UnaryBinary.untyped_width",
-    "TreewidthHom.LCSInstance.lcs_bounded_graph_reduction",
-    "TreewidthHom.schema_graph_card_le",
-    "TreewidthHom.LCSInstance.query_card",
-    "TreewidthHom.LCSInstance.target_card",
-    "TreewidthHom.LCSInstance.query_domain_bound",
-    "TreewidthHom.LCSInstance.target_domain_bound",
-    "TreewidthHom.LCSInstance.graph_bound_of_domain",
-    "TreewidthHom.LCSInstance.reduce_correct",
-    "TreewidthHom.LCSInstance.reduce_width",
-    "TreewidthHom.LCSInstance.reduce_size",
-    "TreewidthHom.LCSInstance.full_reduction",
-    "TreewidthHom.BlockLCS.blockCommon_hom",
-    "TreewidthHom.BlockLCS.Decode.blockCommon",
-    "TreewidthHom.BlockLCS.block_relational_iff",
-    "TreewidthHom.BlockLCS.block_graph_iff",
-    "TreewidthHom.BlockLCS.query_width",
-    "TreewidthHom.BlockLCS.target_width",
-    "TreewidthHom.BlockLCS.blockCommon_iff",
-    "TreewidthHom.BlockLCS.reduce_correct",
-    "TreewidthHom.BlockLCS.reduce_width",
-    "TreewidthHom.BlockLCS.reduce_size",
-    "TreewidthHom.BlockLCS.full_reduction",
-    "TreewidthHom.BlockLCS.commonSubsequence_map",
-    "TreewidthHom.BlockLCS.exists_code",
-    "TreewidthHom.BlockLCS.alphabet_reduction",
-    "TreewidthHom.BlockLCS.alphabet_full_reduction",
+    "TreewidthHom.hasWidth_of_apex_forest",
+    "TreewidthHom.hasWidth_of_phased_forest",
+    "TreewidthHom.linked_hom_iff",
     "TreewidthHom.OddCycle.cyc_eq_cycleGraph",
     "TreewidthHom.OddCycle.dial",
     "TreewidthHom.OddCycle.walk_iff_ne",
-    "TreewidthHom.linked_hom_iff",
-    "TreewidthHom.Decomposition.comap",
-    "TreewidthHom.hasWidth_of_apex_forest",
     "TreewidthHom.OddCycle.label_solve",
     "TreewidthHom.OddCycle.source_hom_iff",
     "TreewidthHom.OddCycle.hom_of_clique",
@@ -94,141 +27,40 @@
     "TreewidthHom.OddCycle.source_card_le",
     "TreewidthHom.OddCycle.reduction",
     "TreewidthHom.OddCycle.reduction_cycleGraph",
-    "TreewidthHom.Executable.markers_bound",
-    "TreewidthHom.Executable.Presentation.iso",
-    "TreewidthHom.Executable.arcOfCode_injective",
-    "TreewidthHom.Executable.arcOfCode_surjective",
-    "TreewidthHom.Executable.indexedAssemblyIso",
-    "TreewidthHom.Executable.relationalGraphIso",
-    "TreewidthHom.Executable.compile_correct",
-    "TreewidthHom.Executable.compile_width",
-    "TreewidthHom.Executable.compile_size",
-    "TreewidthHom.Executable.compile_spec",
-    "TreewidthHom.Executable.indexMeasured_value",
-    "TreewidthHom.Executable.indexMeasured_cost",
-    "TreewidthHom.Executable.serializeMeasured_value",
-    "TreewidthHom.Executable.serializeMeasured_cost",
-    "TreewidthHom.Executable.indexedAssemblyMeasured_value",
-    "TreewidthHom.Executable.indexedAssemblyMeasured_cost",
-    "TreewidthHom.Executable.indexedAssemblyMeasured_quadratic",
-    "TreewidthHom.Executable.indexedAssemblyMeasured_order_bound",
-    "TreewidthHom.Executable.Measured.finRange_value",
-    "TreewidthHom.Executable.Measured.finRange_cost",
-    "TreewidthHom.Executable.EnumRun.bounded_sigma",
-    "TreewidthHom.Executable.EnumRun.bounded_subtype",
-    "TreewidthHom.Executable.EnumRun.budget_polynomial",
-    "TreewidthHom.Executable.Decision.existsFin_cost",
-    "TreewidthHom.Executable.EnumRun.output_eq",
-    "TreewidthHom.Executable.EnumRun.functions_level",
-    "TreewidthHom.Executable.SchemaRun.facts_level",
-    "TreewidthHom.Executable.SchemaRun.incidence_level",
-    "TreewidthHom.Executable.SchemaRun.cycles_level",
-    "TreewidthHom.Executable.SchemaRun.arcs_level",
-    "TreewidthHom.Executable.relationalMeasured_value",
-    "TreewidthHom.Executable.relationalMeasured_cost",
-    "TreewidthHom.Executable.queryTest_level",
-    "TreewidthHom.Executable.targetTest_level",
-    "TreewidthHom.Executable.queryHoldsTest_level",
-    "TreewidthHom.Executable.targetHoldsTest_level",
-    "TreewidthHom.Executable.EnumRun.queryVertices_level",
-    "TreewidthHom.Executable.EnumRun.targetVertices_level",
-    "TreewidthHom.Executable.statsMeasured_spec",
-    "TreewidthHom.Executable.statsMeasured_short",
-    "TreewidthHom.Executable.rawMeasured_value",
-    "TreewidthHom.Executable.rawMeasured_cost",
-    "TreewidthHom.Executable.compileMeasured_value",
-    "TreewidthHom.Executable.compileMeasured_cost",
-    "TreewidthHom.Executable.compileMeasured_polynomial"
+    "TreewidthHom.OddCycle.Chained.source_hom_iff",
+    "TreewidthHom.OddCycle.Chained.hom_of_clique",
+    "TreewidthHom.OddCycle.Chained.clique_of_hom",
+    "TreewidthHom.OddCycle.Chained.source_hom_iff_clique",
+    "TreewidthHom.OddCycle.Chained.source_width",
+    "TreewidthHom.OddCycle.Chained.source_card_le",
+    "TreewidthHom.OddCycle.Chained.reduction",
+    "TreewidthHom.Decomposition.agree_on_bags",
+    "TreewidthHom.Decomposition.hom_iff_bagAssignments",
+    "TreewidthHom.Decomposition.hom_iff_pathBagAssignments",
+    "TreewidthHom.Decomposition.two_bag_records_le"
   ],
   "axioms": {
-    "TreewidthHom.paddedAdvance_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.commonSubsequence_iff_embedding": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.commonSubsequence_iff_paddedSelection": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.cycleHom_dvd": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.prime_cycleHom_eq": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.cycleHom_rotation": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.markerPrimes_prime": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.adj_iff_edges": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.assignments_complete": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.assignments_thirteen": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.rigid_hom": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.ports_separated": [
-      "propext",
-      "Quot.sound"
-    ],
     "TreewidthHom.Decomposition.addApices": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Decomposition.two_apex_width": [
+    "TreewidthHom.Decomposition.mapEquiv": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Arrow.Quotient.connectivity_certificate": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.Assembly.embed_adj_iff": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Arrow.Assembly.confinement": [
+    "TreewidthHom.Decomposition.comap": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Digraph.directionReduction_iff": [
+    "TreewidthHom.intervalDecomposition": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Digraph.directionReduction_card": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.leafTree.isTree": [
+    "TreewidthHom.Graft.isTree": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -253,251 +85,17 @@
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Arrow.gadgetBag_top": [
+    "TreewidthHom.hasWidth_of_apex_forest": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Arrow.Assembly.extendDecomposition": [
+    "TreewidthHom.hasWidth_of_phased_forest": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Arrow.Assembly.extended_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Digraph.directionReduction_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Relational.incidence_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.cycle_rank_constant": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.TypedDag.EncodedHom.component": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.TypedDag.EncodedHom.colors": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.TypedDag.colorEncoding_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.TypedDag.encoded_noIsolated": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Relational.relationalReduction_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Relational.schema_tags_card": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.standardMarkers_bound": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.UnaryBinary.hom_iff_relational": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.lcs_relational_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.lcs_graph_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Graft.isTree": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.RootedGraft.decomposition": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.RootedGraft.width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Relational.incidence_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.TypedDag.colorEncoding_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.query_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.target_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.UnaryBinary.untyped_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.lcs_bounded_graph_reduction": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.schema_graph_card_le": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.query_card": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.target_card": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.query_domain_bound": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.target_domain_bound": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.graph_bound_of_domain": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.reduce_correct": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.reduce_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.reduce_size": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.LCSInstance.full_reduction": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.blockCommon_hom": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.Decode.blockCommon": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.block_relational_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.block_graph_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.query_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.target_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.blockCommon_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.reduce_correct": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.reduce_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.reduce_size": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.full_reduction": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.commonSubsequence_map": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.exists_code": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.alphabet_reduction": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.BlockLCS.alphabet_full_reduction": [
+    "TreewidthHom.linked_hom_iff": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -513,21 +111,6 @@
       "Quot.sound"
     ],
     "TreewidthHom.OddCycle.walk_iff_ne": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.linked_hom_iff": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Decomposition.comap": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.hasWidth_of_apex_forest": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -582,229 +165,62 @@
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.markers_bound": [
+    "TreewidthHom.OddCycle.Chained.source_hom_iff": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.Presentation.iso": [
+    "TreewidthHom.OddCycle.Chained.hom_of_clique": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.arcOfCode_injective": [
+    "TreewidthHom.OddCycle.Chained.clique_of_hom": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.arcOfCode_surjective": [
+    "TreewidthHom.OddCycle.Chained.source_hom_iff_clique": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.indexedAssemblyIso": [
+    "TreewidthHom.OddCycle.Chained.source_width": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.relationalGraphIso": [
+    "TreewidthHom.OddCycle.Chained.source_card_le": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.compile_correct": [
+    "TreewidthHom.OddCycle.Chained.reduction": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.compile_width": [
+    "TreewidthHom.Decomposition.agree_on_bags": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.compile_size": [
+    "TreewidthHom.Decomposition.hom_iff_bagAssignments": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.compile_spec": [
+    "TreewidthHom.Decomposition.hom_iff_pathBagAssignments": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Executable.indexMeasured_value": [
+    "TreewidthHom.Decomposition.two_bag_records_le": [
       "propext",
       "Classical.choice",
       "Quot.sound"
-    ],
-    "TreewidthHom.Executable.indexMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.serializeMeasured_value": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.serializeMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.indexedAssemblyMeasured_value": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.indexedAssemblyMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.indexedAssemblyMeasured_quadratic": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.indexedAssemblyMeasured_order_bound": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.Measured.finRange_value": [
-      "propext",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.Measured.finRange_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.bounded_sigma": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.bounded_subtype": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.budget_polynomial": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.Decision.existsFin_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.functions_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.SchemaRun.facts_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.SchemaRun.incidence_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.SchemaRun.cycles_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.SchemaRun.arcs_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.relationalMeasured_value": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.relationalMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.queryTest_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.targetTest_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.queryHoldsTest_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.targetHoldsTest_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.queryVertices_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.EnumRun.targetVertices_level": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.statsMeasured_spec": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.statsMeasured_short": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.rawMeasured_value": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.rawMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.compileMeasured_value": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.compileMeasured_cost": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Executable.compileMeasured_polynomial": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.markerPrimes_length": [],
-    "TreewidthHom.markerPrimes_nodup": [],
-    "TreewidthHom.Executable.EnumRun.output_eq": []
+    ]
   },
   "build_passed": true,
-  "scope": "Reduction from Multicoloured Clique to homomorphism into an odd cycle, with decision equivalence, source width k+2, target width 2 and polynomial size (OddCycle.reduction_cycleGraph). Combinatorial reduction from LCS over any finite alphabet to simple graph homomorphism, with decision equivalence, source width max(2k,3), target width 3 and polynomial vertex count (BlockLCS.alphabet_full_reduction). Verified executable binary-LCS-to-edge-list constructor with general decision equivalence, source width max(2k,3), target width 3, and polynomial output size. The complete measured constructor is proved equal to the verified edge-list output and has a fixed polynomial bound in a stated traversal/comparison model with supplied primitive cost q. Primitive bit-cost justification, parameterized complexity framework and Pietrzak's hardness theorem remain outside the completed formal result."
+  "scope": "Reductions to homomorphism into an odd cycle (mathlib cycleGraph n, n odd): from Multicoloured Clique with source width k+2 (OddCycle.reduction_cycleGraph), and from Chained Multicoloured Clique with source width 2k+3 independent of the number of layers (OddCycle.Chained.reduction). Each has decision equivalence, target width 2 and polynomial size. Hardness of the source problems, running time and space of the reductions, and the complexity conclusions are outside Lean."
 }

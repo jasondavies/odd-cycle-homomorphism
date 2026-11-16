@@ -1,65 +1,43 @@
-# Graph homomorphism parameterized by both treewidths
+# Graph homomorphism into an odd cycle, parameterized by source width
 
-A reduction from binary longest common subsequence to simple undirected graph
-homomorphism, with a Lean 4 proof of the complete combinatorial reduction.
-The checked construction has source treewidth at most `max(2k,3)` and target
-treewidth at most `3`, where `k` is the number of input strings.
+Deciding whether a graph maps homomorphically into an odd cycle given in the
+input is hard for parameterized complexity classes when the parameter is the
+treewidth or pathwidth of the source. The target has treewidth and pathwidth 2,
+so graph homomorphism parameterized by both treewidths is hard even at target
+treewidth 2. That is optimal: homomorphism into a forest is polynomial.
 
-**Status: the Lean constructor is executable and verified.**
-[`Executable.compile_spec`](TreewidthHom/ExecutableReduction.lean) proves decision
-equivalence, both width bounds, all input cases, and polynomial size for its
-actual integer-numbered edge-list output. The earlier mathematical statement is
-[`LCSInstance.full_reduction`](TreewidthHom/FullReduction.lean).
-[`BlockLCS.alphabet_full_reduction`](TreewidthHom/BlockReduction.lean) proves the
-same decision equivalence, width bounds and polynomial size for LCS over any
-finite alphabet. All 137 principal-declaration axiom audits pass without proof
-admissions.
+Two reductions are checked in Lean 4. Each proves decision equivalence, a width
+bound for the source, width 2 for the target, and polynomial size.
 
-The complete measured constructor now returns provably identical graph data and
-has a fixed polynomial bound in an explicit traversal/comparison model. This
-includes preprocessing, relation tests, all enumeration stages, and sparse
-serialization. Primitive bit costs remain unverified;
-[COST_MODEL.md](COST_MODEL.md) specifies the boundary.
+| Reduction | From | Source width | Lean theorem |
+| --- | --- | --- | --- |
+| Plain | Multicoloured Clique, `k` classes | at most `k+2`; a feedback vertex set of `k+1` vertices | [`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean) |
+| Chained | Chained Multicoloured Clique, `k` colours, any number of layers | at most `2k+3` | [`OddCycle.Chained.reduction`](TreewidthHom/OddCycleChained.lean) |
 
-A formal machine-level running-time proof and parameterized-complexity framework
-are still absent. The written polynomial-time argument and Pietrzak's published
-LCS hardness theorem yield W[1]-hardness; that complexity conclusion is **not a
-Lean theorem in this repository**. The written proof also gives the sharper
-source bound `max(k+1,3)` and a sharper size bound than the checked construction.
-[FORMALIZATION.md](FORMALIZATION.md) records the exact boundary.
+With the published hardness of the two starting problems these give:
 
-**Beyond W[1]:** [SOLUTION.md, Section 9](SOLUTION.md#9-arbitrary-alphabets-hardness-beyond-w1)
-extends the reduction to LCS over arbitrary alphabets by encoding letters as
-binary blocks. With published hardness results for that problem, this gives
-W[t]-hardness for every t and, by a proof sketch, XNLP-hardness, with the same
-target treewidth 3. The combinatorial reduction for arbitrary alphabets is
-checked in Lean. The executable constructor and cost model still cover binary
-strings only, and the logarithmic-space claim behind XNLP-hardness is prose.
+- W[1]-hardness parameterized by the feedback vertex number of the source;
+- W[t]-hardness for every t, and XNLP-hardness, parameterized by its treewidth
+  or pathwidth;
+- XNLP-completeness when a path decomposition of the source is supplied.
 
-**Target treewidth 2:** [ODD_CYCLE.md](ODD_CYCLE.md) gives a separate, much
-shorter reduction from Multicoloured Clique in which the target is a single odd
-cycle. It shows W[1]-hardness with target treewidth 2, which is optimal, and a
-source with a feedback vertex set of k+1 vertices. The reduction is checked in
-Lean ([`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean)) and
-by finite checks (`python3 scripts/run_odd_cycle_checks.py`). It is not
-independently reviewed.
+**What Lean does and does not check.** Lean checks the two combinatorial
+reductions. The hardness of the starting problems, the running time and space
+of the reductions, membership in XNLP, and therefore the complexity conclusions
+themselves are **not Lean theorems**. The pathwidth bounds are proved in prose
+and checked on finite instances; Lean states treewidth. See
+[FORMALIZATION.md](FORMALIZATION.md).
 
-**Prior work:** W[1]-hardness was already announced in
+**Prior work:** W[1]-hardness of homomorphism parameterized by both treewidths
+was announced in
 [Amarilli's comment of 2025-05-30](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
-The relationship between this reduction and that work, and any novelty of this
-proof, have not been established. This repository makes no priority claim.
+The relationship between these reductions and that work, and any novelty, have
+not been established. This repository makes no priority claim.
 
 - [Problem statement and public status](PROBLEM.md)
-- [Written solution, including all reduction stages](SOLUTION.md)
-- [Odd-cycle targets: hardness with target treewidth 2](ODD_CYCLE.md)
-- [Lean theorem map and remaining obligations](FORMALIZATION.md)
-- [Executable reduction](scripts/bounded_width_hom_hardness.py)
-
-The construction first expresses a shared subsequence using padded paths in a
-fixed relational schema. Typed incidence graphs remove relation names; distinct
-prime cycles enforce types; an asymmetric undirected gadget encodes directions.
-Explicit decompositions bound the widths at each step; the gadget is a
-subdivision of K4, which is where the final width three comes from.
+- [The reductions and their proofs](ODD_CYCLE.md)
+- [XNLP-completeness with a supplied path decomposition](XNLP_COMPLETENESS.md)
+- [Lean theorem map and boundary](FORMALIZATION.md)
 
 ## Reproduce
 
@@ -70,40 +48,21 @@ and mathlib **v4.35.0** are pinned, including exact dependency revisions.
 lake exe cache get
 lake build
 python3 scripts/check_formalization.py
-python3 scripts/check_executable.py
-lake env lean --run WorkChecks.lean
-lake env lean --run MeasuredChecks.lean
-python3 scripts/regenerate_quotient_certificates.py --check
-python3 scripts/run_bounded_width_hom_checks.py
+python3 scripts/run_odd_cycle_checks.py
+python3 scripts/run_odd_cycle_chained_checks.py
 ```
 
-The Lean audit rejects proof admissions and nonstandard axiom dependencies.
-The gadget certificate is evaluated by Lean's kernel; it does not use
-`native_decide`. The Python checks independently exercise the executable
-construction, but finite tests are not proofs of the general reduction.
-Recorded reports are in [sources](sources/).
+`check_formalization.py` builds the library, rejects proof admissions and
+audits the principal declarations for nonstandard axioms. The two Python
+runners build the source graphs and compare homomorphism existence with direct
+search; they take several minutes each. Finite checks are not proofs. Recorded
+reports are in [sources](sources/).
 
-## Run the verified constructor
+## History and provenance
 
-```sh
-# Summary counts for requested length 1 and the single word 0:
-lake env lean --run ReduceLCS.lean 1 0
-# Export both graphs as JSON with integer endpoints:
-lake env lean --run ReduceLCS.lean --json 1 0 1
-```
-
-`LENGTH` is a nonnegative decimal integer. Subsequent arguments are binary words;
-use `""` for an empty word and no word arguments for zero words. Raw outputs list
-both orientations of each undirected edge. The fixed no-instance uses one edge;
-the interpretation of every edge list is undirected. This is a reduction
-constructor, not a graph-homomorphism solver. The implementation favors a clear
-proof over speed and produces thousands of vertices even for tiny raw inputs.
-
-## Provenance
-
-Extracted from a3nm-032 in `../open-problems`; written proof dated 2026-10-25,
-Lean development begun 2026-11-12. Developed with AI assistance; independent
-review remains pending. Binary LCS hardness is due to Pietrzak. The direction
-gadget is credited to Hell–Nešetřil via Eleftheriadis. See the citations in
-[SOLUTION.md](SOLUTION.md). This is separate from the minimum-edge treewidth
-problem.
+Extracted from a3nm-032 in `../open-problems`. Developed with AI assistance;
+independent review remains pending. An earlier version of this repository
+proved hardness through longest common subsequence, with target treewidth 3,
+together with an executable constructor and an abstract cost model. It was
+removed once the odd-cycle reductions superseded its conclusions. It remains in
+the git history at commit `4dfb72e`.

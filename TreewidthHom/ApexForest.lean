@@ -1,6 +1,9 @@
 module
 
-public import TreewidthHom.ReductionWidth
+public import TreewidthHom.Width
+public import TreewidthHom.GraftDecomposition
+public import TreewidthHom.IntervalDecomposition
+public import TreewidthHom.DecompositionMaps
 
 @[expose] public section
 
@@ -111,5 +114,110 @@ theorem hasWidth_of_apex_forest {V : Type} (G : SimpleGraph V) (hub : V → Prop
     D1.apexBag_card (A := A) b
   have h1 := hw1 b
   omega
+
+/-- Phases along a path. Retained vertices occupy intervals of phases, with at most
+`m` of them per phase. Every other vertex belongs to one phase, sees only retained
+vertices of that phase, and hangs in a forest of parent pointers. Then the width is
+at most `m+1`. -/
+theorem hasWidth_of_phased_forest {V : Type} (G : SimpleGraph V) (ret : V → Prop) (R m : ℕ)
+    (S : Fin (R+1) → Finset {v // ret v})
+    (hS : ∀ t, (S t).card ≤ m)
+    (hcover : ∀ v, ∃ t, v ∈ S t)
+    (hconvex : ∀ v a b c, a ≤ c → c ≤ b → v ∈ S a → v ∈ S b → v ∈ S c)
+    (hret : ∀ u v : {v // ret v}, G.Adj u.val v.val → ∃ t, u ∈ S t ∧ v ∈ S t)
+    (phase : {v // ¬ ret v} → Fin (R+1))
+    (parent : {v // ¬ ret v} → Option {v // ¬ ret v}) (height : {v // ¬ ret v} → ℕ)
+    (hdec : ∀ p q, parent p = some q → height q < height p)
+    (hphase : ∀ p q, parent p = some q → phase q = phase p)
+    (hmixed : ∀ (p : {v // ¬ ret v}) (v : {v // ret v}), G.Adj p.val v.val → v ∈ S (phase p))
+    (hedge : ∀ p q : {v // ¬ ret v}, G.Adj p.val q.val → parent p = some q ∨ parent q = some p) :
+    HasWidth G (m+1) := by
+  classical
+  let A := {v // ret v}
+  let P := {v // ¬ ret v}
+  let e : A ⊕ P ≃ V := Equiv.sumCompl ret
+  let H : SimpleGraph (A ⊕ P) := G.comap e
+  let G0 : SimpleGraph A := G.comap Subtype.val
+  let D0 : Decomposition G0 (pathGraph (R+1)) :=
+    intervalDecomposition G0 R S hcover (fun {u v} h => hret u v h) hconvex
+  let F : Graft (Fin (R+1)) P :=
+    { parent := fun p => (parent p).elim (.inl (phase p)) .inr
+      height := height
+      decreases := by
+        intro p q h
+        cases hp : parent p with
+        | none => simp [hp] at h
+        | some r =>
+          have hr : r = q := by simpa [hp] using h
+          subst hr
+          exact hdec p r hp }
+  let newBag : P → Finset (A ⊕ P) := fun p =>
+    (S (phase p)).map ⟨Sum.inl,Sum.inl_injective⟩ ∪
+      insert (Sum.inr p) ((parent p).elim ∅ (fun q => {Sum.inr q}))
+  have mem_inl : ∀ (v : A) (p : P), Sum.inl v ∈ newBag p ↔ v ∈ S (phase p) := by
+    intro v p
+    cases hp : parent p <;> simp [newBag,hp]
+  have mem_inr : ∀ (q p : P), Sum.inr q ∈ newBag p ↔ q = p ∨ parent p = some q := by
+    intro q p
+    cases hp : parent p <;> simp [newBag,hp,eq_comm]
+  have bag0 : ∀ t, D0.bag t = S t := fun _ => rfl
+  have key : ∀ q p : P, Sum.inr q ∈ newBag p →
+      Sum.inr q ∉ graftBag D0 newBag (F.parent p) → q = p := by
+    intro q p hm hn
+    rcases (mem_inr q p).mp hm with h | h
+    · exact h
+    · refine False.elim (hn ?_)
+      have hF : F.parent p = Sum.inr q := by simp [F,h]
+      rw [hF,graftBag_inr]
+      exact (mem_inr q q).mpr (Or.inl rfl)
+  let D1 := F.extend D0 H newBag
+    (fun q => ⟨q,(mem_inr q q).mpr (Or.inl rfl)⟩)
+    (by
+      rintro (a | p) (b | q) h
+      · obtain ⟨t,hu,hv⟩ := hret a b h
+        exact ⟨.inl t,(graftBag_inl_inl D0 newBag a t).mpr hu,(graftBag_inl_inl D0 newBag b t).mpr hv⟩
+      · have hm := hmixed q a (G.adj_symm h)
+        exact ⟨.inr q,(mem_inl a q).mpr hm,(mem_inr q q).mpr (Or.inl rfl)⟩
+      · have hm := hmixed p b h
+        exact ⟨.inr p,(mem_inr p p).mpr (Or.inl rfl),(mem_inl b p).mpr hm⟩
+      · rcases hedge p q h with hp | hq
+        · exact ⟨.inr p,(mem_inr p p).mpr (Or.inl rfl),(mem_inr q p).mpr (Or.inr hp)⟩
+        · exact ⟨.inr q,(mem_inr p q).mpr (Or.inr hq),(mem_inr q q).mpr (Or.inl rfl)⟩)
+    (by
+      intro v p hv
+      have hv' := (mem_inl v p).mp hv
+      cases hp : parent p with
+      | none =>
+        have hF : F.parent p = Sum.inl (phase p) := by simp [F,hp]
+        rw [hF,graftBag_inl_inl]
+        exact hv'
+      | some q =>
+        have hF : F.parent p = Sum.inr q := by simp [F,hp]
+        rw [hF,graftBag_inr,mem_inl,hphase p q hp]
+        exact hv')
+    (by
+      intro q p p' hm hn hm' hn'
+      exact (key q p hm hn).symm.trans (key q p' hm' hn'))
+  have he : ∀ u v, G.Adj (e u) (e v) → H.Adj u v := fun _ _ h => h
+  refine ⟨inferInstance,_,_,D1.mapEquiv e he,fun b => ?_⟩
+  rw [Decomposition.mapEquiv_card]
+  change (graftBag D0 newBag b).card ≤ _
+  rcases b with t | p
+  · have := hS t
+    simp only [graftBag,Finset.card_map,bag0]
+    omega
+  · have h1 : ((S (phase p)).map ⟨Sum.inl,Sum.inl_injective⟩ : Finset (A ⊕ P)).card ≤ m := by
+      rw [Finset.card_map]; exact hS _
+    have h2 : (insert (Sum.inr p) ((parent p).elim ∅ (fun q => {Sum.inr q})) :
+        Finset (A ⊕ P)).card ≤ 2 := by
+      cases parent p with
+      | none => simp
+      | some q => exact Finset.card_le_two
+    have h3 : (newBag p).card ≤
+        ((S (phase p)).map ⟨Sum.inl,Sum.inl_injective⟩ : Finset (A ⊕ P)).card +
+        (insert (Sum.inr p) ((parent p).elim ∅ (fun q => {Sum.inr q})) : Finset (A ⊕ P)).card :=
+      Finset.card_union_le _ _
+    change (newBag p).card ≤ _
+    omega
 
 end TreewidthHom

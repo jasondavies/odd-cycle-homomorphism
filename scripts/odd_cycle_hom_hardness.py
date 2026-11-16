@@ -151,3 +151,119 @@ def check(k, N, edges):
     truth = has_clique(k, N, edges)
     assert (result is not None) == truth, (k, N, sorted(edges))
     return count, n, truth
+
+
+# ---------------------------------------------------------------------------
+# Chained Multicoloured Clique -> homomorphism into an odd cycle.
+# r layers, k colours per layer, N vertices per layer-colour slot. Slot (t,c)
+# has index s = t*k+c. Vertices are (t,c,a) with a in 1..N. A pair of slots is
+# required when both lie in one layer or in consecutive layers.
+
+def chained_cycle_length(K, N):
+    return 2 * (N * (2 * N * K + 1 + K) + 2) + 1
+
+
+def reduce_chained(r, k, N, edges):
+    """Return (count, edge list, n, path decomposition bags, number of cycle vertices).
+
+    Every slot has a reference cycle and a choice cycle. All reference cycles
+    share their vertices 0 and 1 (source vertices 0 and 1), hence one edge.
+    """
+    K = r * k
+    n = chained_cycle_length(K, N)
+    weight = [2 * N * K + 1 + s for s in range(K)]
+    label = lambda s, a: a * weight[s]
+    layer = lambda s: s // k
+    count = 2
+    graph, ref, dial = set(), [], []
+
+    def cycle(vs):
+        for a, b in zip(vs, vs[1:] + vs[:1]):
+            graph.add((min(a, b), max(a, b)))
+
+    for s in range(K):
+        ref.append([0, 1] + list(range(count, count + n - 2))); count += n - 2
+        cycle(ref[s])
+        dial.append(list(range(count, count + n))); count += n
+        cycle(dial[s])
+    base = count
+    links = {}
+
+    def link(start, end):
+        nonlocal count
+        path = [start] + list(range(count, count + n - 3)) + [end]
+        count += n - 3
+        for a, b in zip(path, path[1:]):
+            graph.add((min(a, b), max(a, b)))
+        return path
+
+    for s in range(K):
+        allowed = {label(s, a) % n for a in range(1, N + 1)}
+        for d in range(n):
+            if d not in allowed:
+                links.setdefault(("ref", s, d), []).append(link(ref[s][d], dial[s][0]))
+    slot = lambda v: v[0] * k + v[1]
+    for s in range(K):
+        for u in range(s + 1, K):
+            if layer(u) > layer(s) + 1:
+                continue
+            allowed = {(label(u, y[2]) - label(s, x[2])) % n
+                       for x, y in edges if slot(x) == s and slot(y) == u}
+            for d in range(n):
+                if d not in allowed:
+                    links.setdefault(("dial", s, d), []).append(link(dial[s][d], dial[u][0]))
+
+    # Explicit path decomposition: one phase per layer, keeping the two shared
+    # reference vertices and the hubs of the current and the next layer.
+    bags = []
+    for t in range(r):
+        keep = {0, 1} | {dial[s][0] for s in range(K) if layer(s) in (t, t + 1)}
+        bags.append(set(keep))
+        for s in range(t * k, (t + 1) * k):
+            for kind, vs in (("ref", ref[s]), ("dial", dial[s])):
+                for d, x in enumerate(vs):
+                    bags.append(keep | {x})
+                    for path in links.get((kind, s, d), []):
+                        for a, b in zip(path, path[1:]):
+                            bags.append(keep | {x, a, b})
+                    bags.append(keep | {x, vs[(d + 1) % n]})
+    return count, sorted(graph), n, bags, base
+
+
+def check_path_decomposition(count, adj, bags, width):
+    """Vertex coverage, edge coverage, interval occurrences and the width bound."""
+    first, last, seen = [None] * count, [None] * count, [0] * count
+    covered = set()
+    for i, bag in enumerate(bags):
+        assert len(bag) <= width + 1, (len(bag), width)
+        for x in bag:
+            if first[x] is None:
+                first[x] = i
+            last[x] = i
+            seen[x] += 1
+        covered.update(itertools.combinations(sorted(bag), 2))
+    assert all(first[x] is not None and last[x] - first[x] + 1 == seen[x] for x in range(count))
+    assert set(adj) <= covered
+    return max(map(len, bags)) - 1
+
+
+def has_chained_clique(r, k, N, edges):
+    es = set(edges)
+    for vals in itertools.product(range(1, N + 1), repeat=r * k):
+        chosen = [(t, c, vals[t * k + c]) for t in range(r) for c in range(k)]
+        if all((u, v) in es for u, v in itertools.combinations(chosen, 2) if v[0] - u[0] <= 1):
+            return True
+    return False
+
+
+def check_chained(r, k, N, edges):
+    """Compare the chained reduction with direct search on one instance."""
+    count, adj, n, bags, base = reduce_chained(r, k, N, edges)
+    width = check_path_decomposition(count, adj, bags, 2 * k + 4)
+    # By the symmetry of the target, the shared reference edge is placed at (0,1).
+    result, nodes = hom_to_cycle(count, adj, n, fix={0: 0, 1: 1}, core=range(base))
+    if result is not None:
+        assert all((result[u] - result[v]) % n in (1, n - 1) for u, v in adj)
+    truth = has_chained_clique(r, k, N, edges)
+    assert (result is not None) == truth, (r, k, N, sorted(edges))
+    return count, n, width, truth
