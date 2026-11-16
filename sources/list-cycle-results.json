@@ -1,0 +1,22 @@
+{
+  "cases": 837,
+  "negative_instances": 445,
+  "largest_source_vertices": 508,
+  "hom_search_nodes": 393,
+  "target_lengths": [
+    5,
+    7,
+    9
+  ],
+  "checks": [
+    "decision equivalence",
+    "returned homomorphism edges",
+    "polynomial size bound",
+    "tree decomposition",
+    "path decomposition (+5 direct sweep; Lean proves +6)",
+    "feedback vertex set transfer",
+    "2-degeneracy"
+  ],
+  "passed": true,
+  "scope": "Finite checks corroborate the construction; they do not prove universal statements."
+}

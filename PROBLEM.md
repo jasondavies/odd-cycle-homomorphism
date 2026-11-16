@@ -14,11 +14,13 @@ Sources:
 - [a3nm: Complexity of query evaluation parameterized by treewidth](https://a3nm.net/work/research/questions/#complexity-of-query-evaluation-parameterized-by-treewidth)
 - [Graph-homomorphism formulation on cstheory](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth)
 
-The written solution gives W[1]-hardness even when the target is an odd cycle,
-which has treewidth 2, and W[t]-hardness for every t by a chained variant.
-It does not establish W[1]-membership or W[1]-completeness. The source width
-still depends on the parameter; the result does not assert hardness with both
-widths fixed constants.
+The current solution reduces List Coloring to homomorphism into an input odd
+cycle, whose treewidth and pathwidth are 2. It gives XNLP-completeness with a
+supplied path decomposition, XALP-completeness with a supplied tree decomposition,
+and W[3]-hardness for source feedback vertex number. Hardness also holds without
+supplied decompositions; the membership statements require them. The source width
+still depends on the parameter. Neither both widths nor the target cycle length
+are fixed constants in the hardness result.
 
 ## Public status and attribution
 
@@ -29,8 +31,7 @@ already announced W[1]-hardness reductions from workshop participants. A public
 proof was not located in that check. Lack of a posted answer is not evidence
 that the result is unclaimed or new.
 
-This repository preserves our reductions and their formalisation; it does not
-claim to be the first resolution. The hardness of Multicoloured Clique and of
-Chained Multicoloured Clique is established prior work. Independent assessment
-of correctness, overlap with the announced reductions, and publication value
-remains outstanding.
+This repository preserves the List Coloring reduction and its formalisation; it
+does not claim to be the first resolution. The required hardness of List Coloring
+is established prior work, cited in the paper. Independent assessment of overlap
+with the announced reductions and publication value remains outstanding.

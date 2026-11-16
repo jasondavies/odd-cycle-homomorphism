@@ -1,69 +1,68 @@
-# Graph homomorphism into an odd cycle, parameterized by source width
+# Homomorphism to an odd cycle
 
-Deciding whether a graph maps homomorphically into an odd cycle given in the
-input is hard for parameterized complexity classes when the parameter is the
-treewidth or pathwidth of the source. The target has treewidth and pathwidth 2,
-so graph homomorphism parameterized by both treewidths is hard even at target
-treewidth 2. That is optimal: homomorphism into a forest is polynomial.
+A single reduction from List Coloring establishes the complexity of ordinary
+graph homomorphism into an odd cycle whose length is part of the input:
 
-Two reductions are checked in Lean 4. Each proves decision equivalence,
-treewidth and pathwidth bounds for the source, width 2 for the target, and
-polynomial size.
+| Source parameter | Result |
+| --- | --- |
+| Width of a supplied path decomposition | XNLP-complete |
+| Width of a supplied tree decomposition | XALP-complete |
+| Feedback vertex number | W[3]-hard |
 
-| Reduction | From | Source width | Lean theorem |
-| --- | --- | --- | --- |
-| Plain | Multicoloured Clique, `k` classes | treewidth at most `k+2`, pathwidth at most `k+3`, a feedback vertex set of `k+1` vertices | [`OddCycle.reduction_cycleGraph`](TreewidthHom/OddCycleReduction.lean), [`OddCycle.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean) |
-| Chained | Chained Multicoloured Clique, `k` colours, any number of layers | treewidth at most `2k+3`, pathwidth at most `2k+4` | [`OddCycle.Chained.reduction`](TreewidthHom/OddCycleChained.lean), [`OddCycle.Chained.reduction_pathWidth`](TreewidthHom/OddCyclePathWidth.lean) |
+Every target has treewidth and pathwidth exactly 2. The construction also gives
+2-degenerate sources of arbitrarily large prescribed constant girth.
 
-With the published hardness of the two starting problems these give:
+[Read the paper](paper/odd-cycle-homomorphism.pdf) ·
+[Construction and proof](ODD_CYCLE.md) ·
+[Formalization boundary](FORMALIZATION.md) ·
+[Original question and attribution](PROBLEM.md)
 
-- W[1]-hardness parameterized by the feedback vertex number of the source;
-- W[t]-hardness for every t, and XNLP-hardness, parameterized by its treewidth
-  or pathwidth;
-- XNLP-completeness when a path decomposition of the source is supplied.
+## Lean certificate
 
-**What Lean does and does not check.** Lean checks the two combinatorial
-reductions. The hardness of the starting problems, the running time and space
-of the reductions, membership in XNLP, and therefore the complexity conclusions
-themselves are **not Lean theorems**. Closing those would need a formal model
-of space-bounded computation and formal definitions of the complexity classes,
-which this repository does not have. See [FORMALIZATION.md](FORMALIZATION.md).
+The principal theorem is
+[`OddCycle.ListReduction.reduction`](TreewidthHom/ListTheorem.lean).
+For a List Coloring instance on `F`, with target length `n` odd and at least 5,
+it proves:
 
-**Prior work:** W[1]-hardness of homomorphism parameterized by both treewidths
-was announced in
-[Amarilli's comment of 2025-05-30](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
-The relationship between these reductions and that work, and any novelty, have
-not been established. This repository makes no priority claim.
+- decision equivalence with homomorphism `G → C_n`;
+- source treewidth at most `max(w+2, 4)` from an input width bound `w`;
+- source pathwidth at most `p+6` from an input pathwidth bound `p`;
+- target pathwidth at most 2;
+- a feedback vertex set of size `|S|+2` from any feedback vertex set `S` of `F`;
+- polynomial source size.
 
-- [Problem statement and public status](PROBLEM.md)
-- [The reductions and their proofs](ODD_CYCLE.md)
-- [XNLP-completeness with a supplied path decomposition](XNLP_COMPLETENESS.md)
-- [Lean theorem map and boundary](FORMALIZATION.md)
+Lean also proves the bag-assignment gluing lemma used by the membership
+arguments. Published List Coloring hardness, machine time and space bounds,
+complexity-class conclusions, degeneracy and girth are **not Lean theorems**.
+The paper proves the remaining construction and resource claims in prose.
+Completeness uses supplied decompositions; membership without them is not claimed.
 
 ## Reproduce
 
-Requires [elan](https://github.com/leanprover/elan) and Python 3. Lean **4.35.0**
-and mathlib **v4.35.0** are pinned, including exact dependency revisions.
+Lean **4.35.0** and mathlib **v4.35.0** are pinned, including dependency revisions.
+Requires elan, Python 3, and (for the paper) latexmk with a LaTeX installation.
 
 ```sh
 lake exe cache get
-lake build
 python3 scripts/check_formalization.py
-python3 scripts/run_odd_cycle_checks.py
-python3 scripts/run_odd_cycle_chained_checks.py
+python3 scripts/run_list_cycle_checks.py
+make -C paper
 ```
 
-`check_formalization.py` builds the library, rejects proof admissions and
-audits the principal declarations for nonstandard axioms. The two Python
-runners build the source graphs and compare homomorphism existence with direct
-search; they take several minutes each. Finite checks are not proofs. Recorded
-reports are in [sources](sources/).
+The formalization check builds the library, rejects proof admissions and audits
+34 declarations. Only `propext`, `Classical.choice` and `Quot.sound` occur.
+The executable checks cover 837 finite instances, including 445 negative cases;
+finite checks are not proofs. Reports are in [sources](sources/).
 
-## History and provenance
+## Attribution and history
 
-Extracted from a3nm-032 in `../open-problems`. Developed with AI assistance;
-independent review remains pending. An earlier version of this repository
-proved hardness through longest common subsequence, with target treewidth 3,
-together with an executable constructor and an abstract cost model. It was
-removed once the odd-cycle reductions superseded its conclusions. It remains in
-the git history at commit `4dfb72e`.
+W[1]-hardness for the original two-treewidth parameter was already announced in
+[Amarilli's May 2025 comment](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877).
+Overlap with that work and novelty have not been established. This repository
+makes no priority claim. Development and manuscript drafting used AI assistance;
+independent review remains pending.
+
+The superseded clique and chained-clique reductions, arithmetic labels, old
+checks and manuscript remain in git history at `c88dabb`. The earlier LCS
+pipeline remains at `4dfb72e`. The current tree keeps the List Coloring
+construction and its supporting lemmas.

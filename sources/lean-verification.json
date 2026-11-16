@@ -4,49 +4,38 @@
   "theorems_audited": [
     "TreewidthHom.Decomposition.addApices",
     "TreewidthHom.Decomposition.mapEquiv",
-    "TreewidthHom.Decomposition.comap",
     "TreewidthHom.intervalDecomposition",
     "TreewidthHom.Graft.isTree",
     "TreewidthHom.Graft.running_of_tops",
     "TreewidthHom.Graft.extend",
-    "TreewidthHom.Graft.forestDecomposition",
-    "TreewidthHom.Graft.forest_width",
-    "TreewidthHom.hasWidth_of_apex_forest",
-    "TreewidthHom.hasWidth_of_phased_forest",
+    "TreewidthHom.acyclic_of_apex_forest",
+    "TreewidthHom.exists_forestOrientation",
     "TreewidthHom.linked_hom_iff",
+    "TreewidthHom.width_linked_of_bags",
+    "TreewidthHom.HasPathWidth.hasWidth",
+    "TreewidthHom.hasPathWidth_linked",
+    "TreewidthHom.Decomposition.path_intervals",
+    "TreewidthHom.pathWidth_linked_of_bags",
     "TreewidthHom.OddCycle.cyc_eq_cycleGraph",
     "TreewidthHom.OddCycle.dial",
     "TreewidthHom.OddCycle.walk_iff_ne",
-    "TreewidthHom.OddCycle.label_solve",
-    "TreewidthHom.OddCycle.source_hom_iff",
-    "TreewidthHom.OddCycle.hom_of_clique",
-    "TreewidthHom.OddCycle.clique_of_hom",
-    "TreewidthHom.OddCycle.source_hom_iff_clique",
-    "TreewidthHom.OddCycle.target_width",
-    "TreewidthHom.OddCycle.source_width",
-    "TreewidthHom.OddCycle.source_card_le",
-    "TreewidthHom.OddCycle.reduction",
-    "TreewidthHom.OddCycle.reduction_cycleGraph",
-    "TreewidthHom.OddCycle.Chained.source_hom_iff",
-    "TreewidthHom.OddCycle.Chained.hom_of_clique",
-    "TreewidthHom.OddCycle.Chained.clique_of_hom",
-    "TreewidthHom.OddCycle.Chained.source_hom_iff_clique",
-    "TreewidthHom.OddCycle.Chained.source_width",
-    "TreewidthHom.OddCycle.Chained.source_card_le",
-    "TreewidthHom.OddCycle.Chained.reduction",
+    "TreewidthHom.OddCycle.target_pathWidth",
+    "TreewidthHom.OddCycle.ListReduction.source_hom_iff",
+    "TreewidthHom.OddCycle.ListReduction.hom_of_coloring",
+    "TreewidthHom.OddCycle.ListReduction.coloring_of_hom",
+    "TreewidthHom.OddCycle.ListReduction.source_hom_iff_colorable",
+    "TreewidthHom.OddCycle.ListReduction.aug_width",
+    "TreewidthHom.OddCycle.ListReduction.source_width",
+    "TreewidthHom.OddCycle.ListReduction.aug_pathWidth",
+    "TreewidthHom.OddCycle.ListReduction.source_pathWidth",
+    "TreewidthHom.OddCycle.ListReduction.source_feedback",
+    "TreewidthHom.OddCycle.ListReduction.removed_card",
+    "TreewidthHom.OddCycle.ListReduction.source_card_le",
+    "TreewidthHom.OddCycle.ListReduction.reduction",
     "TreewidthHom.Decomposition.agree_on_bags",
     "TreewidthHom.Decomposition.hom_iff_bagAssignments",
     "TreewidthHom.Decomposition.hom_iff_pathBagAssignments",
-    "TreewidthHom.Decomposition.two_bag_records_le",
-    "TreewidthHom.HasPathWidth.hasWidth",
-    "TreewidthHom.hasPathWidth_linked",
-    "TreewidthHom.acyclic_of_apex_forest",
-    "TreewidthHom.OddCycle.source_feedback",
-    "TreewidthHom.OddCycle.target_pathWidth",
-    "TreewidthHom.OddCycle.source_pathWidth",
-    "TreewidthHom.OddCycle.Chained.source_pathWidth",
-    "TreewidthHom.OddCycle.reduction_pathWidth",
-    "TreewidthHom.OddCycle.Chained.reduction_pathWidth"
+    "TreewidthHom.Decomposition.two_bag_records_le"
   ],
   "axioms": {
     "TreewidthHom.Decomposition.addApices": [
@@ -55,11 +44,6 @@
       "Quot.sound"
     ],
     "TreewidthHom.Decomposition.mapEquiv": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.Decomposition.comap": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -84,27 +68,42 @@
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Graft.forestDecomposition": [
+    "TreewidthHom.acyclic_of_apex_forest": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.Graft.forest_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.hasWidth_of_apex_forest": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.hasWidth_of_phased_forest": [
+    "TreewidthHom.exists_forestOrientation": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
     "TreewidthHom.linked_hom_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.width_linked_of_bags": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.HasPathWidth.hasWidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.hasPathWidth_linked": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.path_intervals": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.pathWidth_linked_of_bags": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -124,87 +123,67 @@
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.label_solve": [
+    "TreewidthHom.OddCycle.target_pathWidth": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.source_hom_iff": [
+    "TreewidthHom.OddCycle.ListReduction.source_hom_iff": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.hom_of_clique": [
+    "TreewidthHom.OddCycle.ListReduction.hom_of_coloring": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.clique_of_hom": [
+    "TreewidthHom.OddCycle.ListReduction.coloring_of_hom": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.source_hom_iff_clique": [
+    "TreewidthHom.OddCycle.ListReduction.source_hom_iff_colorable": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.target_width": [
+    "TreewidthHom.OddCycle.ListReduction.aug_width": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.source_width": [
+    "TreewidthHom.OddCycle.ListReduction.source_width": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.source_card_le": [
+    "TreewidthHom.OddCycle.ListReduction.aug_pathWidth": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.reduction": [
+    "TreewidthHom.OddCycle.ListReduction.source_pathWidth": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.reduction_cycleGraph": [
+    "TreewidthHom.OddCycle.ListReduction.source_feedback": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.Chained.source_hom_iff": [
+    "TreewidthHom.OddCycle.ListReduction.removed_card": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.Chained.hom_of_clique": [
+    "TreewidthHom.OddCycle.ListReduction.source_card_le": [
       "propext",
       "Classical.choice",
       "Quot.sound"
     ],
-    "TreewidthHom.OddCycle.Chained.clique_of_hom": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.source_hom_iff_clique": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.source_width": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.source_card_le": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.reduction": [
+    "TreewidthHom.OddCycle.ListReduction.reduction": [
       "propext",
       "Classical.choice",
       "Quot.sound"
@@ -228,53 +207,8 @@
       "propext",
       "Classical.choice",
       "Quot.sound"
-    ],
-    "TreewidthHom.HasPathWidth.hasWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.hasPathWidth_linked": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.acyclic_of_apex_forest": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.source_feedback": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.target_pathWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.source_pathWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.source_pathWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.reduction_pathWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
-    ],
-    "TreewidthHom.OddCycle.Chained.reduction_pathWidth": [
-      "propext",
-      "Classical.choice",
-      "Quot.sound"
     ]
   },
   "build_passed": true,
-  "scope": "Reductions to homomorphism into an odd cycle (mathlib cycleGraph n, n odd): from Multicoloured Clique with source width k+2 (OddCycle.reduction_cycleGraph), and from Chained Multicoloured Clique with source width 2k+3 independent of the number of layers (OddCycle.Chained.reduction). Each has decision equivalence, target width 2 and polynomial size. Hardness of the source problems, running time and space of the reductions, and the complexity conclusions are outside Lean."
+  "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy and girth are outside Lean."
 }

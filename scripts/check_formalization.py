@@ -31,7 +31,7 @@ report = {
     "axioms": {name: [s.strip() for s in axioms.split(",") if s.strip()]
                for name, axioms in entries} | {name: [] for name in empty},
     "build_passed": True,
-    "scope": "Reductions to homomorphism into an odd cycle (mathlib cycleGraph n, n odd): from Multicoloured Clique with source width k+2 (OddCycle.reduction_cycleGraph), and from Chained Multicoloured Clique with source width 2k+3 independent of the number of layers (OddCycle.Chained.reduction). Each has decision equivalence, target width 2 and polynomial size. Hardness of the source problems, running time and space of the reductions, and the complexity conclusions are outside Lean.",
+    "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy and girth are outside Lean.",
 }
 (ROOT / "sources").mkdir(exist_ok=True)
 (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")
