@@ -83,7 +83,7 @@ class Reduction:
         return bags, tree
 
     def path_decomposition(self, original_bags):
-        """Direct sweep; checks even the sharper +5 bound from the review.
+        """Direct sweep with an additive pathwidth bound of +5.
 
         Lean uses a modular argument with the conservative +6 bound.
         """

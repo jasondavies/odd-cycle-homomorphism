@@ -1,6 +1,6 @@
-# Formalization boundary
+# Formalisation boundary
 
-The library checks the finite List Coloring reduction to ordinary homomorphism
+The library checks the finite List Colouring reduction to ordinary homomorphism
 into an odd cycle. The principal declaration is
 [`TreewidthHom.OddCycle.ListReduction.reduction`](TreewidthHom/ListTheorem.lean).
 The target `OddCycle.cyc n` is mathlib's `circulantGraph {1}` on `ZMod n`.
@@ -23,7 +23,7 @@ successor lengths. No source or target lists remain in the output problem.
 | Polynomial source cardinality | `ListReduction.source_card_le`, [ListTheorem](TreewidthHom/ListTheorem.lean) |
 | Combined certificate | `ListReduction.reduction`, [ListTheorem](TreewidthHom/ListTheorem.lean) |
 | Consistent local assignments glue to a homomorphism | `Decomposition.hom_iff_bagAssignments`, [BagHomomorphism](TreewidthHom/BagHomomorphism.lean) |
-| Adjacent-bag specialization for paths | `Decomposition.hom_iff_pathBagAssignments`, [BagHomomorphism](TreewidthHom/BagHomomorphism.lean) |
+| Adjacent-bag specialisation for paths | `Decomposition.hom_iff_pathBagAssignments`, [BagHomomorphism](TreewidthHom/BagHomomorphism.lean) |
 
 Names abbreviated by `ListReduction` above are under `TreewidthHom.OddCycle`;
 other infrastructure is under `TreewidthHom`.
@@ -35,22 +35,15 @@ arbitrary set `S` together with acyclicity of `F-S`; it does not require the
 caller to supply an orientation. The orientation is derived within Lean.
 
 The finite source graph uses one reference copy for *every* vertex/residue pair,
-including allowed colors. A domain link exists only for forbidden colors.
+including allowed colours. A domain link exists only for forbidden colours.
 Each original edge is represented once, using increasing vertex indices.
 The executable constructor follows the same graph up to vertex renaming.
 
-The reference adjacency lemmas live with the construction in `ListReduction`,
-so the feedback proof does not depend on the treewidth proof. The generic
-[ChainGraft](TreewidthHom/ChainGraft.lean) module supplies predecessor chains,
-unique topmost bags, and consecutive-vertex coverage for both treewidth
-constructions. The pathwidth proofs share the division lemma
-`TreewidthHom.mul_add_div_of_lt` for their position encodings.
-
 ## Outside Lean
 
-The following are not formalized as machine-level theorems:
+The following are not formalised as machine-level theorems:
 
-- the published complexity of List Coloring;
+- the published complexity of List Colouring;
 - the logspace transducer and the polynomial number of output bags;
 - time and space analysis of the XNLP and XALP membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
@@ -64,24 +57,22 @@ in the paper; no W[3]-membership result is claimed.
 
 ## Reproduction and audits
 
-```sh
-python3 scripts/check_formalization.py
-python3 scripts/run_list_cycle_checks.py
-```
+See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-The first command builds the library and audits the 37 declarations listed in
-[AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
+`scripts/check_formalization.py` builds the library and audits the 37 declarations
+listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
-[sources/lean-verification.json](sources/lean-verification.json). The report
+[reports/lean-verification.json](reports/lean-verification.json). The report
 records the project commit and working-tree status sampled before verification.
 A dirty report describes a working tree, not just the named commit. All acceptance
 checks remain active under `python -O`, `python -OO`, and `PYTHONOPTIMIZE`.
 
-The second command checks 841 explicit finite instances, including empty graphs,
-empty lists, exhaustive small instances, and seeded instances with path and
+`scripts/run_list_cycle_checks.py` checks 841 explicit finite instances, including
+empty graphs, empty lists, exhaustive small instances, and seeded instances with path and
 branching tree decompositions. It checks satisfiability equivalence, returned
-homomorphisms, source size, decompositions, feedback sets and 2-degeneracy. Three positive cyclic cases exercise nonempty
-input feedback sets, including a branching decomposition. Five targeted cases
-(including empty input) also check exact girth independently by breadth-first search.
+homomorphisms, source size, decompositions, feedback sets and 2-degeneracy.
+Three positive cyclic cases exercise nonempty input feedback sets, including
+a branching decomposition. Five targeted cases (including empty input) also check
+exact girth independently by breadth-first search.
 The direct executable path sweep meets `p+5`; Lean's modular proof uses `p+6`.
-See [sources/list-cycle-results.json](sources/list-cycle-results.json).
+See [reports/list-cycle-results.json](reports/list-cycle-results.json).

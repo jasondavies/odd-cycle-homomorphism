@@ -69,8 +69,8 @@ def main():
         "build_passed": True,
         "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy, girth and connectedness are outside Lean.",
     }
-    (ROOT / "sources").mkdir(exist_ok=True)
-    (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")
+    (ROOT / "reports").mkdir(exist_ok=True)
+    (ROOT / "reports/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"PASS: {len(expected)} theorem axiom audits; no proof admissions.")
 
 

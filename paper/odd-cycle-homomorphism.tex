@@ -7,9 +7,9 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
 \hypersetup{
-  pdftitle={The parameterized complexity of homomorphism to an odd cycle},
+  pdftitle={The parameterised complexity of homomorphism to an odd cycle},
   pdfauthor={Jason Davies},
-  pdfsubject={Parameterized complexity and a Lean-checked List Coloring reduction},
+  pdfsubject={Parameterised complexity and a Lean-checked List Colouring reduction},
   pdfkeywords={graph homomorphism, odd cycle, treewidth, pathwidth, feedback vertex set, Lean}
 }
 \newtheorem{theorem}{Theorem}
@@ -28,7 +28,7 @@
 \newcommand{\lean}[1]{\nolinkurl{#1}}
 \makeatletter\g@addto@macro\UrlBreaks{\do\_}\makeatother
 \emergencystretch=2em
-\title{The parameterized complexity of homomorphism to an odd cycle}
+\title{The parameterised complexity of homomorphism to an odd cycle}
 \author{Jason Davies\thanks{\href{mailto:jason@jasondavies.com}{\nolinkurl{jason@jasondavies.com}}}}
 \date{Draft --- November 16, 2026}
 \begin{document}
@@ -36,10 +36,10 @@
 
 \begin{abstract}
 Deciding whether a graph admits a homomorphism to an odd cycle given in the
-input is XNLP-complete parameterized by the width of a supplied path
-decomposition, and XALP-complete parameterized by the width of a supplied
-tree decomposition. It is also W[3]-hard and in W[P] parameterized by the
-feedback vertex number of the source. A single reduction from List Coloring proves
+input is XNLP-complete parameterised by the width of a supplied path
+decomposition, and XALP-complete parameterised by the width of a supplied
+tree decomposition. It is also W[3]-hard and in W[P] parameterised by the
+feedback vertex number of the source. A single reduction from List Colouring proves
 all three hardness statements, increasing treewidth, pathwidth, and feedback
 vertex number by constants.
 The construction uses reference cycles sharing one edge and paths of length
@@ -75,9 +75,9 @@ classification from one direct reduction.
 Consider the problem of deciding $G\to C_n$, where $G$ is a finite simple
 undirected graph and $n\geq5$ is odd and given in unary.
 \begin{enumerate}
-\item Given a path decomposition, it is XNLP-complete parameterized by its width.
-\item Given a tree decomposition, it is XALP-complete parameterized by its width.
-\item Parameterized by $\fvs(G)$, it is W[3]-hard and belongs to W[P].
+\item Given a path decomposition, it is XNLP-complete parameterised by its width.
+\item Given a tree decomposition, it is XALP-complete parameterised by its width.
+\item Parameterised by $\fvs(G)$, it is W[3]-hard and belongs to W[P].
 \end{enumerate}
 The hardness statements remain valid on connected, 2-degenerate source graphs of
 girth at least any prescribed constant.
@@ -87,7 +87,7 @@ The supplied-decomposition convention is part of the first two problem
 statements. We prove hardness for the corresponding structural parameters
 without a supplied decomposition as well, but make no membership claim for
 those variants. All targets have treewidth and pathwidth exactly two.
-Thus the result gives XALP-hardness parameterized by the maximum of the two
+Thus the result gives XALP-hardness parameterised by the maximum of the two
 input treewidths, and XNLP-hardness for the analogous pathwidth parameter.
 The distinction between the two completeness classifications reflects
 whether the algorithm retains successive bag assignments or additionally
@@ -97,7 +97,7 @@ gives the machine definitions and membership arguments.
 The main technical statement is an additive structural transfer.
 
 \begin{theorem}\label{thm:transfer}
-There is a polynomial-size, logspace reduction from List Coloring on a
+There is a polynomial-size, logspace reduction from List Colouring on a
 graph $F$ to $G\to C_n$, with $n$ odd and $n\geq5$, such that
 \[
  \tw(G)\leq\max\{\tw(F)+2,4\},\qquad
@@ -123,14 +123,14 @@ Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
 from workshop participants~\cite{amarilli2016}. The relationship between
 those reductions and this construction has not been established; this draft
 makes no priority claim for the original hardness question.
-Our starting results are the XNLP-completeness of List Coloring for
+Our starting results are the XNLP-completeness of List Colouring for
 pathwidth~\cite[Theorem~15]{bgns2024}, its XALP-completeness for
 treewidth~\cite[Theorem~8]{bggpp2022}, and its W[3]-hardness for feedback
 vertex number~\cite[Table~1]{bgp2023}.
 Piecyk and Rz\k{a}\.{z}ewski study related fine-grained questions for list
 homomorphism and give SETH-based lower bounds for ordinary homomorphism to
-odd cycles parameterized by cutwidth~\cite{pr2021}. Our statements concern
-uniform parameterized hardness and completeness as the target length varies.
+odd cycles parameterised by cutwidth~\cite{pr2021}. Our statements concern
+uniform parameterised hardness and completeness as the target length varies.
 
 \section{Two properties of odd cycles}
 \paragraph{Conventions.}
@@ -181,10 +181,10 @@ A \emph{link} below means a path of length $n-2$ whose internal vertices
 are private. Different links may share endpoints, but no internal vertices.
 
 \section{The reduction}\label{sec:reduction}
-An instance of List Coloring consists of a graph $F$ and lists
+An instance of List Colouring consists of a graph $F$ and lists
 $L(v)\subseteq\{0,\ldots,q-1\}$. It asks for a map $c$ with
 $c(v)\in L(v)$ for every vertex and $c(u)\ne c(v)$ for every edge $uv$.
-Relabeling the palette is harmless. Choose the least odd integer
+Relabelling the palette is harmless. Choose the least odd integer
 $n\geq\max\{5,q+1\}$, and regard the lists as subsets of $\Z/n\Z$.
 
 Construct $G$ as follows.
@@ -243,7 +243,7 @@ Lean uniform.
   \node[align=center] at (6.5,-.8) {edge link\\enforces $f(h_v)\ne f(h_u)$};
 \end{tikzpicture}
 \caption{Part of the construction for target $C_5$. Solid edges form two
-reference cycles sharing $AB$. After normalizing $A,B$ to $0,1$, their
+reference cycles sharing $AB$. After normalising $A,B$ to $0,1$, their
 private vertices have the indicated images. Each dashed link has three
 edges and two private internal vertices; it forces its endpoint images
 to differ. The remaining reference copies and domain links are omitted.}
@@ -260,7 +260,7 @@ $2,3,4,0$, and endpoint image $1$ via $2,1,0,1$, but it cannot have
 endpoint image $2$: there is no closed walk of length three in $C_5$.
 Together the three domain links leave exactly $\{0,1\}$ available at
 $h_v$. Similarly, the links at $h_u$ leave exactly $\{1,2\}$.
-The coloring $c(v)=0$, $c(u)=1$ extends across the original-edge link
+The colouring $c(v)=0$, $c(u)=1$ extends across the original-edge link
 by the walk $0,1,0,1$. Choosing image $1$ at both hubs would satisfy
 their lists but fail this edge link. Repeated images along these walks
 are allowed because homomorphisms need not be injective.
@@ -275,9 +275,9 @@ at $0,1$. By Lemma~\ref{lem:rigid}, every reference cycle then maps
 coordinatewise to $C_n$. Lemma~\ref{lem:link} says that the domain links
 exclude exactly the residues outside $L(v)$ from the image of $h_v$.
 The links corresponding to edges of $F$ force adjacent vertices to have
-different images. Thus $v\mapsto f(h_v)$ is a list coloring.
+different images. Thus $v\mapsto f(h_v)$ is a list colouring.
 
-Conversely, given a list coloring, map each $h_v$ to its color and every
+Conversely, given a list colouring, map each $h_v$ to its colour and every
 reference cycle coordinatewise. Each link has distinct endpoint images,
 so Lemma~\ref{lem:link} extends the map over it. Private interiors make
 these extensions independent.
@@ -307,7 +307,7 @@ width is at most $\max\{w+2,4\}$.
 For a convenient modular bound, first consider an auxiliary graph $J$.
 It contains the reference cycles, the hubs with the original edges of
 $F$, and the direct edge from coordinate $d$ of $R_{v,d}$ to $h_v$ for
-every pair $(v,d)$. Including the latter edge even for an allowed color
+every pair $(v,d)$. Including the latter edge even for an allowed colour
 can only help provide a decomposition for the eventual source.
 
 Given a path decomposition of $F$ of width $p$, add $A,B$ to every bag.
@@ -325,7 +325,7 @@ present at once. Process all subdivisions serially at their owning bags.
 Delete the unused direct domain edges and subdivide the required domain
 and original edges into links. Vertex intervals and edge coverage are
 preserved, giving $\pw(G)\leq p+6$. This conservative bound is the one
-formalized in Lean.
+formalised in Lean.
 
 \subsection{Feedback vertex sets}
 Let $S$ be a feedback vertex set of $F$. Delete
@@ -348,7 +348,7 @@ $f=\sum_v(n-|L(v)|)$. The exact source size is
  \leq 2+m+mn^2+(mn+m^2)n.
 \end{equation}
 Since $n=O(q+1)$, the output size is polynomial in the explicit input size.
-Here the palette may be taken to contain only colors occurring in the
+Here the palette may be taken to contain only colours occurring in the
 lists: order the distinct labels by first occurrence in the input and
 replace each by its rank. Repeated scans compute these ranks in logarithmic
 space, so $q$ is bounded by the input length even if the original labels
@@ -438,12 +438,12 @@ the strict palette padding in the choice of $n$.
 XNLP consists of problems decidable nondeterministically in time
 $f(k)N^{O(1)}$ and space $f(k)\log N$, where $N$ is the input length.
 XALP permits, in addition, an auxiliary stack with access only to its top;
-it has an equivalent characterization by alternation with bounded total
-computation-tree size~\cite{bgns2024,bggpp2022}. We use parameterized
+it has an equivalent characterisation by alternation with bounded total
+computation-tree size~\cite{bgns2024,bggpp2022}. We use parameterised
 logspace reductions, with workspace $f(k)+O(\log N)$.
 
 \paragraph{Hardness.}
-Apply Theorem~\ref{thm:transfer} to the published List Coloring results
+Apply Theorem~\ref{thm:transfer} to the published List Colouring results
 cited in the introduction. Additive parameter bounds and logarithmic-space
 construction give XNLP-hardness for pathwidth, XALP-hardness for treewidth,
 and W[3]-hardness for feedback vertex number. Output decompositions are
@@ -532,7 +532,7 @@ of $G$ the domain $\Z/n\Z$, and for each edge allow exactly the ordered
 pairs adjacent in $C_n$. The constraint graph is exactly $G$, so its
 feedback vertex number is preserved. The explicit constraint relations
 have polynomial size because $n$ is unary. The W[P] upper bound for
-Binary CSP parameterized by feedback vertex number~\cite[Theorem~2]{bgp2023}
+Binary CSP parameterised by feedback vertex number~\cite[Theorem~2]{bgp2023}
 therefore gives the claimed membership. Together with the reduction,
 this proves the third part of Theorem~\ref{thm:main}.
 
@@ -555,13 +555,10 @@ by the usual dynamic programme; variability of $n$ is essential.
 \paragraph{Artifact availability.}
 The Lean development is in the public repository
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-The exact Lean source version underlying this draft is commit
-\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/493b97c71fd4e2e07e88720a99de94d55d5632ea}{\texttt{493b97c}}~\cite{artifact}.
+The verified reduction and executable checks are available at commit
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/af4b974bc4b66d3c4f1eb41b3112aa4b7d5dbdff}{\texttt{af4b974}}~\cite{artifact}.
 Its \lean{README.md} gives reproduction commands and
 \lean{FORMALIZATION.md} maps the checked statements to declarations.
-The executable checks described below include the subsequent validation
-fixes and additional cases in the repository; these do not change the
-Lean sources or theorem statements.
 
 The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
 mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
@@ -569,7 +566,7 @@ mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
 graph on \lean{ZMod n} with jump set $\{1\}$; the library also proves its
 identification with \lean{cycleGraph} for successor lengths.
 
-The construction is parameterized by a graph on \lean{Fin m}, lists in
+The construction is parameterised by a graph on \lean{Fin m}, lists in
 \lean{Finset (ZMod n)}, and proofs that $n$ is odd and at least five.
 The central theorem is
 \lean{TreewidthHom.OddCycle.ListReduction.reduction}.
@@ -601,10 +598,10 @@ reference or link vertex. The decomposition infrastructure checks vertex
 coverage, edge coverage, connected occurrence sets, and bag cardinalities.
 The generic \lean{BagHomomorphism} module proves the local-to-global
 consistency argument of Lemma~\ref{lem:bags}, including its path
-specialization.
+specialisation.
 
 The formal statements do not encode Turing machines or complexity classes.
-The published hardness of List Coloring, the reduction's time and space
+The published hardness of List Colouring, the reduction's time and space
 bounds, the membership algorithms' resource analysis, and the complexity
 conclusions are mathematical arguments in the text. The degeneracy, girth,
 and connectedness statements are also proved in the text, not in Lean.
@@ -617,12 +614,12 @@ axioms. The permitted foundational axioms are \lean{propext},
 \lean{Classical.choice}, and \lean{Quot.sound}.
 The executable constructor is separately checked on 841 finite instances,
 including 446 negative instances and target lengths $5,7,9$.
-The checks compare direct list-coloring search with graph-only homomorphism
+The checks compare direct list-colouring search with graph-only homomorphism
 search, validate returned homomorphisms, tree and path decompositions,
 feedback vertex sets, the size bound, and 2-degeneracy. Targeted cases
 include positive cyclic inputs with feedback vertex number one and two,
 a branching decomposition, and an independent breadth-first-search girth
-check. Validation remains active under Python's optimized execution modes;
+check. Validation remains active under Python's optimised execution modes;
 the Lean audit report records the project revision and working-tree status.
 These executable checks corroborate
 but do not replace the universal proofs. The direct executable path sweep
@@ -640,9 +637,9 @@ human review of the complete argument.
 \raggedright
 \bibitem{artifact}
 Jason Davies.
-Odd-cycle homomorphism: Lean formalization and executable checks.
-Software repository, 2026. Lean source version
-\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/493b97c71fd4e2e07e88720a99de94d55d5632ea}{\texttt{493b97c}}.
+Odd-cycle homomorphism: Lean formalisation and executable checks.
+Software repository, 2026. Version
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/af4b974bc4b66d3c4f1eb41b3112aa4b7d5dbdff}{\texttt{af4b974}}.
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
 
 \bibitem{amarilli2016}

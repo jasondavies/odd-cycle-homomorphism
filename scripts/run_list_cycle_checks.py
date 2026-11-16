@@ -138,7 +138,8 @@ def main():
         "passed": True,
         "scope": "Finite checks corroborate the construction; they do not prove universal statements.",
     }
-    destination = Path(__file__).resolve().parents[1] / "sources/list-cycle-results.json"
+    destination = Path(__file__).resolve().parents[1] / "reports/list-cycle-results.json"
+    destination.parent.mkdir(exist_ok=True)
     destination.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
 
