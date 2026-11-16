@@ -1,8 +1,11 @@
 """Exhaustive and seeded finite checks of the List Coloring reduction."""
 from pathlib import Path
+from collections import deque
 import itertools
 import json
 import random
+
+from verification import require
 
 from list_cycle_hom import (
     Reduction, check_degeneracy, check_path_decomposition, check_tree_decomposition,
@@ -16,7 +19,29 @@ def powerset(values):
         yield {v for i, v in enumerate(values) if mask & (1 << i)}
 
 
-def verify(lists, edges, n, bags=None, tree=None, is_path=True):
+def girth(count, edges):
+    """Shortest cycle length by BFS from every vertex; None for a forest."""
+    adj = [[] for _ in range(count)]
+    for u, v in edges:
+        adj[u].append(v)
+        adj[v].append(u)
+    shortest = None
+    for root in range(count):
+        distance, parent = {root: 0}, {root: None}
+        queue = deque([root])
+        while queue:
+            v = queue.popleft()
+            for u in adj[v]:
+                if u not in distance:
+                    distance[u], parent[u] = distance[v] + 1, v
+                    queue.append(u)
+                elif parent[v] != u:
+                    length = distance[v] + distance[u] + 1
+                    shortest = length if shortest is None else min(shortest, length)
+    return shortest
+
+
+def verify(lists, edges, n, bags=None, tree=None, is_path=True, check_girth=False):
     m = len(lists)
     if bags is None:
         bags, tree = [set(range(m))], []
@@ -26,8 +51,8 @@ def verify(lists, edges, n, bags=None, tree=None, is_path=True):
              if is_forest_without(m, edges, s))
     g = Reduction(lists, edges, n)
     removed = S | {g.A, g.B}
-    assert len(removed) == len(S) + 2
-    assert is_forest_without(g.count, g.edges, removed)
+    require(len(removed) == len(S) + 2)
+    require(is_forest_without(g.count, g.edges, removed))
     td, tt = g.tree_decomposition(bags, tree)
     check_tree_decomposition(g.count, g.edges, td, tt, max(width+2, 4))
     if is_path:
@@ -36,24 +61,34 @@ def verify(lists, edges, n, bags=None, tree=None, is_path=True):
     check_degeneracy(g.count, g.edges)
     hom, nodes = hom_to_cycle(g.count, g.edges, n, fix={g.A: 0, g.B: 1}, core=removed)
     expected = any(all(c[u] != c[v] for u, v in edges) for c in itertools.product(*lists))
-    assert (hom is not None) == expected, (lists, edges, n)
+    require((hom is not None) == expected, (lists, edges, n))
     if hom is not None:
-        assert all((hom[u]-hom[v]) % n in (1, n-1) for u, v in g.edges)
-    return expected, g.count, nodes
+        require(all((hom[u]-hom[v]) % n in (1, n-1) for u, v in g.edges))
+    measured_girth = girth(g.count, g.edges) if check_girth else None
+    if check_girth:
+        require(measured_girth == (n if m else None), "Unexpected source girth")
+    return {"satisfiable": expected, "source_vertices": g.count,
+            "hom_search_nodes": nodes, "input_feedback_vertex_number": len(S),
+            "target_length": n, "girth": measured_girth}
 
 
 def main():
-    cases = negative = max_vertices = total_search_nodes = 0
-    def run(*args, **kwargs):
-        nonlocal cases, negative, max_vertices, total_search_nodes
-        sat, vertices, nodes = verify(*args, **kwargs)
+    cases = negative = max_vertices = total_search_nodes = positive_cyclic = girth_checks = 0
+    targeted = []
+    def run(*args, name=None, **kwargs):
+        nonlocal cases, negative, max_vertices, total_search_nodes, positive_cyclic, girth_checks
+        result = verify(*args, **kwargs)
         cases += 1
-        negative += not sat
-        max_vertices = max(max_vertices, vertices)
-        total_search_nodes += nodes
+        negative += not result["satisfiable"]
+        max_vertices = max(max_vertices, result["source_vertices"])
+        total_search_nodes += result["hom_search_nodes"]
+        positive_cyclic += result["satisfiable"] and result["input_feedback_vertex_number"] > 0
+        girth_checks += kwargs.get("check_girth", False)
+        if name:
+            targeted.append({"name": name, **result})
     # Empty input, empty lists, isolated vertices, all binary-domain instances
     # on up to three vertices, and all three-color instances on two vertices.
-    run([], set(), 5)
+    run([], set(), 5, name="empty input", check_girth=True)
     for m, q in [(1, 2), (2, 2), (3, 2), (2, 3)]:
         for lists in itertools.product(list(powerset(range(q))), repeat=m):
             for edges in powerset(itertools.combinations(range(m), 2)):
@@ -74,16 +109,32 @@ def main():
             bags = [{0, i} for i in range(1, m)]
             tree = [(0, i) for i in range(1, m-1)]
             run(lists, edges, n, bags, tree, is_path=False)
+    # Positive cyclic inputs exercise genuinely nonempty input feedback sets.
+    run([{0, 1, 2}]*3, {(0, 1), (0, 2), (1, 2)}, 5,
+        name="three-color triangle", check_girth=True)
+    cyclic_edges = {(0, 1), (0, 2), (1, 2), (2, 3),
+                    (3, 4), (3, 5), (4, 5), (3, 6)}
+    cyclic_bags = [{0, 1, 2}, {2, 3}, {3, 4, 5}, {3, 6}]
+    run([{0, 1, 2}]*7, cyclic_edges, 7, cyclic_bags, [(0, 1), (1, 2), (2, 3)],
+        name="two triangles, bridge and leaf; staggered path", check_girth=True)
+    run([{0, 1, 2}]*7, cyclic_edges, 7, cyclic_bags, [(0, 1), (1, 2), (1, 3)],
+        name="two triangles, bridge and leaf; branching tree", is_path=False, check_girth=True)
+    run([{0, 1, 2}]*4, set(itertools.combinations(range(4), 2)), 5,
+        name="three-color K4", check_girth=True)
     report = {
         "cases": cases,
         "negative_instances": negative,
         "largest_source_vertices": max_vertices,
         "hom_search_nodes": total_search_nodes,
         "target_lengths": [5, 7, 9],
+        "positive_cyclic_instances": positive_cyclic,
+        "girth_checks": girth_checks,
+        "targeted_cases": targeted,
         "checks": ["decision equivalence", "returned homomorphism edges",
                    "polynomial size bound", "tree decomposition",
                    "path decomposition (+5 direct sweep; Lean proves +6)",
-                   "feedback vertex set transfer", "2-degeneracy"],
+                   "feedback vertex set transfer", "2-degeneracy",
+                   "exact girth on targeted cases"],
         "passed": True,
         "scope": "Finite checks corroborate the construction; they do not prove universal statements.",
     }

@@ -1,6 +1,8 @@
 """List Coloring to odd-cycle homomorphism; finite validation utilities."""
 import itertools
 
+from verification import require
+
 
 class Reduction:
     """Construct precisely the reference copies and links used by Lean.
@@ -10,9 +12,9 @@ class Reduction:
     from the Lean sum type, but all adjacencies agree with that definition.
     """
     def __init__(self, lists, edges, n):
-        assert n >= 5 and n % 2 == 1
+        require(n >= 5 and n % 2 == 1)
         self.m, self.n = len(lists), n
-        assert all(set(domain) <= set(range(n)) for domain in lists)
+        require(all(set(domain) <= set(range(n)) for domain in lists))
         self.count = self.m + 2
         self.A, self.B = self.m, self.m + 1
         self.edges = {(self.A, self.B)}
@@ -27,14 +29,14 @@ class Reduction:
                 self.parts.append(({self.A, self.B, v}, list(range(start, self.count))))
                 self.sweeps.append(({v}, cycle, link, d))
         for u, v in sorted(edges):
-            assert 0 <= u < v < self.m
+            require(0 <= u < v < self.m)
             start = self.count
             link = self.link(u, v)
             self.parts.append(({u, v}, list(range(start, self.count))))
             self.sweeps.append(({u, v}, None, link, None))
         forbidden = sum(n - len(domain) for domain in lists)
-        assert self.count == 2 + self.m + self.m*n*(n-2) + (forbidden+len(edges))*(n-3)
-        assert self.count <= 2+self.m+self.m*n*n+(self.m*n+self.m*self.m)*n
+        require(self.count == 2 + self.m + self.m*n*(n-2) + (forbidden+len(edges))*(n-3))
+        require(self.count <= 2+self.m+self.m*n*n+(self.m*n+self.m*self.m)*n)
 
     def vertex(self):
         v = self.count
@@ -42,7 +44,7 @@ class Reduction:
         return v
 
     def edge(self, u, v):
-        assert u != v
+        require(u != v)
         self.edges.add(tuple(sorted((u, v))))
 
     def link(self, u, v):
@@ -75,7 +77,7 @@ class Reduction:
                     for u in adj[v]:
                         if u in boundary or u == parent:
                             continue
-                        assert u in unseen, "local gadget interior is not a forest"
+                        require(u in unseen, "local gadget interior is not a forest")
                         unseen.remove(u)
                         queue.append((u, v, bi))
         return bags, tree
@@ -112,21 +114,21 @@ class Reduction:
 
 
 def check_tree_decomposition(count, edges, bags, tree, width):
-    assert is_forest_without(len(bags), tree, ())
-    assert len(tree) == len(bags) - 1
+    require(is_forest_without(len(bags), tree, ()))
+    require(len(tree) == len(bags) - 1)
     occurrences, common = [0]*count, [0]*count
     covered = set()
     for bag in bags:
-        assert len(bag) <= width + 1
+        require(len(bag) <= width + 1)
         for v in bag:
             occurrences[v] += 1
         covered.update(itertools.combinations(sorted(bag), 2))
-    assert set(edges) <= covered
+    require(set(edges) <= covered)
     for i, j in tree:
         for v in bags[i] & bags[j]:
             common[v] += 1
     # A nonempty induced subgraph of a tree is connected iff it has |V|-1 edges.
-    assert all(occurrences[v] > 0 and common[v] == occurrences[v]-1 for v in range(count))
+    require(all(occurrences[v] > 0 and common[v] == occurrences[v]-1 for v in range(count)))
     return max(map(len, bags)) - 1
 
 
@@ -146,7 +148,7 @@ def check_degeneracy(count, edges, k=2):
             adj[u].remove(v)
             if len(adj[u]) <= k:
                 queue.append(u)
-    assert len(removed) == count
+    require(len(removed) == count)
 
 def hom_to_cycle(count, adj, n, fix=None, core=None):
     """Complete search knowing only the graph: arc consistency + backtracking on
@@ -168,7 +170,7 @@ def hom_to_cycle(count, adj, n, fix=None, core=None):
     for u, v in adj:
         if u not in inside and v not in inside:
             ru, rv = find(u), find(v)
-            assert ru != rv, "core is not a feedback vertex set"
+            require(ru != rv, "core is not a feedback vertex set")
             parent[ru] = rv
     dom = [full] * count
     for v, val in (fix or {}).items():
@@ -203,7 +205,8 @@ def hom_to_cycle(count, adj, n, fix=None, core=None):
                 d = dom[v]
                 if d & (d - 1):
                     dom[v] = d & -d
-                    assert propagate(dom, [v])
+                    if not propagate(dom, [v]):
+                        raise RuntimeError("Arc consistency failed during forest completion")
             return [d.bit_length() - 1 for d in dom]
         d = dom[best]
         while d:
@@ -238,13 +241,13 @@ def check_path_decomposition(count, adj, bags, width):
     first, last, seen = [None] * count, [None] * count, [0] * count
     covered = set()
     for i, bag in enumerate(bags):
-        assert len(bag) <= width + 1, (len(bag), width)
+        require(len(bag) <= width + 1, (len(bag), width))
         for x in bag:
             if first[x] is None:
                 first[x] = i
             last[x] = i
             seen[x] += 1
         covered.update(itertools.combinations(sorted(bag), 2))
-    assert all(first[x] is not None and last[x] - first[x] + 1 == seen[x] for x in range(count))
-    assert set(adj) <= covered
+    require(all(first[x] is not None and last[x] - first[x] + 1 == seen[x] for x in range(count)))
+    require(set(adj) <= covered)
     return max(map(len, bags)) - 1

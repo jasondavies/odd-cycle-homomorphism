@@ -15,7 +15,7 @@ part of the input, is:
 | --- | --- |
 | Width of a supplied path decomposition of `G` | XNLP-complete |
 | Width of a supplied tree decomposition of `G` | XALP-complete |
-| Feedback vertex number of `G` | W[3]-hard |
+| Feedback vertex number of `G` | W[3]-hard; in W[P] |
 
 The hardness results also hold without supplied decompositions, and
 XNLP-hardness implies W[t]-hardness for every t. The target has treewidth 2,
@@ -50,7 +50,8 @@ paper, latexmk. Lean 4.35.0 and mathlib v4.35.0 are pinned.
 ```sh
 lake exe cache get
 python3 scripts/check_formalization.py   # build, then audit 37 declarations
-python3 scripts/run_list_cycle_checks.py # 837 finite instances
+python3 scripts/run_list_cycle_checks.py # 841 finite instances
+python3 -m unittest discover -s scripts -p 'test_*.py' # verifier regressions
 make -C paper
 ```
 

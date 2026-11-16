@@ -1,12 +1,61 @@
 {
-  "cases": 837,
-  "negative_instances": 445,
+  "cases": 841,
+  "negative_instances": 446,
   "largest_source_vertices": 508,
-  "hom_search_nodes": 393,
+  "hom_search_nodes": 405,
   "target_lengths": [
     5,
     7,
     9
+  ],
+  "positive_cyclic_instances": 3,
+  "girth_checks": 5,
+  "targeted_cases": [
+    {
+      "name": "empty input",
+      "satisfiable": true,
+      "source_vertices": 2,
+      "hom_search_nodes": 1,
+      "input_feedback_vertex_number": 0,
+      "target_length": 5,
+      "girth": null
+    },
+    {
+      "name": "three-color triangle",
+      "satisfiable": true,
+      "source_vertices": 68,
+      "hom_search_nodes": 2,
+      "input_feedback_vertex_number": 1,
+      "target_length": 5,
+      "girth": 5
+    },
+    {
+      "name": "two triangles, bridge and leaf; staggered path",
+      "satisfiable": true,
+      "source_vertices": 398,
+      "hom_search_nodes": 3,
+      "input_feedback_vertex_number": 2,
+      "target_length": 7,
+      "girth": 7
+    },
+    {
+      "name": "two triangles, bridge and leaf; branching tree",
+      "satisfiable": true,
+      "source_vertices": 398,
+      "hom_search_nodes": 3,
+      "input_feedback_vertex_number": 2,
+      "target_length": 7,
+      "girth": 7
+    },
+    {
+      "name": "three-color K4",
+      "satisfiable": false,
+      "source_vertices": 94,
+      "hom_search_nodes": 4,
+      "input_feedback_vertex_number": 2,
+      "target_length": 5,
+      "girth": 5
+    }
   ],
   "checks": [
     "decision equivalence",
@@ -15,7 +64,8 @@
     "tree decomposition",
     "path decomposition (+5 direct sweep; Lean proves +6)",
     "feedback vertex set transfer",
-    "2-degeneracy"
+    "2-degeneracy",
+    "exact girth on targeted cases"
   ],
   "passed": true,
   "scope": "Finite checks corroborate the construction; they do not prove universal statements."

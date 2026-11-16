@@ -17,7 +17,7 @@ Sources:
 The current solution reduces List Coloring to homomorphism into an input odd
 cycle, whose treewidth and pathwidth are 2. It gives XNLP-completeness with a
 supplied path decomposition, XALP-completeness with a supplied tree decomposition,
-and W[3]-hardness for source feedback vertex number. Hardness also holds without
+and W[3]-hardness with W[P] membership for source feedback vertex number. Hardness also holds without
 supplied decompositions; the membership statements require them. The source width
 still depends on the parameter. Neither both widths nor the target cycle length
 are fixed constants in the hardness result.

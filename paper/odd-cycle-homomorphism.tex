@@ -38,11 +38,10 @@
 Deciding whether a graph admits a homomorphism to an odd cycle given in the
 input is XNLP-complete parameterized by the width of a supplied path
 decomposition, and XALP-complete parameterized by the width of a supplied
-tree decomposition. It is also W[3]-hard parameterized by the feedback
-vertex number of the source. A single reduction from List Coloring proves
-all three hardness statements. For an input graph $F$, it produces a graph
-$G$ with treewidth at most $\max\{\tw(F)+2,4\}$, pathwidth at most
-$\pw(F)+6$, and feedback vertex number at most $\fvs(F)+2$.
+tree decomposition. It is also W[3]-hard and in W[P] parameterized by the
+feedback vertex number of the source. A single reduction from List Coloring proves
+all three hardness statements, increasing treewidth, pathwidth, and feedback
+vertex number by constants.
 The construction uses reference cycles sharing one edge and paths of length
 $n-2$, which enforce unequal images in the target $C_n$.
 The reduction's decision equivalence, all three structural bounds, target
@@ -65,6 +64,8 @@ for each fixed $w$, but the exponent depends on $w$.
 Amarilli asked whether additionally bounding the target treewidth makes
 homomorphism fixed-parameter tractable with parameter
 $\max\{\tw(G),\tw(H)\}$~\cite{amarilli2016}.
+A W[1]-hardness answer was announced in 2025; the relationship between
+those reductions and the construction below remains to be determined.
 
 Here the target is a single odd cycle $C_n$, whose length is part of the
 input and is not included in the parameter. We obtain the following
@@ -74,13 +75,11 @@ classification from one direct reduction.
 Consider the problem of deciding $G\to C_n$, where $G$ is a finite simple
 undirected graph and $n\geq5$ is odd and given in unary.
 \begin{enumerate}
-\item With a path decomposition supplied, the problem is XNLP-complete
-parameterized by the width of that decomposition.
-\item With a tree decomposition supplied, it is XALP-complete
-parameterized by the width of that decomposition.
-\item Parameterized by $\fvs(G)$, it is W[3]-hard.
+\item Given a path decomposition, it is XNLP-complete parameterized by its width.
+\item Given a tree decomposition, it is XALP-complete parameterized by its width.
+\item Parameterized by $\fvs(G)$, it is W[3]-hard and belongs to W[P].
 \end{enumerate}
-The hardness statements remain valid on 2-degenerate source graphs of
+The hardness statements remain valid on connected, 2-degenerate source graphs of
 girth at least any prescribed constant.
 \end{theorem}
 
@@ -90,6 +89,10 @@ without a supplied decomposition as well, but make no membership claim for
 those variants. All targets have treewidth and pathwidth exactly two.
 Thus the result gives XALP-hardness parameterized by the maximum of the two
 input treewidths, and XNLP-hardness for the analogous pathwidth parameter.
+The distinction between the two completeness classifications reflects
+whether the algorithm retains successive bag assignments or additionally
+uses a stack of saved parent assignments. Section~\ref{sec:complexity}
+gives the machine definitions and membership arguments.
 
 The main technical statement is an additive structural transfer.
 
@@ -106,13 +109,14 @@ resource bounds. For every feedback vertex set $S$ of $F$, the construction
 specifies a feedback vertex set of $G$ of size $|S|+2$.
 \end{theorem}
 
-The construction removes lists by giving each forbidden color its own
-reference cycle. All reference cycles share an ordered edge, which fixes
+The construction removes lists by giving each forbidden occurrence $(v,d)$
+its own reference cycle and a single domain link. All reference cycles
+share an ordered edge, which fixes
 a common coordinate system in every homomorphism. A path of length $n-2$
-then excludes one coordinate from the image of a chosen vertex. Keeping
-the reference copies separate is what makes the feedback vertex bound
-possible: after deleting the shared edge's endpoints, each copy attaches
-to at most one original vertex.
+then excludes one coordinate from the image of a chosen vertex. After
+deleting $A,B$, each reference cycle becomes a path joined to the rest
+of the graph through at most one link, so it cannot create a new cycle.
+This single-link property is the reason for keeping the copies separate.
 
 \paragraph{Prior work and attribution.}
 Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
@@ -135,7 +139,9 @@ A tree decomposition consists of a nonempty tree $T$ and bags
 $(B_t)_{t\in V(T)}$ covering the graph's vertices and edges, such that
 the bags containing any given vertex induce a connected subtree of $T$.
 Its width is $\max\{0,\max_t |B_t|-1\}$. A path decomposition has a path as
-its index tree. Thus the empty graph has width zero, witnessed by a single
+its index tree. The parameters $\tw$ and $\pw$ are the minimum widths
+over tree and path decompositions, respectively.
+Thus the empty graph has width zero, witnessed by a single
 empty bag. A feedback vertex set is a set whose
 deletion leaves a forest, and $\fvs$ denotes its minimum cardinality.
 
@@ -422,6 +428,12 @@ Choosing $n$ also to exceed any fixed girth threshold preserves all bounds.
 The target length still varies with the input. These observations do not
 bound the maximum degree of the source.
 
+The output is also connected. Since $n\geq q+1$, residue $q$ is outside
+every input list. Each hub therefore has a domain link to the reference
+component containing $AB$. Every remaining vertex lies in a reference
+copy or a link. For empty $F$, the output is simply $AB$. This explains
+the strict palette padding in the choice of $n$.
+
 \section{Complexity consequences}\label{sec:complexity}
 XNLP consists of problems decidable nondeterministically in time
 $f(k)N^{O(1)}$ and space $f(k)\log N$, where $N$ is the input length.
@@ -514,13 +526,23 @@ For a path, check that every occurrence set is a nonempty interval.
 These preliminary checks take logarithmic workspace and polynomial time.
 No decomposition-finding algorithm is assumed.
 
-\paragraph{Scope and optimal target width.}
+\paragraph{Feedback vertex number.}
+For membership in W[P], express $G\to C_n$ as Binary CSP: give each vertex
+of $G$ the domain $\Z/n\Z$, and for each edge allow exactly the ordered
+pairs adjacent in $C_n$. The constraint graph is exactly $G$, so its
+feedback vertex number is preserved. The explicit constraint relations
+have polynomial size because $n$ is unary. The W[P] upper bound for
+Binary CSP parameterized by feedback vertex number~\cite[Theorem~2]{bgp2023}
+therefore gives the claimed membership. Together with the reduction,
+this proves the third part of Theorem~\ref{thm:main}.
+
+\paragraph{Scope and targets of width one.}
 We do not claim W[3]-membership for feedback vertex number, or XNLP-membership
 for treewidth. The two supplied-decomposition completeness statements have
 different parameters and different machine models.
 
-Target treewidth two is the smallest possible hardness bound. If a target
-forest has an edge, a source maps to it exactly when the source is bipartite:
+Homomorphism to targets of treewidth at most one is polynomial-time decidable.
+If a target forest has an edge, a source maps to it exactly when the source is bipartite:
 a bipartition maps to that edge, and a homomorphism into a bipartite graph
 implies a bipartition of the source. Nonempty edgeless targets accept
 exactly edgeless sources, and an empty target accepts exactly the empty
@@ -530,6 +552,17 @@ by the usual dynamic programme; variability of $n$ is essential.
 
 \appendix
 \section{Lean verification}\label{app:lean}
+\paragraph{Artifact availability.}
+The Lean development is in the public repository
+\url{https://github.com/jasondavies/odd-cycle-homomorphism}.
+The exact Lean source version underlying this draft is commit
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/493b97c71fd4e2e07e88720a99de94d55d5632ea}{\texttt{493b97c}}~\cite{artifact}.
+Its \lean{README.md} gives reproduction commands and
+\lean{FORMALIZATION.md} maps the checked statements to declarations.
+The executable checks described below include the subsequent validation
+fixes and additional cases in the repository; these do not change the
+Lean sources or theorem statements.
+
 The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
 mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
 \lean{SimpleGraph}. The target \lean{OddCycle.cyc n} is mathlib's circulant
@@ -573,8 +606,8 @@ specialization.
 The formal statements do not encode Turing machines or complexity classes.
 The published hardness of List Coloring, the reduction's time and space
 bounds, the membership algorithms' resource analysis, and the complexity
-conclusions are mathematical arguments in the text. The degeneracy and
-girth statements are also proved in the text, not in Lean.
+conclusions are mathematical arguments in the text. The degeneracy, girth,
+and connectedness statements are also proved in the text, not in Lean.
 Noncomputable choices used to select bags or roots in structural proofs
 do not stand in for a verified implementation of the logspace transducer.
 
@@ -582,11 +615,16 @@ Running \texttt{python3 scripts/check\_formalization.py} builds the library,
 checks for proof admissions, and audits the principal declarations for
 axioms. The permitted foundational axioms are \lean{propext},
 \lean{Classical.choice}, and \lean{Quot.sound}.
-The executable constructor is separately checked on 837 finite instances,
-including 445 negative instances and target lengths $5,7,9$.
+The executable constructor is separately checked on 841 finite instances,
+including 446 negative instances and target lengths $5,7,9$.
 The checks compare direct list-coloring search with graph-only homomorphism
 search, validate returned homomorphisms, tree and path decompositions,
-feedback vertex sets, the size bound, and 2-degeneracy. They corroborate
+feedback vertex sets, the size bound, and 2-degeneracy. Targeted cases
+include positive cyclic inputs with feedback vertex number one and two,
+a branching decomposition, and an independent breadth-first-search girth
+check. Validation remains active under Python's optimized execution modes;
+the Lean audit report records the project revision and working-tree status.
+These executable checks corroborate
 but do not replace the universal proofs. The direct executable path sweep
 satisfies a slightly sharper $p+5$ bound; the formal theorem and the main
 statements use $p+6$.
@@ -600,6 +638,13 @@ human review of the complete argument.
 
 \begin{thebibliography}{10}
 \raggedright
+\bibitem{artifact}
+Jason Davies.
+Odd-cycle homomorphism: Lean formalization and executable checks.
+Software repository, 2026. Lean source version
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/493b97c71fd4e2e07e88720a99de94d55d5632ea}{\texttt{493b97c}}.
+\url{https://github.com/jasondavies/odd-cycle-homomorphism}.
+
 \bibitem{amarilli2016}
 Antoine Amarilli.
 Complexity of the homomorphism problem parameterized by treewidth.

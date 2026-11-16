@@ -54,12 +54,13 @@ The following are not formalized as machine-level theorems:
 - the logspace transducer and the polynomial number of output bags;
 - time and space analysis of the XNLP and XALP membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
-- the source's 2-degeneracy and girth.
+- the source's 2-degeneracy, girth and connectedness.
 
 The paper provides proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
 the logspace transducer. Completeness is stated only with a supplied decomposition.
-No W[3]-membership result for feedback vertex number is claimed.
+For feedback vertex number, the W[P] upper bound follows from Binary CSP
+in the paper; no W[3]-membership result is claimed.
 
 ## Reproduction and audits
 
@@ -71,11 +72,16 @@ python3 scripts/run_list_cycle_checks.py
 The first command builds the library and audits the 37 declarations listed in
 [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
-[sources/lean-verification.json](sources/lean-verification.json).
+[sources/lean-verification.json](sources/lean-verification.json). The report
+records the project commit and working-tree status sampled before verification.
+A dirty report describes a working tree, not just the named commit. All acceptance
+checks remain active under `python -O`, `python -OO`, and `PYTHONOPTIMIZE`.
 
-The second command checks 837 explicit finite instances, including empty graphs,
+The second command checks 841 explicit finite instances, including empty graphs,
 empty lists, exhaustive small instances, and seeded instances with path and
 branching tree decompositions. It checks satisfiability equivalence, returned
-homomorphisms, source size, decompositions, feedback sets and 2-degeneracy.
+homomorphisms, source size, decompositions, feedback sets and 2-degeneracy. Three positive cyclic cases exercise nonempty
+input feedback sets, including a branching decomposition. Five targeted cases
+(including empty input) also check exact girth independently by breadth-first search.
 The direct executable path sweep meets `p+5`; Lean's modular proof uses `p+6`.
 See [sources/list-cycle-results.json](sources/list-cycle-results.json).

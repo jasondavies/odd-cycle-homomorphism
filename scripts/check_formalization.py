@@ -4,35 +4,75 @@ import json
 import re
 import subprocess
 
+from verification import require
+
 ROOT = Path(__file__).resolve().parents[1]
-subprocess.run(["lake", "build"], cwd=ROOT, check=True)
-result = subprocess.run(["lake", "env", "lean", "AxiomAudit.lean"], cwd=ROOT,
-                        check=True, text=True, capture_output=True)
-print(result.stdout, end="")
-allowed = {"propext", "Classical.choice", "Quot.sound"}
-entries = re.findall(r"'([^']+)' depends on axioms: \[([^]]*)\]", result.stdout)
-empty = re.findall(r"'([^']+)' does not depend on any axioms", result.stdout)
-expected = re.findall(r"^#print axioms (\S+)", (ROOT / "AxiomAudit.lean").read_text(), re.M)
-found = {name for name, _ in entries} | set(empty)
-assert found == set(expected), (found, expected)
-assert "sorryAx" not in result.stdout
-for name, axioms in entries:
-    used = {s.strip() for s in axioms.split(",") if s.strip()}
-    assert used <= allowed, (name, used - allowed)
-for source in (ROOT / "TreewidthHom").rglob("*.lean"):
-    # This catches accidental admissions in addition to the dependency audit.
-    assert not re.search(r"^\s*(?:axiom\s|opaque\s)|\b(?:sorry|admit)\b",
-                         source.read_text(), re.M), source
-report = {
-    "toolchain": (ROOT / "lean-toolchain").read_text().strip(),
-    "mathlib_commit": next(p["rev"] for p in json.loads(
-        (ROOT / "lake-manifest.json").read_text())["packages"] if p["name"] == "mathlib"),
-    "theorems_audited": expected,
-    "axioms": {name: [s.strip() for s in axioms.split(",") if s.strip()]
-               for name, axioms in entries} | {name: [] for name in empty},
-    "build_passed": True,
-    "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy and girth are outside Lean.",
-}
-(ROOT / "sources").mkdir(exist_ok=True)
-(ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")
-print(f"PASS: {len(expected)} theorem axiom audits; no proof admissions.")
+ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
+
+
+def audit_output(output, expected, sources):
+    """Validate compiler output and source admissions before creating a report."""
+    entries = re.findall(r"'([^']+)' depends on axioms: \[([^]]*)\]", output)
+    empty = re.findall(r"'([^']+)' does not depend on any axioms", output)
+    names = [name for name, _ in entries] + empty
+    require(bool(expected), "No declarations requested for the axiom audit")
+    require(len(expected) == len(set(expected)), "Duplicate requested declarations")
+    require(len(names) == len(set(names)), "Duplicate declarations in audit output")
+    require(set(names) == set(expected),
+            f"Audit declaration mismatch: expected {sorted(expected)}, found {sorted(names)}")
+    require("sorryAx" not in output, "Proof admission found in audit output")
+    axioms = {}
+    for name, values in entries:
+        used = [s.strip() for s in values.split(",") if s.strip()]
+        require(set(used) <= ALLOWED_AXIOMS,
+                f"Nonstandard axioms for {name}: {sorted(set(used) - ALLOWED_AXIOMS)}")
+        axioms[name] = used
+    axioms.update({name: [] for name in empty})
+    for source in sources:
+        require(not re.search(r"^\s*(?:axiom\s|opaque\s)|\b(?:sorry|admit)\b",
+                              source.read_text(), re.M),
+                f"Proof admission or unverified declaration in {source}")
+    return axioms
+
+
+def project_state(root):
+    def git(*args):
+        return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
+    revision = git("rev-parse", "HEAD")
+    # Keep porcelain status prefixes intact, including leading spaces.
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain=v1", "--untracked-files=all"],
+        cwd=root, text=True).splitlines()
+    return {"project_commit": revision, "working_tree_dirty": bool(status),
+            "working_tree_status": status}
+
+
+def main():
+    provenance = project_state(ROOT)
+    subprocess.run(["lake", "build"], cwd=ROOT, check=True)
+    result = subprocess.run(["lake", "env", "lean", "AxiomAudit.lean"], cwd=ROOT,
+                            check=True, text=True, capture_output=True)
+    print(result.stdout, end="")
+    expected = re.findall(r"^#print axioms (\S+)",
+                          (ROOT / "AxiomAudit.lean").read_text(), re.M)
+    sources = [ROOT / "TreewidthHom.lean", *sorted((ROOT / "TreewidthHom").rglob("*.lean"))]
+    axioms = audit_output(result.stdout, expected, sources)
+    require(project_state(ROOT) == provenance, "Working-tree status changed during the audit")
+    report = {
+        **provenance,
+        "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
+        "toolchain": (ROOT / "lean-toolchain").read_text().strip(),
+        "mathlib_commit": next(p["rev"] for p in json.loads(
+            (ROOT / "lake-manifest.json").read_text())["packages"] if p["name"] == "mathlib"),
+        "theorems_audited": expected,
+        "axioms": axioms,
+        "build_passed": True,
+        "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy, girth and connectedness are outside Lean.",
+    }
+    (ROOT / "sources").mkdir(exist_ok=True)
+    (ROOT / "sources/lean-verification.json").write_text(json.dumps(report, indent=2) + "\n")
+    print(f"PASS: {len(expected)} theorem axiom audits; no proof admissions.")
+
+
+if __name__ == "__main__":
+    main()

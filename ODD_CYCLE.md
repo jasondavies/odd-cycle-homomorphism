@@ -77,6 +77,12 @@ bag assignments: retain successive assignments on paths; use an auxiliary
 stack when traversing a tree. Working space is `O((w+1) log N)` and total time
 is polynomial. The target length is given explicitly or in unary.
 
-Every target has treewidth and pathwidth 2. Width 1 cannot give such hardness:
-homomorphism into forests is polynomial-time decidable. The target cycle is
+Every target has treewidth and pathwidth 2. Homomorphism into targets of width at most 1 (forests) is polynomial-time decidable. The target cycle is
 variable, not fixed, and the source width is not a fixed constant.
+
+For feedback vertex number, the problem also belongs to W[P]: encoding
+homomorphism as Binary CSP preserves the constraint graph and hence the
+parameter, so [Bodlaender et al. 2023, Theorem 2](https://doi.org/10.4230/LIPIcs.ICALP.2023.27)
+applies. This upper bound is outside Lean. The palette padding also makes the
+constructed source connected: every hub excludes the common unused residue
+`q` and therefore has a domain link to the shared reference component.

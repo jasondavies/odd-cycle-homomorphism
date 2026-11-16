@@ -1,4 +1,23 @@
 {
+  "project_commit": "493b97c71fd4e2e07e88720a99de94d55d5632ea",
+  "working_tree_dirty": true,
+  "working_tree_status": [
+    " M FORMALIZATION.md",
+    " M ODD_CYCLE.md",
+    " M PROBLEM.md",
+    " M README.md",
+    " M paper/README.md",
+    " M paper/odd-cycle-homomorphism.pdf",
+    " M paper/odd-cycle-homomorphism.tex",
+    " M scripts/check_formalization.py",
+    " M scripts/list_cycle_hom.py",
+    " M scripts/run_list_cycle_checks.py",
+    " M sources/lean-verification.json",
+    " M sources/list-cycle-results.json",
+    "?? scripts/test_verification.py",
+    "?? scripts/verification.py"
+  ],
+  "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
   "toolchain": "leanprover/lean4:v4.35.0",
   "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
   "theorems_audited": [
@@ -228,5 +247,5 @@
     ]
   },
   "build_passed": true,
-  "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy and girth are outside Lean."
+  "scope": "List Coloring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,4), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. Hardness of List Coloring, machine time/space bounds, complexity-class conclusions, degeneracy, girth and connectedness are outside Lean."
 }
