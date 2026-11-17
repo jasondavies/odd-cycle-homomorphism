@@ -17,7 +17,9 @@ proof placeholder is required only for comparison; no definition is unspecified.
 
 - equivalence between list colourability and ordinary homomorphism to `C_n`;
 - treewidth at most `max(tw(F)+2,3)` and pathwidth at most `pw(F)+6`, including
-  transfers of supplied decomposition certificates;
+  transfers of supplied decomposition certificates with polynomial bag-count
+  bounds in the input bag count, vertex count and numeric target length;
+- finite-index output tree certificates even from arbitrary-index input ones;
 - target pathwidth at most two;
 - transfer of any feedback vertex set to one with exactly two more vertices,
   hence feedback vertex number at most `fvs(F)+2`;
@@ -57,7 +59,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 The ordinary build and axiom audit include Solution but exclude the deliberately
 incomplete Challenge. Comparator builds Challenge separately; its one proof-hole
-warning is expected. The audit checks 92 proved declarations and scans Solution
+warning is expected. The audit checks 109 proved declarations and scans Solution
 for admissions along with the library.
 
 The Comparator script preserves sandboxing and uses the toolchain's bundled
@@ -77,9 +79,9 @@ repository; dependencies and cited works retain their own licences.
 The standalone pair passed Comparator with Lean, NanoDa, and con-ron. The check
 used an isolated copy with contained dependency caches and sandboxing enabled;
 its Lean sources and configuration matched this working tree. The expanded
-92-declaration axiom audit and all ten Python regression tests passed.
+109-declaration axiom audit and all ten Python regression tests passed.
 Palomar's metadata validator accepted `formalization.yaml`, including provenance
-and subject classifications. All 40 project Lean files have module headers and
+and subject classifications. All 42 project Lean files have module headers and
 satisfy the source-size limits; the toolchain matches the pinned mathlib release.
 These are local checks, not a Palomar submission or registry decision.
 

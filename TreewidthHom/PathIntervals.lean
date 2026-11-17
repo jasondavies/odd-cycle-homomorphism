@@ -55,11 +55,11 @@ theorem Decomposition.path_intervals {V : Type} [DecidableEq V] {G : SimpleGraph
     · rintro ⟨h1,h2⟩
       exact D.path_convex v (first v) (last v) t h1 h2 (hf v) (hl v)
 
-theorem hasPathWidth_of_intervals {V : Type} [Fintype V] (G : SimpleGraph V)
+theorem pathWidth_of_intervals_bag_bound {V : Type} [Fintype V] (G : SimpleGraph V)
     (P w : ℕ) (lo hi : V → ℕ) (hlohi : ∀ v, lo v ≤ hi v) (hhi : ∀ v, hi v ≤ P)
     (hedge : ∀ u v, G.Adj u v → lo u ≤ hi v ∧ lo v ≤ hi u)
     (hcard : ∀ p, (Finset.univ.filter (fun v => lo v ≤ p ∧ p ≤ hi v)).card ≤ w+1) :
-    HasPathWidth G w := by
+    HasPathWidthWithBags G w (P+1) := by
   classical
   let bag := fun p : Fin (P+1) => Finset.univ.filter (fun v => lo v ≤ p.val ∧ p.val ≤ hi v)
   let D := intervalDecomposition G P bag
@@ -79,15 +79,22 @@ theorem hasPathWidth_of_intervals {V : Type} [Fintype V] (G : SimpleGraph V)
       have h1' : a.val ≤ c.val := h1
       have h2' : c.val ≤ b.val := h2
       omega)
-  exact ⟨inferInstance,P,D,fun p => hcard p.val⟩
+  exact ⟨inferInstance,P,D,(fun p => hcard p.val),le_rfl⟩
+
+theorem hasPathWidth_of_intervals {V : Type} [Fintype V] (G : SimpleGraph V)
+    (P w : ℕ) (lo hi : V → ℕ) (hlohi : ∀ v, lo v ≤ hi v) (hhi : ∀ v, hi v ≤ P)
+    (hedge : ∀ u v, G.Adj u v → lo u ≤ hi v ∧ lo v ≤ hi u)
+    (hcard : ∀ p, (Finset.univ.filter (fun v => lo v ≤ p ∧ p ≤ hi v)).card ≤ w+1) :
+    HasPathWidth G w := by
+  exact (pathWidth_of_intervals_bag_bound G P w lo hi hlohi hhi hedge hcard).hasPathWidth
 
 /-- A general path-decomposition transfer for subdivisions. -/
-theorem pathWidth_linked_of_bags {V L : Type} [Fintype V] [Fintype L]
+theorem pathWidth_linked_of_bags_bound {V L : Type} [Fintype V] [Fintype L]
     {G : SimpleGraph V} (H : SimpleGraph V) (hH : H ≤ G)
-    (s t : L → V) (q : ℕ) (hq : 0 < q) {w : ℕ} (hw : HasPathWidth G w)
-    (hedge : ∀ l, G.Adj (s l) (t l)) : HasPathWidth (linked H s t q) (w+2) := by
+    (s t : L → V) (q : ℕ) (hq : 0 < q) {w N : ℕ} (hw : HasPathWidthWithBags G w N)
+    (hedge : ∀ l, G.Adj (s l) (t l)) : HasPathWidthWithBags (linked H s t q) (w+2) (N*((Fintype.card L+1)*(q+1))) := by
   classical
-  obtain ⟨d,R,D,hw⟩ := hw
+  obtain ⟨d,R,D,hw,hN⟩ := hw
   obtain ⟨lo,hi,hlohi,hhi,hmem⟩ := D.path_intervals
   choose owner hs ht using fun l => D.edge_cover (hedge l)
   have hb : ∀ p, (Finset.univ.filter (fun v => lo v ≤ p ∧ p ≤ hi v)).card ≤ w+1 := by
@@ -102,14 +109,27 @@ theorem pathWidth_linked_of_bags {V L : Type} [Fintype V] [Fintype L]
         have hh : p ≤ hi v := (Finset.mem_filter.mp hv).2.2
         have := hhi v; omega
       simp [he]
-  apply hasPathWidth_linked H s t q hq R (Fintype.card L) (w+2) lo hi hlohi hhi
-    (fun u v h => ?_) (fun l => (owner l).val) (fun l => (Fintype.equivFin L l).val)
-    (fun l => (Fintype.equivFin L l).isLt) (fun l l' _ h => (Fintype.equivFin L).injective (Fin.ext h))
-    (fun l => (hmem _ _).mp (hs l)) (fun l => (hmem _ _).mp (ht l))
-    (fun p => by have := hb p; omega) (fun l => by have := hb (owner l).val; omega)
-  obtain ⟨b,hu,hv⟩ := D.edge_cover (hH h)
-  have hu' := (hmem _ _).mp hu
-  have hv' := (hmem _ _).mp hv
-  omega
+  have h : HasPathWidthWithBags (linked H s t q) (w+2)
+      ((R+1)*((Fintype.card L+1)*(q+1))) := by
+    apply pathWidth_linked_bag_bound H s t q hq R (Fintype.card L) (w+2) lo hi hlohi hhi
+      (fun u v h => ?_) (fun l => (owner l).val) (fun l => (Fintype.equivFin L l).val)
+      (fun l => (Fintype.equivFin L l).isLt) (fun l l' _ h => (Fintype.equivFin L).injective (Fin.ext h))
+      (fun l => (hmem _ _).mp (hs l)) (fun l => (hmem _ _).mp (ht l))
+      (fun p => by have := hb p; omega) (fun l => by have := hb (owner l).val; omega)
+    obtain ⟨b,hu,hv⟩ := D.edge_cover (hH h)
+    have hu' := (hmem _ _).mp hu
+    have hv' := (hmem _ _).mp hv
+    omega
+  obtain ⟨d', r, D', hD', hr⟩ := h
+  exact ⟨d', r, D', hD', hr.trans (Nat.mul_le_mul_right _ hN)⟩
+
+theorem pathWidth_linked_of_bags {V L : Type} [Fintype V] [Fintype L]
+    {G : SimpleGraph V} (H : SimpleGraph V) (hH : H ≤ G)
+    (s t : L → V) (q : ℕ) (hq : 0 < q) {w : ℕ} (hw : HasPathWidth G w)
+    (hedge : ∀ l, G.Adj (s l) (t l)) : HasPathWidth (linked H s t q) (w+2) := by
+  classical
+  obtain ⟨d, R, D, hD⟩ := hw
+  exact (pathWidth_linked_of_bags_bound H hH s t q hq
+    ⟨d, R, D, hD, le_rfl⟩ hedge).hasPathWidth
 
 end TreewidthHom

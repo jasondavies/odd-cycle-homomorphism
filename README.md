@@ -62,6 +62,10 @@ the matching treewidth and feedback-number lower bounds under palette padding
 and an input edge. The pathwidth lower bound also holds for nonempty edgeless
 inputs. Lean checks target capping and the target-free odd-cycle-core reduction,
 including the general equivalence with mapping to a shortest odd cycle.
+Finite graphs admit finite-index tree certificates of the same width.
+[ListCertificates](TreewidthHom/ListCertificates.lean) bounds the output tree
+and path bag counts polynomially in the input bag count, vertex count and
+numeric target length.
 The circular-chromatic-number interpretation, complexity classifications, and
 machine resource bounds remain outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
@@ -80,7 +84,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 92 declarations. The finite suite
+The Lean audit builds the library and checks 109 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not

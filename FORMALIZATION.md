@@ -24,6 +24,8 @@ successor lengths. No source or target lists remain in the output problem.
 | Rooted-tree attachments give width at most `max(w,1)` | `Graft.hasWidth`, [GraftWidth](TreewidthHom/GraftWidth.lean) |
 | Source treewidth `max(w+2,3)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
 | Source pathwidth `p+6` | `ListReduction.source_pathWidth`, [ListPathWidth](TreewidthHom/ListPathWidth.lean) |
+| Finite-index tree certificates give the same width on finite graphs | `hasFiniteWidth_iff_hasWidth`, `finite_decomposition_at_treewidth`, [FiniteDecomposition](TreewidthHom/FiniteDecomposition.lean) |
+| Polynomial output tree and path bag counts from supplied certificates | `ListReduction.source_tree_bag_bound`, `source_path_certificate`, [ListCertificates](TreewidthHom/ListCertificates.lean) |
 | Target pathwidth 2 | `OddCycle.target_pathWidth`, [CycleWidth](TreewidthHom/CycleWidth.lean) |
 | Forest orientation exists | `exists_forestOrientation`, [ForestOrientation](TreewidthHom/ForestOrientation.lean) |
 | Transferred set leaves an acyclic graph | `ListReduction.source_feedback`, [ListFeedback](TreewidthHom/ListFeedback.lean) |
@@ -58,6 +60,22 @@ not oracle assumptions about graph widths. The feedback theorem accepts an
 arbitrary set `S` together with acyclicity of `F-S`; it does not require the
 caller to supply an orientation. The orientation is derived within Lean.
 
+`HasFiniteWidth` requires a bag tree indexed by `Fin N`. The library proves
+that this has the same meaning as `HasWidth` on finite graphs, including the
+empty graph. It selects finitely many covering bags, connects them inside the
+original tree, restricts the decomposition, and relabels the finite subtree.
+This existence proof does not bound the size of that subtree.
+
+Separately, `HasWidthWithBags` and `HasPathWidthWithBags` record an upper bound
+on the number of supplied bags. From a certificate with at most `N` bags for an
+`m`-vertex input and target length `n`, the construction gives at most
+
+- `N + m*n*n + (m*n+m*m)*n` tree bags, of width `max(w+2,3)`;
+- `N*(2*(m*n*n+2))*((m*n+m*m+1)*n)` path bags, of width `p+6`.
+
+These are checked cardinality bounds for finite certificates, polynomial in
+`m,n,N`. They do not assert an encoded transducer or its workspace bound.
+
 `treewidth`, `pathwidth` and `fvs` are infima over these certificates. For a
 finite graph the infimum is attained, which the transfer inequalities use for
 the input graph. `IsDegenerate G k` says that every nonempty finite vertex set
@@ -91,17 +109,15 @@ a canonical core is asserted.
 
 ## Outside Lean
 
-Two representation bridges remain unchecked. `HasWidth` permits an arbitrary
-bag-index type; a same-width finite-index decomposition for a finite graph has
-not yet been derived in Lean. `HasPathWidth` already uses a finite index path.
-Neither fact establishes a polynomial bound on the encoded output certificates.
-Likewise, the source-size bound is polynomial in the numeric parameters `m,n`;
-palette compaction and the connection to encoded input length remain textual.
+Finite tree-certificate representation and polynomial output bag counts are
+checked. The remaining representation work concerns bit-level encodings and
+palette compaction: the vertex and bag bounds are polynomial in numeric
+parameters, and their connection to encoded input length remains textual.
 
 The following also remain outside the formalisation:
 
 - the published complexity of List Colouring;
-- the logspace transducer and the polynomial number of output bags;
+- the logspace transducer and the encoding of its output certificates;
 - time and space analysis of the XNLP, XALP and W[P] membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
 - the implementation and resource bound of the binary-to-unary transducer
@@ -134,7 +150,7 @@ precise scope and reproduction commands.
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 92 declarations
+`scripts/check_formalization.py` builds the library and audits the 109 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report

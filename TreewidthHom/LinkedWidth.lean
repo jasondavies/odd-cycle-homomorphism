@@ -11,13 +11,14 @@ open SimpleGraph
 
 /-- Subdividing edges, or adding paths whose ends already share a bag, requires
 only new bags of size three. -/
-theorem width_linked_of_bags {V L B : Type} [DecidableEq V]
+theorem decomposition_linked_of_bags {V L B : Type} [DecidableEq V] [DecidableEq L]
     {G : SimpleGraph V} {T : SimpleGraph B} (D : Decomposition G T)
     (H : SimpleGraph V) (hH : H ≤ G) (s t : L → V) (q w : ℕ)
     (hw : ∀ b, (D.bag b).card ≤ w+1)
     (owner : L → B) (hs : ∀ l, s l ∈ D.bag (owner l))
     (ht : ∀ l, t l ∈ D.bag (owner l)) :
-    HasWidth (linked H s t q) (max w 2) := by
+    ∃ T' : SimpleGraph (B ⊕ (L × Fin q)), ∃ D' : Decomposition (linked H s t q) T',
+      ∀ b, (D'.bag b).card ≤ max w 2 + 1 := by
   classical
   let prev : (L × Fin q) → V ⊕ (L × Fin q) := ChainGraft.prev s
   let F := ChainGraft.graft q owner
@@ -58,6 +59,18 @@ theorem width_linked_of_bags {V L B : Type} [DecidableEq V]
         subst v
         simp [F,ChainGraft.graft,ChainGraft.prev,hz,bag])
     (ChainGraft.unique_top D s bag new_mem owner)
-  exact ⟨inferInstance,_,_,D',graftBag_card D bag hw (fun _ => Finset.card_le_three)⟩
+  exact ⟨_,D',graftBag_card D bag hw (fun _ => Finset.card_le_three)⟩
+
+/-- The width bound obtained by forgetting the explicit output index type. -/
+theorem width_linked_of_bags {V L B : Type} [DecidableEq V]
+    {G : SimpleGraph V} {T : SimpleGraph B} (D : Decomposition G T)
+    (H : SimpleGraph V) (hH : H ≤ G) (s t : L → V) (q w : ℕ)
+    (hw : ∀ b, (D.bag b).card ≤ w+1)
+    (owner : L → B) (hs : ∀ l, s l ∈ D.bag (owner l))
+    (ht : ∀ l, t l ∈ D.bag (owner l)) :
+    HasWidth (linked H s t q) (max w 2) := by
+  classical
+  obtain ⟨T', D', hD'⟩ := decomposition_linked_of_bags D H hH s t q w hw owner hs ht
+  exact ⟨inferInstance, B ⊕ (L × Fin q), T', D', hD'⟩
 
 end TreewidthHom

@@ -86,10 +86,13 @@ def layout : ((Fin m ⊕ Private m n) ⊕ Fin 2) ≃ BaseVertex m n where
 
 /-- Removing the anchors exposes the input graph with rooted trees attached;
 adding the anchors back gives bags of size at most max(w+3,4). -/
-theorem aug_width (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasWidth F w) :
-    HasWidth (aug (n := n) F) (max (w+2) 3) := by
+theorem aug_decomposition {B : Type} [DecidableEq (Fin m)]
+    (F : SimpleGraph (Fin m)) {T : SimpleGraph B} (D₀ : Decomposition F T)
+    {w : ℕ} (hw : ∀ b, (D₀.bag b).card ≤ w+1) :
+    ∃ T' : SimpleGraph (B ⊕ Private m n), ∃ D' : Decomposition (aug (n := n) F) T',
+      ∀ b, (D'.bag b).card ≤ max (w+2) 3 + 1 := by
   classical
-  obtain ⟨d,B,T,D,hD⟩ := (referenceGraft m n).hasWidth hw
+  obtain ⟨T₁,D,hD⟩ := (referenceGraft m n).decomposition_of_bags D₀ hw
   let H := (aug (n := n) F).comap layout
   have hbase : ∀ {u v}, H.Adj (.inl u) (.inl v) →
       ((referenceGraft m n).graph F).Adj u v := by
@@ -109,21 +112,46 @@ theorem aug_width (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasWidth F w) :
       · exact (reference_parent_step he.symm hh).symm
   let D' := D.addApices H hbase
   have he : ∀ u v, (aug F).Adj (layout u) (layout v) → H.Adj u v := fun _ _ h => h
-  refine ⟨inferInstance,_,_,D'.mapEquiv layout he,fun b => ?_⟩
+  refine ⟨_,D'.mapEquiv layout he,fun b => ?_⟩
   rw [Decomposition.mapEquiv_card]
   have h := D.two_apex_width hD (A := Fin 2) (by simp) b
   change (D.apexBag (A := Fin 2) b).card ≤ _
   omega
 
+/-- Forgetting the explicit bag-index type recovers the width-only statement. -/
+theorem aug_width (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasWidth F w) :
+    HasWidth (aug (n := n) F) (max (w+2) 3) := by
+  classical
+  obtain ⟨d, B, T, D, hD⟩ := hw
+  let := d
+  obtain ⟨T', D', hD'⟩ := aug_decomposition (n := n) F D hD
+  exact ⟨inferInstance, B ⊕ Private m n, T', D', hD'⟩
+
+set_option synthInstance.maxSize 256 in
+/-- The output indices consist of the input bags, one bag per private reference
+vertex, and one bag per internal link vertex. -/
+theorem source_decomposition {B : Type} [DecidableEq (Fin m)]
+    (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
+    {T : SimpleGraph B} (D₀ : Decomposition F T)
+    {w : ℕ} (hw : ∀ b, (D₀.bag b).card ≤ w+1) :
+    ∃ T' : SimpleGraph ((B ⊕ Private m n) ⊕ (Link F L × Fin (n-3))),
+      ∃ D' : Decomposition (source F L) T',
+        ∀ b, (D'.bag b).card ≤ max (w+2) 3 + 1 := by
+  classical
+  obtain ⟨T₁, D, hD⟩ := aug_decomposition (n := n) F D₀ hw
+  choose owner hs ht using fun l : Link F L => D.edge_cover (link_adj_aug F L l)
+  obtain ⟨T', D', hD'⟩ := decomposition_linked_of_bags D (base m n) (base_le_aug F)
+    (fun l : Link F L => src l.val) (fun l => dst l.val) (n-3) (max (w+2) 3)
+    hD owner hs ht
+  exact ⟨T', D', fun b => by have := hD' b; omega⟩
+
 theorem source_width (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     {w : ℕ} (hw : HasWidth F w) :
     HasWidth (source F L) (max (w+2) 3) := by
   classical
-  obtain ⟨d,B,T,D,hw⟩ := aug_width (n := n) F hw
-  choose owner hs ht using fun l : Link F L => D.edge_cover (link_adj_aug F L l)
-  have h := width_linked_of_bags D (base m n) (base_le_aug F)
-    (fun l : Link F L => src l.val) (fun l => dst l.val) (n-3) (max (w+2) 3)
-    hw owner hs ht
-  exact h.mono (by omega)
+  obtain ⟨d, B, T, D, hD⟩ := hw
+  let := d
+  obtain ⟨T', D', hD'⟩ := source_decomposition F L D hD
+  exact ⟨_, _, T', D', hD'⟩
 
 end TreewidthHom.OddCycle.ListReduction

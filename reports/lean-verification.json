@@ -1,7 +1,27 @@
 {
-  "project_commit": "01e8c39f9c0c85ee7685494a7d936bd666e75355",
-  "working_tree_dirty": false,
-  "working_tree_status": [],
+  "project_commit": "0055cfc4818e27b27735fcbe6dd98aa09bf5b326",
+  "working_tree_dirty": true,
+  "working_tree_status": [
+    " M AxiomAudit.lean",
+    " M Challenge.lean",
+    " M FORMALIZATION.md",
+    " M PALOMAR.md",
+    " M README.md",
+    " M Solution.lean",
+    " M TreewidthHom.lean",
+    " M TreewidthHom/GraftWidth.lean",
+    " M TreewidthHom/LinkedWidth.lean",
+    " M TreewidthHom/ListPathWidth.lean",
+    " M TreewidthHom/ListWidth.lean",
+    " M TreewidthHom/PathIntervals.lean",
+    " M TreewidthHom/PathWidth.lean",
+    " M formalization.yaml",
+    " M paper/odd-cycle-homomorphism.pdf",
+    " M paper/odd-cycle-homomorphism.tex",
+    " M scripts/check_formalization.py",
+    "?? TreewidthHom/FiniteDecomposition.lean",
+    "?? TreewidthHom/ListCertificates.lean"
+  ],
   "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
   "toolchain": "leanprover/lean4:v4.35.0",
   "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
@@ -97,7 +117,24 @@
     "TreewidthHom.OddCycle.ListReduction.join_minor",
     "TreewidthHom.OddCycle.ListReduction.source_width_lower",
     "TreewidthHom.OddCycle.ListReduction.source_fvs_lower",
-    "TreewidthHom.OddCycle.ListReduction.exact_parameter_transfer"
+    "TreewidthHom.OddCycle.ListReduction.exact_parameter_transfer",
+    "TreewidthHom.finite_connected_superset",
+    "TreewidthHom.Decomposition.restrict",
+    "TreewidthHom.Decomposition.reindex",
+    "TreewidthHom.Decomposition.finite_restriction",
+    "TreewidthHom.hasFiniteWidth_iff_hasWidth",
+    "TreewidthHom.finite_decomposition_at_treewidth",
+    "TreewidthHom.Graft.decomposition_of_bags",
+    "TreewidthHom.decomposition_linked_of_bags",
+    "TreewidthHom.OddCycle.ListReduction.aug_decomposition",
+    "TreewidthHom.OddCycle.ListReduction.source_decomposition",
+    "TreewidthHom.pathWidth_linked_bag_bound",
+    "TreewidthHom.pathWidth_of_intervals_bag_bound",
+    "TreewidthHom.pathWidth_linked_of_bags_bound",
+    "TreewidthHom.OddCycle.ListReduction.aug_pathWidth_bag_bound",
+    "TreewidthHom.OddCycle.ListReduction.source_tree_certificate",
+    "TreewidthHom.OddCycle.ListReduction.source_tree_bag_bound",
+    "TreewidthHom.OddCycle.ListReduction.source_path_certificate"
   ],
   "axioms": {
     "TreewidthHom.Decomposition.addApices": [
@@ -557,8 +594,93 @@
       "propext",
       "Classical.choice",
       "Quot.sound"
+    ],
+    "TreewidthHom.finite_connected_superset": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.restrict": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.reindex": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Decomposition.finite_restriction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.hasFiniteWidth_iff_hasWidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.finite_decomposition_at_treewidth": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Graft.decomposition_of_bags": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.decomposition_linked_of_bags": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.aug_decomposition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_decomposition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.pathWidth_linked_bag_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.pathWidth_of_intervals_bag_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.pathWidth_linked_of_bags_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.aug_pathWidth_bag_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_tree_certificate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_tree_bag_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.OddCycle.ListReduction.source_path_certificate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
     ]
   },
   "build_passed": true,
-  "scope": "List Colouring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,3), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. parameter_reduction adds numerical parameter bounds, degeneracy, girth, connectedness under omitted-colour hypotheses, and an edge bound. Odd closed-walk length and palette-padding lemmas are checked, as are the bag and forest extension criteria. The join minor, matching treewidth and feedback-number bounds, pathwidth lower bound, target-capping equivalence, and odd-cycle-core finite reduction are checked. The library also proves odd-cycle-core recognition equivalent to mapping to a shortest odd cycle. Circular chromatic number, external hardness, and machine resource bounds (including transducer implementation) remain outside Lean."
+  "scope": "List Colouring to homomorphism into an input odd cycle. ListReduction.reduction checks decision equivalence, source treewidth max(w+2,3), source pathwidth p+6, target pathwidth 2, feedback vertex set transfer of size |S|+2, and polynomial source size. parameter_reduction adds numerical parameter bounds, degeneracy, girth, connectedness under omitted-colour hypotheses, and an edge bound. Odd closed-walk length and palette-padding lemmas are checked, as are the bag and forest extension criteria. The join minor, matching treewidth and feedback-number bounds, pathwidth lower bound, target-capping equivalence, and odd-cycle-core finite reduction are checked. The library also proves odd-cycle-core recognition equivalent to mapping to a shortest odd cycle. Finite-index tree certificates preserve width on finite graphs. Output tree and path bag counts are polynomial in numeric m,n and the supplied input bag count. Bit-level encodings, palette compaction, circular chromatic number, external hardness, and machine resource bounds (including transducer implementation) remain outside Lean."
 }

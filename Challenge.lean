@@ -15,10 +15,12 @@ empty graphs. The theorem's graph is finite, so the minima are attained.
 The claim includes the finite mathematical reduction, structural upper bounds,
 matching lower bounds under their stated padding, nonemptiness and edge hypotheses,
 target-capping equivalence, and the target-free odd-cycle-core reduction.
+Tree certificates have finite indices, and both certificate transfers include
+polynomial bounds on the number of bags in terms of numeric parameters.
 `Solution.lean` supplies the concrete reference-cycle construction and proves
 the statement using the development. No statement definition is left
-unspecified; only the final proof is omitted. Encoded transducers, finite
-tree-certificate representation, machine resource bounds, complexity classes,
+unspecified; only the final proof is omitted. Bit-level encodings, transducers,
+machine resource bounds, complexity classes,
 and the circular-chromatic-number interpretation remain outside this claim.
 -/
 
@@ -45,6 +47,23 @@ def HasPathWidth {V : Type} (G : SimpleGraph V) (w : ℕ) : Prop := by
   exact ∃ d : DecidableEq V, ∃ n : ℕ,
     ∃ D : @Decomposition V (Fin (n+1)) d G (pathGraph (n+1)), ∀ b, (D.bag b).card ≤ w+1
 
+/-- Width witnessed by a tree decomposition with finitely labelled bags. -/
+def HasFiniteWidth {V : Type} (G : SimpleGraph V) (w : ℕ) : Prop :=
+  ∃ d : DecidableEq V, ∃ N : ℕ, ∃ T : SimpleGraph (Fin N),
+    ∃ D : @Decomposition V (Fin N) d G T, ∀ b, (D.bag b).card ≤ w + 1
+
+/-- A finite tree certificate with an explicit upper bound on its bag count. -/
+def HasWidthWithBags {V : Type} (G : SimpleGraph V) (w N : ℕ) : Prop :=
+  ∃ d : DecidableEq V, ∃ K : ℕ, ∃ T : SimpleGraph (Fin K),
+    ∃ D : @Decomposition V (Fin K) d G T,
+      (∀ b, (D.bag b).card ≤ w+1) ∧ K ≤ N
+
+/-- A path certificate with an explicit upper bound on its number of bags. -/
+def HasPathWidthWithBags {V : Type} (G : SimpleGraph V) (w N : ℕ) : Prop :=
+  ∃ d : DecidableEq V, ∃ r : ℕ,
+    ∃ D : @Decomposition V (Fin (r+1)) d G (pathGraph (r+1)),
+      (∀ b, (D.bag b).card ≤ w+1) ∧ r+1 ≤ N
+
 /-- The least width of a tree decomposition. -/
 noncomputable def treewidth {V : Type} (G : SimpleGraph V) : ℕ := sInf {w | HasWidth G w}
 
@@ -66,15 +85,19 @@ ordinary graph-homomorphism encoding with additive structural overhead.
 The same witness satisfies both certificate transfers and numerical bounds.
 `egirth` is the length of a shortest cycle, or infinity for a forest.
 The connectedness premise holds for padded palettes; exact girth needs a
-nonempty input. The polynomial bound counts vertices, not machine resources. -/
+nonempty input. The polynomial bounds count vertices and bags, not machine resources. -/
 theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
     (L : Fin m → Finset (ZMod n)) (hodd : Odd n) (hn : 5 ≤ n) :
     ∃ (V : Type) (_ : Fintype V) (G : SimpleGraph V),
       (Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod n))) ↔
         ∃ c : Fin m → ZMod n, (∀ v, c v ∈ L v) ∧
           ∀ u v, F.Adj u v → c u ≠ c v) ∧
-      (∀ w, HasWidth F w → HasWidth G (max (w+2) 3)) ∧
+      (∀ w, HasWidth F w → HasFiniteWidth G (max (w+2) 3)) ∧
       (∀ p, HasPathWidth F p → HasPathWidth G (p+6)) ∧
+      (∀ w N, HasWidthWithBags F w N →
+        HasWidthWithBags G (max (w+2) 3) (N+m*n*n+(m*n+m*m)*n)) ∧
+      (∀ p N, HasPathWidthWithBags F p N →
+        HasPathWidthWithBags G (p+6) (N*(2*(m*n*n+2))*((m*n+m*m+1)*n))) ∧
       HasPathWidth (circulantGraph {1} : SimpleGraph (ZMod n)) 2 ∧
       (∀ S : Finset (Fin m), (F.induce {v | v ∉ S}).IsAcyclic →
         ∃ S' : Finset V, S'.card = S.card+2 ∧

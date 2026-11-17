@@ -21,6 +21,9 @@ project:
     matching treewidth and feedback-number bounds for inputs with an edge and a
     pathwidth lower bound for nonempty inputs. It also includes target capping
     and the target-free odd-cycle-core reduction for the same witness graph.
+    Output tree certificates have finite indices, and both tree and path
+    certificate transfers include polynomial bag-count bounds in the numeric
+    parameters and supplied input bag count.
   authors:
     - Jason Davies
   responsible_maintainers:
@@ -41,8 +44,9 @@ sources:
       The manuscript and Lean development were developed together with AI assistance
       under the author's direction. This source-based entry identifies the mathematical
       account being formalised; it does not claim priority for the original hardness
-      question. The cited revision includes the strengthened standalone Comparator
-      statement and its proof.
+      question. The cited revision includes the structural, capping and core
+      results; this development additionally checks finite tree-certificate
+      representation and polynomial output bag counts.
   - title: "Complexity of the homomorphism problem parameterized by treewidth"
     authors:
       - Antoine Amarilli
@@ -150,7 +154,9 @@ fidelity:
     bounds explicitly require the common forbidden last coordinate, and exact
     treewidth and feedback-number transfer require an input edge. Core recognition
     is expressed by homomorphisms in both directions with an odd cycle. The
-    circular-chromatic-number interpretation, external complexity results and
+    bag-count bounds are polynomial in the numeric parameters and input bag count;
+    palette compaction and bit-level input/output encodings remain outside Lean.
+    The circular-chromatic-number interpretation, external complexity results and
     machine resource bounds remain outside Lean.
 
 review:
@@ -158,13 +164,18 @@ review:
   notes: >-
     The author supplied several AI-agent reviews of the manuscript, Lean statements,
     and executable checks; revisions addressed their concrete findings. The expanded
-    development passed a 92-declaration axiom audit, all 841 finite cases, and ten
+    development passed a 109-declaration axiom audit, all 841 finite cases, and ten
     Python regression tests. The strengthened standalone Comparator pair passed
     Lean, NanoDa, and con-ron; these checks are documented in PALOMAR.md. No independent
     human subject-expert review of the complete argument is claimed.
 
 alignment:
   statements:
+    - source: "Manuscript size and construction resources, finite certificate counts"
+      lean: TreewidthHom.Palomar.list_elimination
+      module: Solution.lean
+      status: proved
+      note: "Finite-index tree certificates preserve width; output tree and path bag counts are polynomial in numeric m,n and the supplied bag count. Encoded transducers and workspace bounds are excluded."
     - source: "Manuscript Theorem 2, structural bounds and finite decision equivalence"
       lean: TreewidthHom.Palomar.list_elimination
       module: Solution.lean

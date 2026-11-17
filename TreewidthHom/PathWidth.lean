@@ -22,6 +22,17 @@ def HasPathWidth {V : Type} (G : SimpleGraph V) (w : ℕ) : Prop := by
   exact ∃ d : DecidableEq V, ∃ n : ℕ,
     ∃ D : @Decomposition V (Fin (n+1)) d G (pathGraph (n+1)), ∀ b, (D.bag b).card ≤ w+1
 
+/-- A path certificate with an explicit upper bound on its number of bags. -/
+def HasPathWidthWithBags {V : Type} (G : SimpleGraph V) (w N : ℕ) : Prop :=
+  ∃ d : DecidableEq V, ∃ r : ℕ,
+    ∃ D : @Decomposition V (Fin (r+1)) d G (pathGraph (r+1)),
+      (∀ b, (D.bag b).card ≤ w+1) ∧ r+1 ≤ N
+
+theorem HasPathWidthWithBags.hasPathWidth {V : Type} {G : SimpleGraph V} {w N : ℕ}
+    (h : HasPathWidthWithBags G w N) : HasPathWidth G w := by
+  obtain ⟨d, r, D, hD, _⟩ := h
+  exact ⟨d, r, D, hD⟩
+
 theorem HasPathWidth.hasWidth {V : Type} {G : SimpleGraph V} {w : ℕ}
     (h : HasPathWidth G w) : HasWidth G w := by
   obtain ⟨d,n,D,hw⟩ := h
@@ -57,7 +68,7 @@ the positions `lo x,...,hi x`. Link `l` is swept at position `pos l`, in slot
 `slot l`, while both of its ends are present. If at most `w+1` base vertices are
 present at any position, and at most `w-1` at the position of any link, the
 width is at most `w`. -/
-theorem hasPathWidth_linked {V₀ L : Type} [Fintype V₀] [Fintype L]
+theorem pathWidth_linked_bag_bound {V₀ L : Type} [Fintype V₀] [Fintype L]
     (B : SimpleGraph V₀) (s t : L → V₀) (q : ℕ) (hq : 0 < q) (P J w : ℕ)
     (lo hi : V₀ → ℕ) (hlohi : ∀ x, lo x ≤ hi x) (hhi : ∀ x, hi x ≤ P)
     (hB : ∀ x y, B.Adj x y → lo x ≤ hi y ∧ lo y ≤ hi x)
@@ -67,7 +78,7 @@ theorem hasPathWidth_linked {V₀ L : Type} [Fintype V₀] [Fintype L]
     (ht : ∀ l, lo (t l) ≤ pos l ∧ pos l ≤ hi (t l))
     (hbase : ∀ p, (Finset.univ.filter (fun x => lo x ≤ p ∧ p ≤ hi x)).card ≤ w+1)
     (hlink : ∀ l, (Finset.univ.filter (fun x => lo x ≤ pos l ∧ pos l ≤ hi x)).card + 2 ≤ w+1) :
-    HasPathWidth (linked B s t q) w := by
+    HasPathWidthWithBags (linked B s t q) w ((P+1)*((J+1)*(q+1))) := by
   classical
   -- one extra slot keeps the time unit positive even without links
   let J' := J+1
@@ -170,7 +181,8 @@ theorem hasPathWidth_linked {V₀ L : Type} [Fintype V₀] [Fintype L]
           refine (hmem _ _).mpr ?_
           change τ3.val = start l + c.val ∨ τ3.val = start l + c.val + 1
           omega)
-  refine ⟨inferInstance,n-1,D,fun τ => ?_⟩
+  refine ⟨inferInstance,n-1,D,?_,by dsimp [n, U, J', a] at *; omega⟩
+  intro τ
   change (bag τ).card ≤ w+1
   let p := τ.val/U
   let baseSet : Finset V₀ := Finset.univ.filter (fun x => lo x ≤ p ∧ p ≤ hi x)
@@ -243,5 +255,19 @@ theorem hasPathWidth_linked {V₀ L : Type} [Fintype V₀] [Fintype L]
     rw [← hp] at hb
     change baseSet.card + 2 ≤ w+1 at hb
     omega
+
+theorem hasPathWidth_linked {V₀ L : Type} [Fintype V₀] [Fintype L]
+    (B : SimpleGraph V₀) (s t : L → V₀) (q : ℕ) (hq : 0 < q) (P J w : ℕ)
+    (lo hi : V₀ → ℕ) (hlohi : ∀ x, lo x ≤ hi x) (hhi : ∀ x, hi x ≤ P)
+    (hB : ∀ x y, B.Adj x y → lo x ≤ hi y ∧ lo y ≤ hi x)
+    (pos slot : L → ℕ) (hslot : ∀ l, slot l < J)
+    (hinj : ∀ l l', pos l = pos l' → slot l = slot l' → l = l')
+    (hs : ∀ l, lo (s l) ≤ pos l ∧ pos l ≤ hi (s l))
+    (ht : ∀ l, lo (t l) ≤ pos l ∧ pos l ≤ hi (t l))
+    (hbase : ∀ p, (Finset.univ.filter (fun x => lo x ≤ p ∧ p ≤ hi x)).card ≤ w+1)
+    (hlink : ∀ l, (Finset.univ.filter (fun x => lo x ≤ pos l ∧ pos l ≤ hi x)).card + 2 ≤ w+1) :
+    HasPathWidth (linked B s t q) w := by
+  exact (pathWidth_linked_bag_bound B s t q hq P J w lo hi hlohi hhi hB
+    pos slot hslot hinj hs ht hbase hlink).hasPathWidth
 
 end TreewidthHom

@@ -8,11 +8,13 @@ public import TreewidthHom.Width
 namespace TreewidthHom
 open SimpleGraph
 
-/-- Attaching rooted trees at single vertices raises treewidth only to one. -/
-theorem Graft.hasWidth {V P : Type} (F : Graft V P) {G : SimpleGraph V}
-    {w : ℕ} (hw : HasWidth G w) : HasWidth (F.graph G) (max w 1) := by
+/-- The graft construction adds exactly one index for each attached vertex. -/
+theorem Graft.decomposition_of_bags {V P B : Type} [DecidableEq V] [DecidableEq P]
+    (F : Graft V P) {G : SimpleGraph V} {T : SimpleGraph B}
+    (D : Decomposition G T) {w : ℕ} (hw : ∀ b, (D.bag b).card ≤ w+1) :
+    ∃ T' : SimpleGraph (B ⊕ P), ∃ D' : Decomposition (F.graph G) T',
+      ∀ b, (D'.bag b).card ≤ max w 1 + 1 := by
   classical
-  obtain ⟨d,B,T,D,hw⟩ := hw
   choose owner ho using D.vertex_cover
   let A : Graft B P :=
     { parent := fun p => (F.parent p).map owner id
@@ -53,6 +55,15 @@ theorem Graft.hasWidth {V P : Type} (F : Graft V P) {G : SimpleGraph V}
       have hp : F.parent p = .inl v := by simpa [bag,eq_comm] using hv
       simpa [A,hp] using ho v)
     (fun q p p' hp hn hp' hn' => (top q p hp hn).symm.trans (top q p' hp' hn'))
-  exact ⟨inferInstance,_,_,D',graftBag_card D bag hw (fun _ => Finset.card_le_two)⟩
+  exact ⟨_,D',graftBag_card D bag hw (fun _ => Finset.card_le_two)⟩
+
+/-- Attaching rooted trees at single vertices gives width at most `max w 1`. -/
+theorem Graft.hasWidth {V P : Type} (F : Graft V P) {G : SimpleGraph V}
+    {w : ℕ} (hw : HasWidth G w) : HasWidth (F.graph G) (max w 1) := by
+  classical
+  obtain ⟨d, B, T, D, hw⟩ := hw
+  let := d
+  obtain ⟨T', D', hD'⟩ := F.decomposition_of_bags D hw
+  exact ⟨inferInstance, B ⊕ P, T', D', hD'⟩
 
 end TreewidthHom

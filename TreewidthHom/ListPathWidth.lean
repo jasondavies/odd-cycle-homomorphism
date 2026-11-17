@@ -41,10 +41,10 @@ theorem privateRank_injective : Function.Injective (privateRank (m := m) (n := n
   have he3 : p.2.val=r.2.val := by dsimp [privateRank] at h; rw [he1,he2] at h; omega
   exact Prod.ext (Prod.ext (Fin.ext he1) (ZMod.val_injective _ he2)) (Fin.ext he3)
 
-theorem aug_pathWidth (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasPathWidth F w) :
-    HasPathWidth (aug (n := n) F) (w+4) := by
+theorem aug_pathWidth_bag_bound (F : SimpleGraph (Fin m)) {w N : ℕ} (hw : HasPathWidthWithBags F w N) :
+    HasPathWidthWithBags (aug (n := n) F) (w+4) (N*(2*(m*n*(n-2)+2))) := by
   classical
-  obtain ⟨d,R,D,hw⟩ := hw
+  obtain ⟨d,R,D,hw,hN⟩ := hw
   obtain ⟨lo,hi,hlohi,hhi,hmem⟩ := D.path_intervals
   let C := m*n*(n-2)
   let S := 2*(C+2)
@@ -144,55 +144,67 @@ theorem aug_pathWidth (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasPathWidth F w
       have h1 := hub_at u b.val hu'.1 hu'.2
       have h2 := hub_at v b.val hv'.1 hv'.2
       omega
-  apply hasPathWidth_of_intervals (aug F) P (w+4) low high lowhigh highP edges
-  intro t
-  let hubs := Finset.univ.filter (fun v : Fin m => low (.inr v) ≤ t ∧ t ≤ high (.inr v))
-  let inner := Finset.univ.filter (fun p : Private m n => time p-1 ≤ t ∧ t ≤ time p+1)
-  have hinner : inner.card ≤ 2 := by
-    have hsub : ∀ p ∈ inner, time p ∈ ({2*(t/2),2*(t/2+1)} : Finset ℕ) := by
-      intro p hp
-      have hh : time p-1 ≤ t ∧ t ≤ time p+1 := (Finset.mem_filter.mp hp).2
-      have hp0 := (bounds p).1
-      have heven : time p % 2 = 0 := by simp [time,S,Nat.add_mod,Nat.mul_mod]
-      simp only [Finset.mem_insert,Finset.mem_singleton]
-      omega
-    exact (Finset.card_le_card_of_injOn time hsub time_inj.injOn).trans Finset.card_le_two
-  have hhubs : hubs.card ≤ w+1 := by
-    by_cases ht : t ≤ P
-    · have hdiv : t/S ≤ R := by
-        have hmul : t < (R+1)*S := by dsimp [P] at ht; have := Nat.mul_pos (by omega : 0<R+1) hS; omega
-        have := (Nat.div_lt_iff_lt_mul hS).mpr hmul; omega
-      apply (Finset.card_le_card (t := D.bag ⟨t/S,by omega⟩) ?_).trans (hw _)
-      intro v hv
-      have hh : lo v*S ≤ t ∧ t ≤ (hi v+1)*S-1 := (Finset.mem_filter.mp hv).2
-      apply (hmem _ _).mpr
-      have h1 := (Nat.le_div_iff_mul_le hS).mpr hh.1
-      have hpos : 0 < (hi v+1)*S := Nat.mul_pos (by omega) hS
-      have h2 := (Nat.div_lt_iff_lt_mul hS).mpr (show t < (hi v+1)*S by omega)
-      change lo v ≤ t/S ∧ t/S ≤ hi v
-      exact ⟨h1,by omega⟩
-    · have he : hubs=∅ := by
-        apply Finset.eq_empty_of_forall_notMem
+  have h : HasPathWidthWithBags (aug (n := n) F) (w+4) (P+1) := by
+    apply pathWidth_of_intervals_bag_bound (aug F) P (w+4) low high lowhigh highP edges
+    intro t
+    let hubs := Finset.univ.filter (fun v : Fin m => low (.inr v) ≤ t ∧ t ≤ high (.inr v))
+    let inner := Finset.univ.filter (fun p : Private m n => time p-1 ≤ t ∧ t ≤ time p+1)
+    have hinner : inner.card ≤ 2 := by
+      have hsub : ∀ p ∈ inner, time p ∈ ({2*(t/2),2*(t/2+1)} : Finset ℕ) := by
+        intro p hp
+        have hh : time p-1 ≤ t ∧ t ≤ time p+1 := (Finset.mem_filter.mp hp).2
+        have hp0 := (bounds p).1
+        have heven : time p % 2 = 0 := by simp [time,S,Nat.add_mod,Nat.mul_mod]
+        simp only [Finset.mem_insert,Finset.mem_singleton]
+        omega
+      exact (Finset.card_le_card_of_injOn time hsub time_inj.injOn).trans Finset.card_le_two
+    have hhubs : hubs.card ≤ w+1 := by
+      by_cases ht : t ≤ P
+      · have hdiv : t/S ≤ R := by
+          have hmul : t < (R+1)*S := by dsimp [P] at ht; have := Nat.mul_pos (by omega : 0<R+1) hS; omega
+          have := (Nat.div_lt_iff_lt_mul hS).mpr hmul; omega
+        apply (Finset.card_le_card (t := D.bag ⟨t/S,by omega⟩) ?_).trans (hw _)
         intro v hv
-        have hh := (Finset.mem_filter.mp hv).2.2
-        have := highP (.inr v); omega
-      simp [he]
-  let eH : Fin m ↪ BaseVertex m n := ⟨Sum.inr,Sum.inr_injective⟩
-  let eA : Fin 2 ↪ BaseVertex m n := ⟨fun a => .inl (.inl a),fun _ _ h => Sum.inl.inj (Sum.inl.inj h)⟩
-  let eP : Private m n ↪ BaseVertex m n := ⟨fun p => .inl (.inr p),fun _ _ h => Sum.inr.inj (Sum.inl.inj h)⟩
-  have hsub : Finset.univ.filter (fun x => low x ≤ t ∧ t ≤ high x) ⊆
-      hubs.map eH ∪ (Finset.univ.map eA ∪ inner.map eP) := by
-    rintro ((a | p) | v) hx
-    · exact Finset.mem_union_right _ (Finset.mem_union_left _ (Finset.mem_map.mpr ⟨a,Finset.mem_univ _,rfl⟩))
-    · have hp : p ∈ inner := by simpa [low,high,inner] using hx
-      exact Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_map.mpr ⟨p,hp,rfl⟩))
-    · have hv : v ∈ hubs := by simpa [hubs] using hx
-      exact Finset.mem_union_left _ (Finset.mem_map.mpr ⟨v,hv,rfl⟩)
-  have hc := Finset.card_le_card hsub
-  have hc1 := Finset.card_union_le (hubs.map eH) (Finset.univ.map eA ∪ inner.map eP)
-  have hc2 := Finset.card_union_le (Finset.univ.map eA) (inner.map eP)
-  simp only [Finset.card_map,Finset.card_univ,Fintype.card_fin] at hc1 hc2
+        have hh : lo v*S ≤ t ∧ t ≤ (hi v+1)*S-1 := (Finset.mem_filter.mp hv).2
+        apply (hmem _ _).mpr
+        have h1 := (Nat.le_div_iff_mul_le hS).mpr hh.1
+        have hpos : 0 < (hi v+1)*S := Nat.mul_pos (by omega) hS
+        have h2 := (Nat.div_lt_iff_lt_mul hS).mpr (show t < (hi v+1)*S by omega)
+        change lo v ≤ t/S ∧ t/S ≤ hi v
+        exact ⟨h1,by omega⟩
+      · have he : hubs=∅ := by
+          apply Finset.eq_empty_of_forall_notMem
+          intro v hv
+          have hh := (Finset.mem_filter.mp hv).2.2
+          have := highP (.inr v); omega
+        simp [he]
+    let eH : Fin m ↪ BaseVertex m n := ⟨Sum.inr,Sum.inr_injective⟩
+    let eA : Fin 2 ↪ BaseVertex m n := ⟨fun a => .inl (.inl a),fun _ _ h => Sum.inl.inj (Sum.inl.inj h)⟩
+    let eP : Private m n ↪ BaseVertex m n := ⟨fun p => .inl (.inr p),fun _ _ h => Sum.inr.inj (Sum.inl.inj h)⟩
+    have hsub : Finset.univ.filter (fun x => low x ≤ t ∧ t ≤ high x) ⊆
+        hubs.map eH ∪ (Finset.univ.map eA ∪ inner.map eP) := by
+      rintro ((a | p) | v) hx
+      · exact Finset.mem_union_right _ (Finset.mem_union_left _ (Finset.mem_map.mpr ⟨a,Finset.mem_univ _,rfl⟩))
+      · have hp : p ∈ inner := by simpa [low,high,inner] using hx
+        exact Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_map.mpr ⟨p,hp,rfl⟩))
+      · have hv : v ∈ hubs := by simpa [hubs] using hx
+        exact Finset.mem_union_left _ (Finset.mem_map.mpr ⟨v,hv,rfl⟩)
+    have hc := Finset.card_le_card hsub
+    have hc1 := Finset.card_union_le (hubs.map eH) (Finset.univ.map eA ∪ inner.map eP)
+    have hc2 := Finset.card_union_le (Finset.univ.map eA) (inner.map eP)
+    simp only [Finset.card_map,Finset.card_univ,Fintype.card_fin] at hc1 hc2
+    omega
+  obtain ⟨d', r, D', hD', hr⟩ := h
+  refine ⟨d', r, D', hD', hr.trans ?_⟩
+  have hpos : 0 < (R+1)*S := Nat.mul_pos (by omega) hS
+  have hle := Nat.mul_le_mul_right S hN
+  dsimp [P, S, C] at *
   omega
+
+theorem aug_pathWidth (F : SimpleGraph (Fin m)) {w : ℕ} (hw : HasPathWidth F w) :
+    HasPathWidth (aug (n := n) F) (w+4) := by
+  obtain ⟨d, R, D, hD⟩ := hw
+  exact (aug_pathWidth_bag_bound F ⟨d, R, D, hD, le_rfl⟩).hasPathWidth
 
 /-- A conservative additive bound, factoring through the auxiliary graph. -/
 theorem source_pathWidth (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))

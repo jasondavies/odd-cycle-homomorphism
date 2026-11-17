@@ -20,15 +20,19 @@ ordinary graph-homomorphism encoding with additive structural overhead.
 The same witness satisfies both certificate transfers and numerical bounds.
 `egirth` is the length of a shortest cycle, or infinity for a forest.
 The connectedness premise holds for padded palettes; exact girth needs a
-nonempty input. The polynomial bound counts vertices, not machine resources. -/
+nonempty input. The polynomial bounds count vertices and bags, not machine resources. -/
 theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
     (L : Fin m → Finset (ZMod n)) (hodd : Odd n) (hn : 5 ≤ n) :
     ∃ (V : Type) (_ : Fintype V) (G : SimpleGraph V),
       (Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod n))) ↔
         ∃ c : Fin m → ZMod n, (∀ v, c v ∈ L v) ∧
           ∀ u v, F.Adj u v → c u ≠ c v) ∧
-      (∀ w, HasWidth F w → HasWidth G (max (w+2) 3)) ∧
+      (∀ w, HasWidth F w → HasFiniteWidth G (max (w+2) 3)) ∧
       (∀ p, HasPathWidth F p → HasPathWidth G (p+6)) ∧
+      (∀ w N, HasWidthWithBags F w N →
+        HasWidthWithBags G (max (w+2) 3) (N+m*n*n+(m*n+m*m)*n)) ∧
+      (∀ p N, HasPathWidthWithBags F p N →
+        HasPathWidthWithBags G (p+6) (N*(2*(m*n*n+2))*((m*n+m*m+1)*n))) ∧
       HasPathWidth (circulantGraph {1} : SimpleGraph (ZMod n)) 2 ∧
       (∀ S : Finset (Fin m), (F.induce {v | v ∉ S}).IsAcyclic →
         ∃ S' : Finset V, S'.card = S.card+2 ∧
@@ -59,8 +63,10 @@ theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
   let : Fintype (Link F L) := Subtype.fintype _
   refine ⟨SourceVertex F L, inferInstance, source F L,
     source_hom_iff_colorable F L hodd hn,
-    fun _ hw => source_width F L hw,
+    fun _ hw => hasFiniteWidth_iff_hasWidth.mpr (source_width F L hw),
     fun _ hp => source_pathWidth F L hn hp,
+    fun _ _ h => source_tree_bag_bound F L h,
+    fun _ _ h => source_path_certificate F L hn h,
     target_pathWidth n (by omega), ?_,
     treewidth_source_le F L, pathwidth_source_le F L hn, fvs_source_le F L hn,
     source_degenerate F L, source_le_egirth F L hn, source_egirth F L hn,

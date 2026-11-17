@@ -756,11 +756,13 @@ algorithm for $G\to C_g$. Bipartite graphs cannot have odd-cycle cores.
 \paragraph{Artifact availability.}
 The Lean development is in the public repository
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-The complete Lean development and executable checks described here are
+A verified baseline of the Lean development and executable checks is
 available at commit
 \href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/01e8c39f9c0c85ee7685494a7d936bd666e75355}{\texttt{01e8c39}}~\cite{artifact}.
 Its \lean{README.md} gives reproduction commands and
 \lean{FORMALIZATION.md} maps the checked statements to declarations.
+The accompanying source tree additionally checks finite tree-certificate
+representation and the output bag-count bounds described below.
 
 The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
 mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
@@ -820,6 +822,19 @@ specialisation. The \lean{FeedbackHomomorphism} module proves the criterion
 used for W[P] membership: a guess on a feedback vertex set extends to a
 homomorphism exactly when it preserves the edges inside the set and every
 root of the remaining forest has a feasible pair.
+
+For finite graphs, \lean{hasFiniteWidth_iff_hasWidth} proves that finite-index
+tree decompositions give the same width as arbitrary-index ones, including
+for the empty graph. Separately, \lean{source_tree_bag_bound} and
+\lean{source_path_certificate} bound the output bag counts, from an input
+certificate with at most $N$ bags, by
+\[
+N+mn^2+(mn+m^2)n
+\quad\text{and}\quad
+2N(mn^2+2)(mn+m^2+1)n,
+\]
+respectively. These bounds concern finite certificates and numeric parameters;
+palette compaction and bit-level input/output encodings remain textual.
 
 The minor model consists of disjoint, nonempty connected branch sets and
 edge witnesses. Generic lemmas prove minor monotonicity of all three parameters;
