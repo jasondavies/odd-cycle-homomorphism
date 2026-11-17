@@ -44,6 +44,19 @@ theorem cyc_adj [Fact (1 < n)] (u v : ZMod n) : (cyc n).Adj u v ↔ Near u v := 
 theorem cyc_eq_cycleGraph (m : ℕ) : cyc (m+1) = cycleGraph (m+1) :=
   (cycleGraph_eq_circulantGraph m).symm
 
+/-- Successor coordinates do not wrap when the successor is nonzero. -/
+theorem val_succ_of_ne_zero {n : ℕ} [Fact (1 < n)] {a b : ZMod n} (hb : b ≠ 0)
+    (h : b = a + 1) : b.val = a.val + 1 := by
+  have hn : NeZero n := ⟨by have := Fact.out (p := 1 < n); omega⟩
+  have hval : b.val = (a.val+1) % n := by rw [h,ZMod.val_add,ZMod.val_one]
+  have hlt := ZMod.val_lt a
+  rcases Nat.lt_or_ge (a.val+1) n with h1 | h1
+  · rwa [Nat.mod_eq_of_lt h1] at hval
+  · have h2 : a.val+1 = n := by omega
+    rw [h2,Nat.mod_self] at hval
+    exact absurd ((ZMod.val_eq_zero b).mp hval) hb
+
+
 /-! ## A cycle maps to itself by a rotation or a reflection -/
 
 theorem natCast_two_mul_eq_zero (hodd : Odd n) {b : ℕ} (h : ((2*b : ℕ) : ZMod n) = 0) :

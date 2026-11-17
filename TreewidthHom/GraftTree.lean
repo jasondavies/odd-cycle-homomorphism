@@ -47,22 +47,15 @@ def inclusion : T →g F.graph T where
   map_rel' := fun h => h
 
 theorem reaches_base : ∀ p : P, ∃ b, (F.graph T).Reachable (.inr p) (.inl b) := by
-  have main : ∀ n, ∀ p, F.height p = n → ∃ b, (F.graph T).Reachable (.inr p) (.inl b) := by
-    intro n
-    induction n using Nat.strong_induction_on with
-    | h n ih =>
-      intro p hp
-      have hedge := F.parent_adj T p
-      cases h : F.parent p with
-      | inl b => exact ⟨b,by rw [h] at hedge; exact hedge.reachable⟩
-      | inr q =>
-        obtain ⟨b,hb⟩ := ih (F.height q) (by have := F.decreases p q h; omega) q rfl
-        have hr : (F.graph T).Reachable (.inr p) (.inr q) := by
-          rw [h] at hedge
-          exact hedge.reachable
-        exact ⟨b,hr.trans hb⟩
   intro p
-  exact main (F.height p) p rfl
+  induction h : F.height p using Nat.strong_induction_on generalizing p with
+  | h n ih =>
+    have hedge := (F.parent_adj T p).reachable
+    cases hp : F.parent p with
+    | inl b => exact ⟨b, by simpa [hp] using hedge⟩
+    | inr q =>
+      obtain ⟨b, hb⟩ := ih _ (h ▸ F.decreases p q hp) q rfl
+      exact ⟨b, (by simpa [hp] using hedge : (F.graph T).Reachable (.inr p) (.inr q)).trans hb⟩
 
 theorem connected (hT : T.Connected) : (F.graph T).Connected := by
   have reach : ∀ x : B ⊕ P, ∃ b, (F.graph T).Reachable x (.inl b) := by

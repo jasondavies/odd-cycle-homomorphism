@@ -15,9 +15,7 @@ theorem source_card_le (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
     Nat.card (SourceVertex F L) ≤ 2+m+m*n*n+(m*n+m*m)*n := by
   classical
   let : Fintype (Link F L) := Subtype.fintype _
-  have hL : Fintype.card (Link F L) ≤ m*n+m*m := by
-    have h := Fintype.card_subtype_le (Valid F L)
-    simpa [Code,Copies,ZMod.card] using h
+  have hL := link_card_le F L
   have hV : Nat.card (SourceVertex F L) = 2+m*n*(n-2)+m+Fintype.card (Link F L)*(n-3) := by
     simp [Nat.card_eq_fintype_card,SourceVertex,BaseVertex,RefVertex,Copies,ZMod.card]
   have h1 := Nat.mul_le_mul_left (m*n) (Nat.sub_le n 2)

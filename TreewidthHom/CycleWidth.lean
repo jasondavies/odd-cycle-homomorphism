@@ -9,17 +9,6 @@ public import TreewidthHom.PathWidth
 namespace TreewidthHom.OddCycle
 open SimpleGraph
 
-theorem val_succ_of_ne_zero {n : ℕ} [Fact (1 < n)] {a b : ZMod n} (hb : b ≠ 0)
-    (h : b = a + 1) : b.val = a.val + 1 := by
-  have hn : NeZero n := ⟨by have := Fact.out (p := 1 < n); omega⟩
-  have hval : b.val = (a.val+1) % n := by rw [h,ZMod.val_add,ZMod.val_one]
-  have hlt := ZMod.val_lt a
-  rcases Nat.lt_or_ge (a.val+1) n with h1 | h1
-  · rwa [Nat.mod_eq_of_lt h1] at hval
-  · have h2 : a.val+1 = n := by omega
-    rw [h2,Nat.mod_self] at hval
-    exact absurd ((ZMod.val_eq_zero b).mp hval) hb
-
 /-- A cycle of length at least three has pathwidth at most two: keep vertex 0 and
 slide a window of two consecutive vertices. -/
 theorem target_pathWidth (n : ℕ) [Fact (1 < n)] (hn : 3 ≤ n) : HasPathWidth (cyc n) 2 := by

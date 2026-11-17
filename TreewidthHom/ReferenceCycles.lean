@@ -38,11 +38,12 @@ theorem coord_ref (s : I) (d : ZMod (n)) : coord (ref s d) = d := by
   · have : d.val-2+2 = d.val := by omega
     simp only [coord,this,hd]
 
-theorem ref_ne (s : I) (d : ZMod (n)) : ref s d ≠ ref s (d+1) := by
-  intro h
-  have h' := congrArg coord h
-  rw [coord_ref,coord_ref] at h'
-  exact one_ne_zero (left_eq_add.mp h')
+/-- Reading the coordinate is a left inverse of each reference copy. -/
+theorem ref_injective (s : I) : Function.Injective (ref (n := n) s) :=
+  Function.LeftInverse.injective (coord_ref s)
+
+theorem ref_ne (s : I) (d : ZMod (n)) : ref s d ≠ ref s (d+1) :=
+  (ref_injective s).ne (fun h => one_ne_zero (left_eq_add.mp h))
 
 theorem ref_private {s s' : I} {d : ZMod (n)}
     {e : Fin (n - 2)} (h : ref s d = .inr (s',e)) :

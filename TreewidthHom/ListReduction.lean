@@ -56,9 +56,26 @@ def source (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)) :
 def Colorable (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)) : Prop :=
   ∃ c : Fin m → ZMod n, (∀ v, c v ∈ L v) ∧ ∀ u v, F.Adj u v → c u ≠ c v
 
+/-- Links are indexed by forbidden occurrences or ordered pairs of input vertices. -/
+theorem link_card_le (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
+    [Fintype (Link F L)] : Fintype.card (Link F L) ≤ m*n+m*m := by
+  classical
+  simpa [Code, Copies, ZMod.card] using Fintype.card_subtype_le (Valid F L)
+
 theorem base_anchor_adj : (base m n).Adj (.inl (.inl 0)) (.inl (.inl 1)) := by
   apply (fromRel_adj _ _ _).mpr
   exact ⟨by simp,Or.inl (Or.inl ⟨rfl,rfl⟩)⟩
+
+/-- Hubs have no edges until the links are attached. -/
+@[simp] theorem base_hub_not_adj (v : Fin m) (x : BaseVertex m n) :
+    ¬ (base m n).Adj (.inr v) x := by
+  cases x <;> simp [base, BaseRel, fromRel_adj]
+
+theorem base_adj_reference {x y : BaseVertex m n} (h : (base m n).Adj x y) :
+    ∃ r, y = .inl r := by
+  cases y with
+  | inl r => exact ⟨r, rfl⟩
+  | inr v => exact (base_hub_not_adj v x h.symm).elim
 
 /-- Palette padding leaves the last reference coordinate forbidden at every hub. -/
 theorem palette_missing_last (L : Fin m → Finset (ZMod n)) {q : ℕ}
@@ -80,13 +97,12 @@ theorem private_step {i j : Copies m n} {a b : Fin (n-2)} {d : ZMod n}
     i = j ∧ b.val = a.val+1 := by
   obtain ⟨_,hda⟩ := ref_private ha
   obtain ⟨hij,hdb⟩ := ref_private hb
-  have hv : (d+1).val = (d.val+1)%n := by rw [ZMod.val_add,ZMod.val_one]
-  have hd := ZMod.val_lt d
-  refine ⟨hij.symm,?_⟩
-  rcases Nat.lt_or_ge (d.val+1) n with hh | hh
-  · rw [Nat.mod_eq_of_lt hh] at hv; omega
-  · have : d.val+1=n := by omega
-    rw [this,Nat.mod_self] at hv; omega
+  have hnonzero : d+1 ≠ 0 := by
+    intro hz
+    rw [hz, ZMod.val_zero] at hdb
+    omega
+  have hv := val_succ_of_ne_zero hnonzero rfl
+  exact ⟨hij.symm, by omega⟩
 
 theorem private_adj {p r : Private m n}
     (h : (base m n).Adj (.inl (.inr p)) (.inl (.inr r))) :

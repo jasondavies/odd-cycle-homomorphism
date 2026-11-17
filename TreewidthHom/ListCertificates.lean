@@ -34,8 +34,7 @@ theorem source_tree_certificate {N w : ℕ} [DecidableEq (Fin m)]
   let B := (Fin N ⊕ Private m n) ⊕ (Link F L × Fin (n-3))
   let e := (Fintype.equivFin B).symm
   refine ⟨_, Fintype.card B, _, D'.reindex e, (fun b => hD' (e b)), ?_⟩
-  have hL : Fintype.card (Link F L) ≤ m*n+m*m := by
-    simpa [Code, Copies, ZMod.card] using Fintype.card_subtype_le (Valid F L)
+  have hL := link_card_le F L
   have hcard : Fintype.card B = N+m*n*(n-2)+Fintype.card (Link F L)*(n-3) := by
     simp [B, Private, Copies, ZMod.card]
   have h1 := Nat.mul_le_mul_left (m*n) (Nat.sub_le n 2)
@@ -65,8 +64,7 @@ theorem source_path_certificate (F : SimpleGraph (Fin m))
     (aug_pathWidth_bag_bound F h) (link_adj_aug F L)
   obtain ⟨d, r, D, hD, hr⟩ := hout
   refine ⟨d, r, D, hD, hr.trans ?_⟩
-  have hL : Fintype.card (Link F L) ≤ m*n+m*m := by
-    simpa [Code, Copies, ZMod.card] using Fintype.card_subtype_le (Valid F L)
+  have hL := link_card_le F L
   apply Nat.mul_le_mul
   · exact Nat.mul_le_mul_left N (Nat.mul_le_mul_left 2
       (Nat.add_le_add_right (Nat.mul_le_mul_left (m*n) (Nat.sub_le n 2)) 2))

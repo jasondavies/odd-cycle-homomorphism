@@ -14,12 +14,8 @@ theorem one_le_treewidth_of_adj {V : Type} [Fintype V] {G : SimpleGraph V}
   obtain ⟨d, B, T, D, hD⟩ := hasWidth_treewidth G
   let := d
   obtain ⟨b, hu, hv⟩ := D.edge_cover huv
-  have hsub : ({u, v} : Finset V) ⊆ D.bag b := by
-    intro x hx
-    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
-    rcases hx with rfl | rfl
-    · exact hu
-    · exact hv
+  have hsub : ({u, v} : Finset V) ⊆ D.bag b :=
+    Finset.insert_subset hu (Finset.singleton_subset_iff.mpr hv)
   have h := (Finset.card_le_card hsub).trans (hD b)
   rw [Finset.card_pair huv.ne] at h
   omega

@@ -105,6 +105,20 @@ theorem pathWidth_linked_bag_bound {V₀ L : Type} [Fintype V₀] [Fintype L]
     intro v τ
     simp [bag]
   have hfin : ∀ τ : ℕ, τ < n → τ < n-1+1 := by intro τ h; omega
+  have mixed_cover (x : V₀) (l : L) (c : Fin q)
+      (h : (c.val = 0 ∧ x = s l) ∨ (c.val+1 = q ∧ x = t l)) :
+      ∃ b, .inl x ∈ bag b ∧ .inr (l,c) ∈ bag b := by
+    rcases h with ⟨hc,rfl⟩ | ⟨hc,rfl⟩
+    · have h1 := hrange l 0 (by omega)
+      refine ⟨⟨start l + 0,hfin _ h1⟩,(hmem _ _).mpr ?_,(hmem _ _).mpr (Or.inl (by simp [hc]))⟩
+      change lo (s l) ≤ (start l + 0)/U ∧ (start l + 0)/U ≤ hi (s l)
+      rw [hdiv l 0 (by omega)]
+      exact hs l
+    · have h1 := hrange l q (by omega)
+      refine ⟨⟨start l + q,hfin _ h1⟩,(hmem _ _).mpr ?_,(hmem _ _).mpr (Or.inr (by simp; omega))⟩
+      change lo (t l) ≤ (start l + q)/U ∧ (start l + q)/U ≤ hi (t l)
+      rw [hdiv l q (by omega)]
+      exact ht l
   let D : Decomposition (linked B s t q) (pathGraph (n-1+1)) :=
     intervalDecomposition (linked B s t q) (n-1) bag
       (by
@@ -134,30 +148,9 @@ theorem pathWidth_linked_bag_bound {V₀ L : Type} [Fintype V₀] [Fintype L]
           · change lo y ≤ p*U/U ∧ p*U/U ≤ hi y
             rw [Nat.mul_div_cancel _ hU]
             exact ⟨le_max_right _ _,hp2⟩
-        · have h' : (c'.val = 0 ∧ x = s l') ∨ (c'.val+1 = q ∧ x = t l') := h
-          rcases h' with ⟨hc,rfl⟩ | ⟨hc,rfl⟩
-          · have h1 := hrange l' 0 (by omega)
-            refine ⟨⟨start l' + 0,hfin _ h1⟩,(hmem _ _).mpr ?_,(hmem _ _).mpr (Or.inl (by simp [hc]))⟩
-            change lo (s l') ≤ (start l' + 0)/U ∧ (start l' + 0)/U ≤ hi (s l')
-            rw [hdiv l' 0 (by omega)]
-            exact hs l'
-          · have h1 := hrange l' q (by omega)
-            refine ⟨⟨start l' + q,hfin _ h1⟩,(hmem _ _).mpr ?_,(hmem _ _).mpr (Or.inr (by simp; omega))⟩
-            change lo (t l') ≤ (start l' + q)/U ∧ (start l' + q)/U ≤ hi (t l')
-            rw [hdiv l' q (by omega)]
-            exact ht l'
-        · have h' : (c.val = 0 ∧ y = s l) ∨ (c.val+1 = q ∧ y = t l) := h
-          rcases h' with ⟨hc,rfl⟩ | ⟨hc,rfl⟩
-          · have h1 := hrange l 0 (by omega)
-            refine ⟨⟨start l + 0,hfin _ h1⟩,(hmem _ _).mpr (Or.inl (by simp [hc])),(hmem _ _).mpr ?_⟩
-            change lo (s l) ≤ (start l + 0)/U ∧ (start l + 0)/U ≤ hi (s l)
-            rw [hdiv l 0 (by omega)]
-            exact hs l
-          · have h1 := hrange l q (by omega)
-            refine ⟨⟨start l + q,hfin _ h1⟩,(hmem _ _).mpr (Or.inr (by simp; omega)),(hmem _ _).mpr ?_⟩
-            change lo (t l) ≤ (start l + q)/U ∧ (start l + q)/U ≤ hi (t l)
-            rw [hdiv l q (by omega)]
-            exact ht l
+        · exact mixed_cover x l' c' h
+        · obtain ⟨b, hy, hx⟩ := mixed_cover y l c h
+          exact ⟨b, hx, hy⟩
         · obtain ⟨hl,hcc⟩ : l = l' ∧ (c'.val = c.val+1 ∨ c.val = c'.val+1) := h
           subst hl
           rcases hcc with h1 | h1
@@ -188,30 +181,20 @@ theorem pathWidth_linked_bag_bound {V₀ L : Type} [Fintype V₀] [Fintype L]
   let baseSet : Finset V₀ := Finset.univ.filter (fun x => lo x ≤ p ∧ p ≤ hi x)
   let inner : Finset (L × Fin q) := Finset.univ.filter
     (fun lc => τ.val = start lc.1 + lc.2.val ∨ τ.val = start lc.1 + lc.2.val + 1)
-  have hsub : bag τ ⊆ baseSet.map ⟨Sum.inl,Sum.inl_injective⟩ ∪ inner.map ⟨Sum.inr,Sum.inr_injective⟩ := by
-    rintro (x | ⟨l,c⟩) hv
-    · have hx : lo x ≤ p ∧ p ≤ hi x := (hmem _ _).mp hv
-      simp [baseSet,hx]
-    · have hx : τ.val = start l + c.val ∨ τ.val = start l + c.val + 1 := (hmem _ _).mp hv
-      simp [inner,hx]
-  have hcard := (Finset.card_le_card hsub).trans (Finset.card_union_le _ _)
-  simp only [Finset.card_map] at hcard
+  have hcard : (bag τ).card = baseSet.card + inner.card := by
+    have hbag : bag τ = baseSet.disjSum inner := by
+      ext (x | lc) <;> simp [bag, act, baseSet, inner, p]
+    rw [hbag, Finset.card_disjSum]
+  have active_time (lc : L × Fin q) (hlc : lc ∈ inner) :
+      ∃ e, e < a ∧ τ.val = start lc.1 + e := by
+    have hc := lc.2.isLt
+    rcases (Finset.mem_filter.mp hlc).2 with h | h
+    · exact ⟨lc.2.val, by omega, h⟩
+    · exact ⟨lc.2.val+1, by omega, h⟩
   have hsame : ∀ lc ∈ inner, ∀ lc' ∈ inner, lc.1 = lc'.1 := by
     intro lc hlc lc' hlc'
-    have h1 : τ.val = start lc.1 + lc.2.val ∨ τ.val = start lc.1 + lc.2.val + 1 := by
-      simpa [inner] using hlc
-    have h2 : τ.val = start lc'.1 + lc'.2.val ∨ τ.val = start lc'.1 + lc'.2.val + 1 := by
-      simpa [inner] using hlc'
-    have c1 := lc.2.isLt
-    have c2 := lc'.2.isLt
-    obtain ⟨e1,he1,hτ1⟩ : ∃ e, e < a ∧ τ.val = start lc.1 + e := by
-      rcases h1 with h | h
-      · exact ⟨lc.2.val,by omega,h⟩
-      · exact ⟨lc.2.val+1,by omega,h⟩
-    obtain ⟨e2,he2,hτ2⟩ : ∃ e, e < a ∧ τ.val = start lc'.1 + e := by
-      rcases h2 with h | h
-      · exact ⟨lc'.2.val,by omega,h⟩
-      · exact ⟨lc'.2.val+1,by omega,h⟩
+    obtain ⟨e1, he1, hτ1⟩ := active_time lc hlc
+    obtain ⟨e2, he2, hτ2⟩ := active_time lc' hlc'
     obtain ⟨hp,hsl⟩ := time_slot (hslot' lc.1) (hslot' lc'.1) he1 he2 (hτ1.symm.trans hτ2)
     exact hinj _ _ hp hsl
   have hinner : inner.card ≤ 2 := by
@@ -240,17 +223,11 @@ theorem pathWidth_linked_bag_bound {V₀ L : Type} [Fintype V₀] [Fintype L]
     change baseSet.card ≤ w+1 at hb
     omega
   · obtain ⟨lc,hlc⟩ := Finset.nonempty_iff_ne_empty.mpr hempty
-    have h1 : τ.val = start lc.1 + lc.2.val ∨ τ.val = start lc.1 + lc.2.val + 1 := by
-      simpa [inner] using hlc
-    have c1 := lc.2.isLt
+    obtain ⟨e, he, hτ⟩ := active_time lc hlc
     have hp : p = pos lc.1 := by
-      rcases h1 with h | h
-      · change τ.val/U = _
-        rw [h]
-        exact hdiv lc.1 _ (by omega)
-      · change τ.val/U = _
-        rw [h,Nat.add_assoc]
-        exact hdiv lc.1 _ (by omega)
+      change τ.val/U = _
+      rw [hτ]
+      exact hdiv lc.1 e he
     have hb := hlink lc.1
     rw [← hp] at hb
     change baseSet.card + 2 ≤ w+1 at hb

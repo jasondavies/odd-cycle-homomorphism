@@ -54,10 +54,7 @@ theorem IsDegenerate.card_pairs_le {V : Type*} [DecidableEq V] {G : SimpleGraph 
     have h5 := Finset.card_erase_of_mem hv
     have h6 : 0 < S.card := Finset.card_pos.mpr hS
     have h7 : 2*k*S.card = 2*k*(S.erase v).card+2*k := by
-      rw [h5]
-      obtain ⟨c,hc⟩ : ∃ c, S.card = c+1 := ⟨S.card-1,by omega⟩
-      rw [hc]
-      simp [Nat.mul_add]
+      rw [show S.card = (S.erase v).card+1 by omega, Nat.mul_add, Nat.mul_one]
     omega
 
 /-- A `k`-degenerate finite graph has at most `k|V|` edges. -/
@@ -317,11 +314,7 @@ theorem src_ne_dst {F : SimpleGraph (Fin m)} {L : Fin m → Finset (ZMod n)} (l 
 
 theorem dst_isolated {F : SimpleGraph (Fin m)} {L : Fin m → Finset (ZMod n)} (l : Link F L)
     (u : BaseVertex m n) : ¬ (base m n).Adj (dst l.val) u := by
-  obtain ⟨(⟨v,d⟩ | ⟨u',v⟩),h⟩ := l <;>
-  · intro hadj
-    obtain ⟨_,h | h⟩ := (fromRel_adj _ _ _).mp hadj
-    · exact h.elim
-    · rcases u with u | u <;> exact h.elim
+  rcases l with ⟨(⟨v,d⟩ | ⟨u',v⟩),h⟩ <;> exact base_hub_not_adj v u
 
 variable (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
 
@@ -344,14 +337,9 @@ theorem source_cycle_length (hn : 5 ≤ n) {v : SourceVertex F L}
     obtain ⟨v,rfl⟩ := nolink v w.start_mem_support
     have aa : (base m n).Adj v a := aa
     have ab : (base m n).Adj v b := ab
-    have inl : ∀ {x y : BaseVertex m n}, (base m n).Adj x y → ∃ r, y = .inl r := by
-      intro x y h
-      obtain ⟨_,h | h⟩ := (fromRel_adj _ _ _).mp h
-      · rcases x with x | x <;> rcases y with y | y <;> first | exact ⟨_,rfl⟩ | exact h.elim
-      · rcases x with x | x <;> rcases y with y | y <;> first | exact ⟨_,rfl⟩ | exact h.elim
-    obtain ⟨ra,rfl⟩ := inl aa
-    obtain ⟨rb,rfl⟩ := inl ab
-    obtain ⟨rv,rfl⟩ := inl aa.symm
+    obtain ⟨ra,rfl⟩ := base_adj_reference aa
+    obtain ⟨rb,rfl⟩ := base_adj_reference ab
+    obtain ⟨rv,rfl⟩ := base_adj_reference aa.symm
     rcases ra with ja | ⟨i,e⟩
     · rcases rb with jb | ⟨i,e⟩
       · rcases rv with jv | ⟨i,e⟩
@@ -417,9 +405,7 @@ theorem source_cycle_length (hn : 5 ≤ n) {v : SourceVertex F L}
   have hcard : S.card = n := by
     rw [Finset.card_image_of_injective]
     · simp [ZMod.card]
-    · intro a b hab
-      have h := congrArg coord (Sum.inl.inj (Sum.inl.inj hab))
-      simpa [coord_ref] using h
+    · exact Sum.inl_injective.comp (Sum.inl_injective.comp (ref_injective i))
   have := card_le_length hw.not_nil S (by
     intro y hy
     obtain ⟨d,_,rfl⟩ := Finset.mem_image.mp hy
@@ -437,9 +423,7 @@ theorem target_isContained (i : Copies m n) : (cyc n) ⊑ (source F L) := by
     rcases (cyc_adj _ _).mp hab with rfl | rfl
     · exact base_ref_adj i a
     · exact (base_ref_adj i b).symm
-  · intro a b hab
-    have h := congrArg coord (Sum.inl.inj (Sum.inl.inj hab))
-    simpa [coord_ref] using h
+  · exact Sum.inl_injective.comp (Sum.inl_injective.comp (ref_injective i))
 
 /-- With at least one input vertex, the girth is exactly the target length. -/
 theorem source_egirth (hn : 5 ≤ n) (hm : 0 < m) : (source F L).egirth = n := by
@@ -469,9 +453,7 @@ theorem source_degenerate : IsDegenerate (source F L) 2 := by
   · obtain ⟨v,hm⟩ := h2
     refine ⟨_,hm,∅,by simp,fun u hu hadj => ?_⟩
     obtain ⟨u,rfl⟩ := nolink u hu
-    obtain ⟨_,h | h⟩ := (fromRel_adj _ _ _).mp (show (base m n).Adj (.inr v) u from hadj)
-    · exact h.elim
-    · rcases u with u | u <;> exact h.elim
+    exact (base_hub_not_adj v u hadj).elim
   by_cases h3 : ∃ i e, (.inl (.inl (.inr (i,e))) : SourceVertex F L) ∈ S
   · obtain ⟨i,e,hm⟩ := h3
     have he2 : e.val+2 < n := by have := e.isLt; omega

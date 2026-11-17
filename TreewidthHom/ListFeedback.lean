@@ -140,27 +140,11 @@ theorem parent_cases (hn : 5 ≤ n) {x y : SourceVertex F L}
   classical
   rcases x with ((a | ⟨⟨v,d⟩,c⟩) | v) | ⟨⟨(⟨v,d⟩ | ⟨u,v⟩),hl⟩,c⟩
   · simp [parent] at h
-  · by_cases h1 : c.val < center d
-    · have he : y=.inl (.inl (.inr ((v,d),⟨c.val+1,by have := ZMod.val_lt d; dsimp [center] at h1; omega⟩))) :=
-        by simpa [parent,h1] using h.symm
-      subst y
-      refine ⟨id,?_⟩
-      simp only [height,Nat.dist]
-      omega
-    · by_cases h2 : center d < c.val
-      · have he : y=.inl (.inl (.inr ((v,d),⟨c.val-1,by have := c.isLt; omega⟩))) :=
-          by simpa [parent,h1,h2] using h.symm
-        subst y
-        refine ⟨id,?_⟩
-        simp only [height,Nat.dist]
-        omega
-      · by_cases hd : d ∉ L v ∧ 2 ≤ d.val
-        · have he : y=.inr (⟨.inl (v,d),hd.1⟩,⟨0,by omega⟩) := by simpa [parent,h1,h2,hd] using h.symm
-          subst y
-          refine ⟨id,?_⟩
-          simp only [height,Nat.dist]
-          omega
-        · simp [parent,h1,h2,hd] at h
+  · -- Private reference vertices move towards their attachment coordinate.
+    simp only [parent] at h
+    split_ifs at h <;> simp only [Option.some.injEq] at h
+    all_goals subst y; simp_all [removed, height, Nat.dist]
+    all_goals omega
   · cases hu : oldParent F S O v with
     | none =>
       simp only [parent] at h
@@ -181,48 +165,19 @@ theorem parent_cases (hn : 5 ≤ n) {x y : SourceVertex F L}
         simp only [edgeLink,dite_eq_right hvu',height,htrue,↓reduceIte]
         rw [hr,heq]
         omega
-  · by_cases hc : c.val+1 < n-3
-    · have he : y=.inr (⟨.inl (v,d),hl⟩,⟨c.val+1,hc⟩) := by simpa [parent,hc] using h.symm
-      subst y
-      refine ⟨id,?_⟩
-      simp only [height]
-      omega
-    · by_cases hv : v ∉ S
-      · have he : y=.inl (.inr v) := by simpa [parent,hc,hv] using h.symm
-        subst y
-        refine ⟨hv,?_⟩
-        have hh := hub_below (n := n) F S O v
-        change oldRank F S O v*(n-2) < ceiling (n := n) F S O+(n-3-c.val)
-        omega
-      · simp [parent,hc,hv] at h
-  · cases hf : towardStart F S O u v
-    · by_cases hc : c.val+1 < n-3
-      · have he : y=.inr (⟨.inr (u,v),hl⟩,⟨c.val+1,hc⟩) := by simpa [parent,hf,hc] using h.symm
-        subst y
-        refine ⟨id,?_⟩
-        simp only [height,hf,Bool.false_eq_true,↓reduceIte]
-        omega
-      · by_cases hv : v ∉ S
-        · have he : y=.inl (.inr v) := by simpa [parent,hf,hc,hv] using h.symm
-          subst y
-          refine ⟨hv,?_⟩
-          have hh := c.isLt
-          simp only [height,hf,Bool.false_eq_true,↓reduceIte]
-          omega
-        · simp [parent,hf,hc,hv] at h
-    · by_cases hc : c.val=0
-      · by_cases hu : u ∉ S
-        · have he : y=.inl (.inr u) := by simpa [parent,hf,hc,hu] using h.symm
-          subst y
-          refine ⟨hu,?_⟩
-          simp [height,hf,hc]
-        · simp [parent,hf,hc,hu] at h
-      · have he : y=.inr (⟨.inr (u,v),hl⟩,⟨c.val-1,by have := c.isLt; omega⟩) :=
-          by simpa [parent,hf,hc] using h.symm
-        subst y
-        refine ⟨id,?_⟩
-        simp only [height,hf,↓reduceIte]
-        omega
+  · -- Domain links move towards their hub, below the reference vertices.
+    have := hub_below (n := n) F S O v
+    have := c.isLt
+    simp only [parent] at h
+    split_ifs at h <;> simp only [Option.some.injEq] at h
+    all_goals subst y; simp_all [removed, height]
+    all_goals omega
+  · -- Original-edge links move towards the lower surviving endpoint.
+    have := c.isLt
+    simp only [parent] at h
+    split_ifs at h <;> simp only [Option.some.injEq] at h
+    all_goals subst y; simp_all [removed, height]
+    all_goals omega
 
 theorem parent_private_edge (hn : 5 ≤ n) {p r : Private m n}
     (h : (base m n).Adj (.inl (.inr p)) (.inl (.inr r))) :
@@ -301,18 +256,14 @@ theorem parent_inner_edge (hn : 5 ≤ n) (l : Link F L) (a b : Fin (n-3))
     parent F L S O hn (.inr (l,b))=some (.inr (l,a)) := by
   classical
   have ha : a.val+1<n-3 := by have := b.isLt; omega
-  have hb : b.val≠0 := by omega
   rcases l with ⟨(⟨v,d⟩ | ⟨u,v⟩),hl⟩
   · left
-    simp only [parent,ha,↓reduceDIte,Option.some.injEq,Sum.inr.injEq,Prod.mk.injEq,true_and]
-    exact Fin.ext (by dsimp only; omega)
+    simp [parent, ha, Fin.ext_iff, h]
   · cases hf : towardStart F S O u v
     · left
-      simp only [parent,hf,Bool.false_eq_true,↓reduceIte,ha,↓reduceDIte,Option.some.injEq,Sum.inr.injEq,Prod.mk.injEq,true_and]
-      exact Fin.ext (by dsimp only; omega)
+      simp [parent, hf, ha, Fin.ext_iff, h]
     · right
-      simp only [parent,hf,↓reduceIte,hb,↓reduceDIte,Option.some.injEq,Sum.inr.injEq,Prod.mk.injEq,true_and]
-      exact Fin.ext (by dsimp only; omega)
+      simp [parent, hf, h]
 
 theorem parent_edge (hn : 5 ≤ n) {x y : SourceVertex F L}
     (hx : ¬ removed S x) (hy : ¬ removed S y) (h : (source F L).Adj x y) :

@@ -34,22 +34,10 @@ theorem hom_of_bipartite (h : G.IsBipartite) : Nonempty (G →g cyc n) := by
 
 private theorem parity_ne_of_near {a b : ZMod n} (ha : a ≠ 0) (hb : b ≠ 0)
     (h : Near a b) : a.val % 2 ≠ b.val % 2 := by
-  have hn : 1 < n := Fact.out
-  have hstep : ∀ x y : ZMod n, y ≠ 0 → y = x + 1 → y.val = x.val + 1 := by
-    intro x y hy he
-    have hx := ZMod.val_lt x
-    have hv : y.val = (x.val + 1) % n := by rw [he, ZMod.val_add, ZMod.val_one]
-    have hsmall : x.val + 1 < n := by
-      by_contra hnot
-      have heq : x.val + 1 = n := by omega
-      have : y.val = 0 := by simp [hv, heq]
-      exact hy (ZMod.val_injective n (by simpa using this))
-    rw [Nat.mod_eq_of_lt hsmall] at hv
-    exact hv
   rcases h with h | h
-  · have := hstep a b hb h
+  · have := val_succ_of_ne_zero hb h
     omega
-  · have := hstep b a ha h
+  · have := val_succ_of_ne_zero ha h
     omega
 
 /-- Cutting the target cycle at an unused vertex gives a two-colouring. -/

@@ -178,21 +178,14 @@ theorem aug_pathWidth_bag_bound (F : SimpleGraph (Fin m)) {w N : ℕ} (hw : HasP
           have hh := (Finset.mem_filter.mp hv).2.2
           have := highP (.inr v); omega
         simp [he]
-    let eH : Fin m ↪ BaseVertex m n := ⟨Sum.inr,Sum.inr_injective⟩
-    let eA : Fin 2 ↪ BaseVertex m n := ⟨fun a => .inl (.inl a),fun _ _ h => Sum.inl.inj (Sum.inl.inj h)⟩
-    let eP : Private m n ↪ BaseVertex m n := ⟨fun p => .inl (.inr p),fun _ _ h => Sum.inr.inj (Sum.inl.inj h)⟩
     have hsub : Finset.univ.filter (fun x => low x ≤ t ∧ t ≤ high x) ⊆
-        hubs.map eH ∪ (Finset.univ.map eA ∪ inner.map eP) := by
+        ((Finset.univ : Finset (Fin 2)).disjSum inner).disjSum hubs := by
       rintro ((a | p) | v) hx
-      · exact Finset.mem_union_right _ (Finset.mem_union_left _ (Finset.mem_map.mpr ⟨a,Finset.mem_univ _,rfl⟩))
-      · have hp : p ∈ inner := by simpa [low,high,inner] using hx
-        exact Finset.mem_union_right _ (Finset.mem_union_right _ (Finset.mem_map.mpr ⟨p,hp,rfl⟩))
-      · have hv : v ∈ hubs := by simpa [hubs] using hx
-        exact Finset.mem_union_left _ (Finset.mem_map.mpr ⟨v,hv,rfl⟩)
+      · simp
+      · simpa [inner, low, high] using hx
+      · simpa [hubs] using hx
     have hc := Finset.card_le_card hsub
-    have hc1 := Finset.card_union_le (hubs.map eH) (Finset.univ.map eA ∪ inner.map eP)
-    have hc2 := Finset.card_union_le (Finset.univ.map eA) (inner.map eP)
-    simp only [Finset.card_map,Finset.card_univ,Fintype.card_fin] at hc1 hc2
+    simp only [Finset.card_disjSum, Finset.card_univ, Fintype.card_fin] at hc
     omega
   obtain ⟨d', r, D', hD', hr⟩ := h
   refine ⟨d', r, D', hD', hr.trans ?_⟩
