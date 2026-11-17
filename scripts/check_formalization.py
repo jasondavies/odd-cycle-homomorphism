@@ -55,7 +55,7 @@ def main():
     print(result.stdout, end="")
     expected = re.findall(r"^#print axioms (\S+)",
                           (ROOT / "AxiomAudit.lean").read_text(), re.M)
-    sources = [ROOT / "TreewidthHom.lean", *sorted((ROOT / "TreewidthHom").rglob("*.lean"))]
+    sources = [ROOT / "TreewidthHom.lean", ROOT / "Solution.lean", ROOT / "AxiomAudit.lean", *sorted((ROOT / "TreewidthHom").rglob("*.lean"))]
     axioms = audit_output(result.stdout, expected, sources)
     require(project_state(ROOT) == provenance, "Working-tree status changed during the audit")
     report = {

@@ -1,4 +1,6 @@
-import TreewidthHom
+module
+
+import Solution
 
 #print axioms TreewidthHom.Decomposition.addApices
 #print axioms TreewidthHom.Decomposition.mapEquiv
@@ -62,3 +64,5 @@ import TreewidthHom
 #print axioms TreewidthHom.Feedback.exists_assignment
 #print axioms TreewidthHom.Feedback.extends_iff
 #print axioms TreewidthHom.Feedback.exists_orientation_extends
+
+#print axioms TreewidthHom.Palomar.list_elimination

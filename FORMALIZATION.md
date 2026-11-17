@@ -21,7 +21,7 @@ successor lengths. No source or target lists remain in the output problem.
 | Odd-cycle homomorphisms cannot increase length; equivalence forces equal lengths | `OddCycle.length_le_of_hom`, `OddCycle.length_eq_of_homs`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Lists contained in a smaller palette omit coordinate `n-1` | `ListReduction.palette_missing_last`, [ListReduction](TreewidthHom/ListReduction.lean) |
 | Decision equivalence | `ListReduction.source_hom_iff_colorable`, [ListReduction](TreewidthHom/ListReduction.lean) |
-| Rooted-tree attachments raise treewidth only to one | `Graft.hasWidth`, [GraftWidth](TreewidthHom/GraftWidth.lean) |
+| Rooted-tree attachments give width at most `max(w,1)` | `Graft.hasWidth`, [GraftWidth](TreewidthHom/GraftWidth.lean) |
 | Source treewidth `max(w+2,3)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
 | Source pathwidth `p+6` | `ListReduction.source_pathWidth`, [ListPathWidth](TreewidthHom/ListPathWidth.lean) |
 | Target pathwidth 2 | `OddCycle.target_pathWidth`, [CycleWidth](TreewidthHom/CycleWidth.lean) |
@@ -89,11 +89,22 @@ decompositions. For feedback vertex number, the W[P] upper bound needs no
 supplied decomposition; the paper proves it directly and also derives it from
 Binary CSP. No W[3]-membership result is claimed.
 
+## Independent Palomar statement
+
+[`TreewidthHom.Palomar.list_elimination`](Solution.lean) packages the finite
+reduction and sparse-source properties as one existential theorem, choosing the
+existing concrete construction as its witness. [Challenge.lean](Challenge.lean)
+repeats its mathematical definitions and statement using only Mathlib imports.
+The deliberately omitted Challenge proof is excluded from the proof-admission
+audit; the proved Solution is included. [Comparator](comparator.json) compares
+the two independently compiled modules. See [PALOMAR.md](PALOMAR.md) for the
+precise scope and reproduction commands.
+
 ## Reproduction and audits
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 62 declarations
+`scripts/check_formalization.py` builds the library and audits the 63 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report

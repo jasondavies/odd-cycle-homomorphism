@@ -1,6 +1,6 @@
 name = "treewidth_homomorphism_hardness"
 version = "0.1.0"
-defaultTargets = ["TreewidthHom"]
+defaultTargets = ["TreewidthHom", "Solution"]
 
 [[require]]
 name = "mathlib"
@@ -9,3 +9,11 @@ rev = "v4.35.0"
 
 [[lean_lib]]
 name = "TreewidthHom"
+
+[[lean_lib]]
+name = "Challenge"
+roots = ["Challenge"]
+
+[[lean_lib]]
+name = "Solution"
+roots = ["Solution"]

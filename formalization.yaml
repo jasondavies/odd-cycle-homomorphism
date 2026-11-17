@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "List elimination into odd-cycle homomorphism with additive structural bounds"
+  description: >-
+    For every finite List Colouring instance on a graph F with lists in Z/nZ,
+    where n is odd and at least five, there exists a finite simple graph G
+    that maps to the cycle C_n exactly when the instance is list-colourable.
+    The same graph has treewidth at most max(tw(F)+2,3), pathwidth at most
+    pw(F)+6, and feedback vertex number at most fvs(F)+2. The theorem also
+    transfers supplied decomposition certificates and any feedback vertex set,
+    with exactly two extra vertices in the latter set. The target has pathwidth
+    at most two. The source is 2-degenerate, has girth at least n (exactly n
+    for nonempty F), is connected when every list omits a residue, and satisfies
+    explicit polynomial vertex and linear edge bounds. The proved witness is
+    the repository's reference-cycle and inequality-path construction. This
+    submission records a finite structural theorem; the manuscript's complexity
+    classifications, matching parameter lower bounds, and machine resource
+    analysis are not part of the formal statement.
+  authors:
+    - Jason Davies
+  responsible_maintainers:
+    - Jason Davies
+  license: Apache-2.0
+
+# This repository contains the substantive proof development, not an external wrapper.
+sources:
+  - title: "Parameterised complexity of graph homomorphism to odd cycles"
+    authors:
+      - Jason Davies
+    id: "https://github.com/jasondavies/odd-cycle-homomorphism/blob/569b6298f8fa3608581a1335ccf1104645c8cf1c/paper/odd-cycle-homomorphism.pdf"
+    type: paper
+    location: "Theorem 2 (upper bounds), Section 3, Proposition 7, and Appendix A"
+    relationship: formalizes
+    author_endorsement: participated
+    note: >-
+      The manuscript and Lean development were developed together with AI assistance
+      under the author's direction. This source-based entry identifies the mathematical
+      account being formalised; it does not claim priority for the original hardness
+      question. The cited revision precedes the standalone Comparator packaging.
+  - title: "Complexity of the homomorphism problem parameterized by treewidth"
+    authors:
+      - Antoine Amarilli
+    id: "https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth"
+    type: web discussion
+    location: "Question of 2 June 2016 and comment of 30 May 2025"
+    relationship: background
+    note: >-
+      Motivating question and prior announcement of W[1]-hardness reductions.
+      Their relationship to this construction remains unresolved. Neither novelty
+      nor priority is established by the formalisation or by the reviews so far.
+  - title: "Parameterized problems complete for nondeterministic FPT time and logarithmic space"
+    authors:
+      - Hans L. Bodlaender
+      - Carla Groenland
+      - Jesper Nederlof
+      - Céline Swennenhuis
+    id: "https://doi.org/10.1016/j.ic.2024.105195"
+    type: paper
+    location: "Theorem 15; Information and Computation 300:105195, 2024"
+    relationship: background
+    note: "List Colouring hardness used in the manuscript's prose complexity consequences, not assumed by the Lean theorem."
+  - title: "On the complexity of problems on tree-structured graphs"
+    authors:
+      - Hans L. Bodlaender
+      - Carla Groenland
+      - Hugo Jacob
+      - Marcin Pilipczuk
+      - Michał Pilipczuk
+    id: "https://doi.org/10.4230/LIPIcs.IPEC.2022.6"
+    type: paper
+    location: "Theorem 8; IPEC 2022, pages 6:1–6:17"
+    relationship: background
+    note: "List Colouring hardness used in the manuscript's prose complexity consequences, not assumed by the Lean theorem."
+  - title: "Parameterized complexity of Binary CSP: vertex cover, treedepth, and related parameters"
+    authors:
+      - Hans L. Bodlaender
+      - Carla Groenland
+      - Michał Pilipczuk
+    id: "https://arxiv.org/abs/2208.12543v5"
+    type: paper
+    location: "Corollary 34; full version of ICALP 2023, DOI 10.4230/LIPIcs.ICALP.2023.27"
+    relationship: background
+    note: "Feedback-vertex-number hardness used outside Lean; no external hardness hypothesis occurs in the formal theorem."
+  - title: "Fine-grained complexity of the graph homomorphism problem for bounded-treewidth graphs"
+    authors:
+      - Karolina Okrasa
+      - Paweł Rzążewski
+    id: "https://doi.org/10.1137/20M1320146"
+    type: paper
+    location: "SIAM Journal on Computing 50(2):487–508, 2021; preprint arXiv:1906.08371v3, Lemma 17 and Proposition 19"
+    relationship: background
+    note: "Prior disequality and list gadgets; the manuscript compares their fixed-target setting with the uniform structural transfer here."
+
+related_formalizations: []
+classification:
+  arxiv: [math.CO, cs.DM]
+  msc2020: [05C15, 05C60, 05C75]
+
+status:
+  scope: >-
+    A standalone existential formulation of the concrete finite reduction, its
+    decomposition and feedback-set transfers, numerical parameter upper bounds,
+    and sparse-source properties. The proof explicitly chooses ListReduction.source.
+    Deliberate Challenge proof placeholders are excluded from the admission counts.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: [propext, Classical.choice, Quot.sound]
+  main_results:
+    - declaration: TreewidthHom.Palomar.list_elimination
+      file: Solution.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: manual
+      tool_setup: "Human research direction, editorial choices, and responsibility by Jason Davies."
+    - method: agent
+      framework: "OpenAI Codex and AI-assisted review sessions"
+      tool_setup: >-
+        AI agents assisted mathematical exploration, Lean proof development,
+        executable checks, manuscript drafting, and review. Proofs were checked
+        using the pinned Lean toolchain; finite tests use Python.
+      prompting_notes: >-
+        Iterative author-directed development and revision in response to agent
+        reviews. Exact model identifiers and costs were not comprehensively
+        recorded and are not reconstructed retrospectively.
+  notes: >-
+    AI systems are credited as tools, not as authors or responsible maintainers.
+    This metadata does not represent kernel checking or agent review as independent
+    human review or as a determination of novelty.
+
+fidelity:
+  divergences: >-
+    Challenge.lean states existence of one finite output graph with all listed
+    properties and fully defines the custom width and degeneracy notions. It does
+    not expose the construction's vertex representation or claim an executable
+    transducer; Solution.lean instantiates the witness with the concrete graph.
+    Lists are arbitrary subsets of Z/nZ, so connectedness requires every list to
+    omit a residue. Exact girth requires a nonempty input. The generic bounds
+    do not require the padded palettes used in the manuscript. Matching minor-based
+    lower bounds, binary-length equivalence, core/circular-colouring recognition,
+    external complexity results, and machine resource bounds remain outside Lean.
+
+review:
+  status: agent-reviewed
+  notes: >-
+    The author supplied several AI-agent reviews of the manuscript, Lean statements,
+    and executable checks; revisions addressed their concrete findings. The last
+    substantive proof snapshot was reported to pass a fresh 62-declaration audit
+    and all 841 finite cases. The standalone Comparator pair is an additional
+    packaging layer whose checks are documented in PALOMAR.md. No independent
+    human subject-expert review of the complete argument is claimed.
+
+alignment:
+  statements:
+    - source: "Manuscript Theorem 2, upper bounds and finite decision equivalence"
+      lean: TreewidthHom.Palomar.list_elimination
+      module: Solution.lean
+      status: proved
+      note: "Uses ListReduction.reduction and numerical parameter bounds; no matching lower bounds are asserted."
+    - source: "Manuscript sparse-source proposition and connectedness argument"
+      lean: TreewidthHom.Palomar.list_elimination
+      module: Solution.lean
+      status: proved
+      note: "Uses source_degenerate, source_le_egirth, source_egirth, source_connected, and source_edges_le."

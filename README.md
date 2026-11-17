@@ -7,6 +7,8 @@ The odd target length `n ≥ 5` is part of the input and may be given in binary.
 Read the paper: **[Parameterised complexity of graph homomorphism to odd cycles](paper/odd-cycle-homomorphism.pdf)**.
 For a short explanation of the gadgets and structural bounds, see
 [CONSTRUCTION.md](CONSTRUCTION.md).
+The [Palomar submission guide](PALOMAR.md) describes the independent statement,
+Comparator checks, and final snapshot requirements.
 
 ## Results
 
@@ -74,7 +76,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 62 declarations. The finite suite
+The Lean audit builds the library and checks 63 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not
@@ -92,6 +94,8 @@ for LaTeX requirements.
 | [FORMALIZATION.md](FORMALIZATION.md) | Lean theorem map, scope, and audit details |
 | [TreewidthHom/](TreewidthHom/) | Lean proofs; [TreewidthHom.lean](TreewidthHom.lean) is the library entry point |
 | [AxiomAudit.lean](AxiomAudit.lean) | Declarations inspected by the audit |
+| [Challenge.lean](Challenge.lean), [Solution.lean](Solution.lean) | Independent Palomar statement and proved counterpart |
+| [formalization.yaml](formalization.yaml), [comparator.json](comparator.json) | Submission metadata and comparison configuration |
 | [scripts/](scripts/) | Executable construction, finite checks, and verification tools |
 | [reports/](reports/) | Generated verification results, retained for inspection |
 
@@ -105,3 +109,8 @@ construction remains unresolved; this repository makes no priority claim.
 The paper cites the published List Colouring results used in the reduction.
 Development and drafting used AI assistance; the paper describes the scope
 and review status.
+
+## Licence
+
+This repository is licensed under [Apache-2.0](LICENSE). Dependencies and cited
+works retain their own licences.

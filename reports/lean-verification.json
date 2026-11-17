@@ -1,7 +1,20 @@
 {
-  "project_commit": "3d0a9d4e7d816ae898ad36ccd8d540cd1db51dcb",
-  "working_tree_dirty": false,
-  "working_tree_status": [],
+  "project_commit": "569b6298f8fa3608581a1335ccf1104645c8cf1c",
+  "working_tree_dirty": true,
+  "working_tree_status": [
+    " M AxiomAudit.lean",
+    " M FORMALIZATION.md",
+    " M README.md",
+    " M lakefile.toml",
+    " M scripts/check_formalization.py",
+    "?? Challenge.lean",
+    "?? LICENSE",
+    "?? PALOMAR.md",
+    "?? Solution.lean",
+    "?? comparator.json",
+    "?? formalization.yaml",
+    "?? scripts/check_palomar.sh"
+  ],
   "provenance_note": "Git state sampled before verification; dirty paths are relative to the repository root.",
   "toolchain": "leanprover/lean4:v4.35.0",
   "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
@@ -67,7 +80,8 @@
     "TreewidthHom.Feedback.feasible_of_hom",
     "TreewidthHom.Feedback.exists_assignment",
     "TreewidthHom.Feedback.extends_iff",
-    "TreewidthHom.Feedback.exists_orientation_extends"
+    "TreewidthHom.Feedback.exists_orientation_extends",
+    "TreewidthHom.Palomar.list_elimination"
   ],
   "axioms": {
     "TreewidthHom.Decomposition.addApices": [
@@ -376,6 +390,11 @@
       "Quot.sound"
     ],
     "TreewidthHom.Feedback.exists_orientation_extends": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "TreewidthHom.Palomar.list_elimination": [
       "propext",
       "Classical.choice",
       "Quot.sound"
