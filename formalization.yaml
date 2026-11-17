@@ -41,7 +41,8 @@ sources:
       The manuscript and Lean development were developed together with AI assistance
       under the author's direction. This source-based entry identifies the mathematical
       account being formalised; it does not claim priority for the original hardness
-      question. The cited revision precedes the standalone Comparator packaging.
+      question. The cited revision includes the strengthened standalone Comparator
+      statement and its proof.
   - title: "Complexity of the homomorphism problem parameterized by treewidth"
     authors:
       - Antoine Amarilli
@@ -156,10 +157,10 @@ review:
   status: agent-reviewed
   notes: >-
     The author supplied several AI-agent reviews of the manuscript, Lean statements,
-    and executable checks; revisions addressed their concrete findings. The last
-    substantive proof snapshot was reported to pass a fresh 62-declaration audit
-    and all 841 finite cases. The standalone Comparator pair is an additional
-    packaging layer whose checks are documented in PALOMAR.md. No independent
+    and executable checks; revisions addressed their concrete findings. The expanded
+    development passed a 92-declaration axiom audit, all 841 finite cases, and ten
+    Python regression tests. The strengthened standalone Comparator pair passed
+    Lean, NanoDa, and con-ron; these checks are documented in PALOMAR.md. No independent
     human subject-expert review of the complete argument is claimed.
 
 alignment:

@@ -91,7 +91,14 @@ a canonical core is asserted.
 
 ## Outside Lean
 
-The following are not formalised as machine-level theorems:
+Two representation bridges remain unchecked. `HasWidth` permits an arbitrary
+bag-index type; a same-width finite-index decomposition for a finite graph has
+not yet been derived in Lean. `HasPathWidth` already uses a finite index path.
+Neither fact establishes a polynomial bound on the encoded output certificates.
+Likewise, the source-size bound is polynomial in the numeric parameters `m,n`;
+palette compaction and the connection to encoded input length remain textual.
+
+The following also remain outside the formalisation:
 
 - the published complexity of List Colouring;
 - the logspace transducer and the polynomial number of output bags;
@@ -105,7 +112,9 @@ The following are not formalised as machine-level theorems:
 
 The paper provides proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
-the logspace transducer. The XNLP and XALP completeness statements use supplied
+the logspace transducer. The Python construction is independently tested; no
+universal refinement theorem connects its output to the Lean graph. The XNLP
+and XALP completeness statements use supplied
 decompositions. For feedback vertex number, the W[P] upper bound needs no
 supplied decomposition; the paper proves it directly and also derives it from
 Binary CSP. No W[3]-membership result is claimed.

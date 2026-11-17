@@ -12,12 +12,14 @@ are defined here: ordinary tree/path decompositions, their minimum widths,
 feedback vertex number, and degeneracy. Widths are nonnegative, including for
 empty graphs. The theorem's graph is finite, so the minima are attained.
 
-The claim is the finite mathematical reduction and its structural upper bounds,
-not a formal complexity-class theorem. `Solution.lean` supplies the concrete
-reference-cycle construction and proves the statement using the development.
-No statement definition is left unspecified; only the final proof is omitted.
-The manuscript's matching lower bounds, binary-encoding reduction, core
-recognition, and machine resource analysis remain outside this formal claim.
+The claim includes the finite mathematical reduction, structural upper bounds,
+matching lower bounds under their stated padding, nonemptiness and edge hypotheses,
+target-capping equivalence, and the target-free odd-cycle-core reduction.
+`Solution.lean` supplies the concrete reference-cycle construction and proves
+the statement using the development. No statement definition is left
+unspecified; only the final proof is omitted. Encoded transducers, finite
+tree-certificate representation, machine resource bounds, complexity classes,
+and the circular-chromatic-number interpretation remain outside this claim.
 -/
 
 namespace TreewidthHom
