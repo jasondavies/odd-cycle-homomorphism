@@ -32,9 +32,9 @@ sources:
   - title: "Parameterised complexity of graph homomorphism to odd cycles"
     authors:
       - Jason Davies
-    id: "https://github.com/jasondavies/odd-cycle-homomorphism/blob/569b6298f8fa3608581a1335ccf1104645c8cf1c/paper/odd-cycle-homomorphism.pdf"
+    id: "https://github.com/jasondavies/odd-cycle-homomorphism/blob/01e8c39f9c0c85ee7685494a7d936bd666e75355/paper/odd-cycle-homomorphism.pdf"
     type: paper
-    location: "Theorem 2 (upper bounds), Section 3, Proposition 7, and Appendix A"
+    location: "Structural transfer theorem, structural bounds, target-capping lemma, odd-cycle-core corollary, and Appendix A"
     relationship: formalizes
     author_endorsement: participated
     note: >-
