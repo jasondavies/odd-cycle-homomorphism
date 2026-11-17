@@ -85,7 +85,19 @@ theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
       (0 < m → G.egirth = n) ∧
       ((∀ v, ∃ d, d ∉ L v) → G.Connected) ∧
       Nat.card V ≤ 2+m+m*n*n+(m*n+m*m)*n ∧
-      Nat.card G.edgeSet ≤ 2*Nat.card V := by
+      Nat.card G.edgeSet ≤ 2*Nat.card V ∧
+      ((∀ v, ((n-1 : ℕ) : ZMod n) ∉ L v) →
+        (0 < m → treewidth F + 2 ≤ treewidth G ∧ pathwidth F + 2 ≤ pathwidth G) ∧
+        ((∃ u v, F.Adj u v) → treewidth G = treewidth F + 2 ∧ fvs G = fvs F + 2)) ∧
+      (∀ k, 5 ≤ k →
+        (Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod k))) ↔
+          Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod (min k (2*Fintype.card V+5))))))) ∧
+      (0 < m →
+        ((∃ k, 3 ≤ k ∧ Odd k ∧
+          Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod k))) ∧
+          Nonempty ((circulantGraph {1} : SimpleGraph (ZMod k)) →g G)) ↔
+        ∃ c : Fin m → ZMod n, (∀ v, c v ∈ L v) ∧
+          ∀ u v, F.Adj u v → c u ≠ c v)) := by
   sorry
 
 end TreewidthHom

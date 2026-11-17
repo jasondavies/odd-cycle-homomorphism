@@ -40,6 +40,14 @@ successor lengths. No source or target lists remain in the output problem.
 | Consistent local assignments glue to a homomorphism | `Decomposition.hom_iff_bagAssignments`, [BagHomomorphism](TreewidthHom/BagHomomorphism.lean) |
 | Adjacent-bag specialisation for paths | `Decomposition.hom_iff_pathBagAssignments`, [BagHomomorphism](TreewidthHom/BagHomomorphism.lean) |
 | A guess on a feedback vertex set extends exactly when it preserves edges inside the set and every root of the remaining forest has a feasible pair | `Feedback.extends_iff`, `Feedback.feasible_iff`, [FeedbackHomomorphism](TreewidthHom/FeedbackHomomorphism.lean) |
+| Join minor under a common forbidden last coordinate | `ListReduction.join_minor`, [ListMinor](TreewidthHom/ListMinor.lean) |
+| Minor monotonicity of treewidth, pathwidth and feedback vertex number | `MinorModel.treewidth_le`, `pathwidth_le`, `fvs_le`, [MinorModel](TreewidthHom/MinorModel.lean) |
+| Exact treewidth and pathwidth increases on joining a clique | `treewidth_apexJoin`, `pathwidth_apexJoin`, [JoinWidth](TreewidthHom/JoinWidth.lean) |
+| Exact treewidth and feedback-number transfer; pathwidth lower bound | `ListReduction.exact_parameter_transfer`, `source_width_lower`, [ListExact](TreewidthHom/ListExact.lean) |
+| Target capping and bipartiteness for oversized targets | `OddCycle.hom_iff_capped`, `hom_iff_bipartite_of_card_lt`, [BinaryTarget](TreewidthHom/BinaryTarget.lean) |
+| Odd closed walks contain odd cycles; finite odd girth is attained | `OddCycle.odd_cycle_of_odd_closed_walk`, `exists_oddGirth_eq_length`, [OddGirth](TreewidthHom/OddGirth.lean) |
+| Odd cycles are cores; recognition iff mapping to a shortest odd cycle | `OddCycle.cycle_isCore`, `hasOddCycleCore_iff_of_oddGirth`, [OddCycleCore](TreewidthHom/OddCycleCore.lean) |
+| Target-free finite reduction | `ListReduction.source_hasOddCycleCore_iff`, [OddCycleCore](TreewidthHom/OddCycleCore.lean) |
 
 Names abbreviated by `ListReduction` above are under `TreewidthHom.OddCycle`;
 other infrastructure is under `TreewidthHom`.
@@ -67,7 +75,19 @@ Each original edge is represented once, using increasing vertex indices.
 The executable constructor follows the same graph up to vertex renaming.
 The sharper treewidth upper bound holds even for full lists. The exact
 parameter equalities in the paper use a forbidden private coordinate at every
-hub and an input edge; they are not conclusions of the generic Lean reduction.
+hub and an input edge. They are checked by `exact_parameter_transfer` under
+those explicit hypotheses; the generic upper-bound theorem remains applicable
+to full lists. The pathwidth lower bound requires only nonempty input.
+
+The new minor model uses disjoint, nonempty connected branch sets with an edge
+witness for each minor edge. Its decomposition transfer and feedback-set
+projection prove minor monotonicity. `TreeHelly` proves the finite Helly property
+for subtrees, giving the join's exact treewidth and pathwidth increases.
+`OddCycle.oddGirth` is the infimum of the lengths
+of odd cycles, with infinity when none exists. Odd cycles are proved to satisfy
+the finite-core endomorphism criterion. Recognition is stated as existence of
+homomorphisms in both directions with an odd cycle; no algorithm for constructing
+a canonical core is asserted.
 
 ## Outside Lean
 
@@ -77,10 +97,11 @@ The following are not formalised as machine-level theorems:
 - the logspace transducer and the polynomial number of output bags;
 - time and space analysis of the XNLP, XALP and W[P] membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
-- the join minor and the treewidth, pathwidth, and feedback-number lower bounds;
-- the binary target-length equivalence and its logspace transducer (the
-  underlying odd-closed-walk length inequality is checked);
-- the odd-cycle-core and circular-colouring corollary.
+- the implementation and resource bound of the binary-to-unary transducer
+  (its target-capping equivalence is checked);
+- the circular-chromatic-number interpretation, and the complexity
+  classifications for odd-cycle-core recognition (its graph-theoretic equivalence
+  and finite reduction are checked).
 
 The paper provides proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
@@ -104,7 +125,7 @@ precise scope and reproduction commands.
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 63 declarations
+`scripts/check_formalization.py` builds the library and audits the 92 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report
@@ -125,4 +146,4 @@ See [reports/list-cycle-results.json](reports/list-cycle-results.json).
 Regression tests additionally validate the join-minor branch sets and exhaustively
 check the feedback-number lower bound on an edge and a triangle. They also check
 the sharper treewidth certificate on full and empty lists. These finite examples
-do not replace the prose proof of exactness.
+supplement the universal Lean proof of exactness.

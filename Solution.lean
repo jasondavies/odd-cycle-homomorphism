@@ -41,7 +41,19 @@ theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
       (0 < m → G.egirth = n) ∧
       ((∀ v, ∃ d, d ∉ L v) → G.Connected) ∧
       Nat.card V ≤ 2+m+m*n*n+(m*n+m*m)*n ∧
-      Nat.card G.edgeSet ≤ 2*Nat.card V := by
+      Nat.card G.edgeSet ≤ 2*Nat.card V ∧
+      ((∀ v, ((n-1 : ℕ) : ZMod n) ∉ L v) →
+        (0 < m → treewidth F + 2 ≤ treewidth G ∧ pathwidth F + 2 ≤ pathwidth G) ∧
+        ((∃ u v, F.Adj u v) → treewidth G = treewidth F + 2 ∧ fvs G = fvs F + 2)) ∧
+      (∀ k, 5 ≤ k →
+        (Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod k))) ↔
+          Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod (min k (2*Fintype.card V+5))))))) ∧
+      (0 < m →
+        ((∃ k, 3 ≤ k ∧ Odd k ∧
+          Nonempty (G →g (circulantGraph {1} : SimpleGraph (ZMod k))) ∧
+          Nonempty ((circulantGraph {1} : SimpleGraph (ZMod k)) →g G)) ↔
+        ∃ c : Fin m → ZMod n, (∀ v, c v ∈ L v) ∧
+          ∀ u v, F.Adj u v → c u ≠ c v)) := by
   classical
   let : Fact (1 < n) := ⟨by omega⟩
   let : Fintype (Link F L) := Subtype.fintype _
@@ -52,15 +64,24 @@ theorem Palomar.list_elimination {m n : ℕ} (F : SimpleGraph (Fin m))
     target_pathWidth n (by omega), ?_,
     treewidth_source_le F L, pathwidth_source_le F L hn, fvs_source_le F L hn,
     source_degenerate F L, source_le_egirth F L hn, source_egirth F L hn,
-    source_connected F L hn, source_card_le F L, source_edges_le F L⟩
-  intro S hS
-  let S' : Finset (SourceVertex F L) := Finset.univ.filter (fun v => removed S v)
-  have hset : {v : SourceVertex F L | v ∉ S'} = {v | ¬ removed S v} := by
-    ext v
-    simp [S']
-  refine ⟨S', ?_, ?_⟩
-  · rw [← removed_card F L S, Nat.card_eq_fintype_card, Fintype.card_subtype]
-  · rw [hset]
-    exact source_feedback F L S hn hS
+    source_connected F L hn, source_card_le F L, source_edges_le F L, ?_, ?_,
+    source_hasOddCycleCore_iff F L hodd hn⟩
+  · intro S hS
+    let S' : Finset (SourceVertex F L) := Finset.univ.filter (fun v => removed S v)
+    have hset : {v : SourceVertex F L | v ∉ S'} = {v | ¬ removed S v} := by
+      ext v
+      simp [S']
+    refine ⟨S', ?_, ?_⟩
+    · rw [← removed_card F L S, Nat.card_eq_fintype_card, Fintype.card_subtype]
+    · rw [hset]
+      exact source_feedback F L S hn hS
+  · intro hL
+    refine ⟨fun hm => source_width_lower F L hn hm hL, ?_⟩
+    intro hedge
+    have h := exact_parameter_transfer F L hn hL hedge
+    exact ⟨h.1, h.2.1⟩
+  · intro k hk
+    let : Fact (1 < k) := ⟨by omega⟩
+    exact hom_iff_capped hk
 
 end TreewidthHom

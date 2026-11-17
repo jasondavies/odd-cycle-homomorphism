@@ -16,8 +16,11 @@ project:
     explicit polynomial vertex and linear edge bounds. The proved witness is
     the repository's reference-cycle and inequality-path construction. This
     submission records a finite structural theorem; the manuscript's complexity
-    classifications, matching parameter lower bounds, and machine resource
-    analysis are not part of the formal statement.
+    classifications and machine resource analysis are not part of the formal
+    statement. Under a common forbidden last coordinate, the statement includes
+    matching treewidth and feedback-number bounds for inputs with an edge and a
+    pathwidth lower bound for nonempty inputs. It also includes target capping
+    and the target-free odd-cycle-core reduction for the same witness graph.
   authors:
     - Jason Davies
   responsible_maintainers:
@@ -142,9 +145,12 @@ fidelity:
     transducer; Solution.lean instantiates the witness with the concrete graph.
     Lists are arbitrary subsets of Z/nZ, so connectedness requires every list to
     omit a residue. Exact girth requires a nonempty input. The generic bounds
-    do not require the padded palettes used in the manuscript. Matching minor-based
-    lower bounds, binary-length equivalence, core/circular-colouring recognition,
-    external complexity results, and machine resource bounds remain outside Lean.
+    do not require the padded palettes used in the manuscript. The matching lower
+    bounds explicitly require the common forbidden last coordinate, and exact
+    treewidth and feedback-number transfer require an input edge. Core recognition
+    is expressed by homomorphisms in both directions with an odd cycle. The
+    circular-chromatic-number interpretation, external complexity results and
+    machine resource bounds remain outside Lean.
 
 review:
   status: agent-reviewed
@@ -158,13 +164,18 @@ review:
 
 alignment:
   statements:
-    - source: "Manuscript Theorem 2, upper bounds and finite decision equivalence"
+    - source: "Manuscript Theorem 2, structural bounds and finite decision equivalence"
       lean: TreewidthHom.Palomar.list_elimination
       module: Solution.lean
       status: proved
-      note: "Uses ListReduction.reduction and numerical parameter bounds; no matching lower bounds are asserted."
+      note: "Includes matching treewidth and feedback-number bounds with their explicit palette and edge hypotheses, and the pathwidth lower bound for nonempty inputs."
     - source: "Manuscript sparse-source proposition and connectedness argument"
       lean: TreewidthHom.Palomar.list_elimination
       module: Solution.lean
       status: proved
       note: "Uses source_degenerate, source_le_egirth, source_egirth, source_connected, and source_edges_le."
+    - source: "Manuscript target-capping lemma and odd-cycle-core corollary, finite equivalences"
+      lean: TreewidthHom.Palomar.list_elimination
+      module: Solution.lean
+      status: proved
+      note: "Target capping and target-free recognition are checked for the same witness graph; machine bounds and circular chromatic number are excluded."

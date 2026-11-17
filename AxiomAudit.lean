@@ -66,3 +66,33 @@ import Solution
 #print axioms TreewidthHom.Feedback.exists_orientation_extends
 
 #print axioms TreewidthHom.Palomar.list_elimination
+
+#print axioms TreewidthHom.OddCycle.hom_of_bipartite
+#print axioms TreewidthHom.OddCycle.bipartite_of_hom_misses
+#print axioms TreewidthHom.OddCycle.hom_iff_bipartite_of_card_lt
+#print axioms TreewidthHom.OddCycle.hom_iff_capped
+#print axioms TreewidthHom.OddCycle.capped_length_spec
+#print axioms TreewidthHom.OddCycle.odd_cycle_of_odd_closed_walk
+#print axioms TreewidthHom.OddCycle.exists_oddGirth_eq_length
+#print axioms TreewidthHom.OddCycle.homOfClosedWalk
+#print axioms TreewidthHom.OddCycle.oddGirth_le_of_cycle_hom
+#print axioms TreewidthHom.OddCycle.cycle_isCore
+#print axioms TreewidthHom.OddCycle.girth_le_of_odd_cycle_hom
+#print axioms TreewidthHom.OddCycle.hasOddCycleCore_iff
+#print axioms TreewidthHom.OddCycle.hasOddCycleCore_iff_of_oddGirth
+#print axioms TreewidthHom.OddCycle.ListReduction.source_hasOddCycleCore_iff
+#print axioms TreewidthHom.MinorModel.decomposition
+#print axioms TreewidthHom.MinorModel.treewidth_le
+#print axioms TreewidthHom.MinorModel.pathwidth_le
+#print axioms TreewidthHom.MinorModel.isAcyclic
+#print axioms TreewidthHom.MinorModel.feedback_transfer
+#print axioms TreewidthHom.MinorModel.fvs_le
+#print axioms TreewidthHom.treeSet_helly
+#print axioms TreewidthHom.Decomposition.clique_bag
+#print axioms TreewidthHom.treewidth_apexJoin
+#print axioms TreewidthHom.pathwidth_apexJoin
+#print axioms TreewidthHom.fvs_twoApex_ge
+#print axioms TreewidthHom.OddCycle.ListReduction.join_minor
+#print axioms TreewidthHom.OddCycle.ListReduction.source_width_lower
+#print axioms TreewidthHom.OddCycle.ListReduction.source_fvs_lower
+#print axioms TreewidthHom.OddCycle.ListReduction.exact_parameter_transfer

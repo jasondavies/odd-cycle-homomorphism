@@ -66,9 +66,10 @@ For every nonempty `F`, the same minor also gives
 `pw(F)+2 ≤ pw(G) ≤ pw(F)+6`: joining two adjacent universal vertices raises
 pathwidth by exactly two, by the Helly property for vertex-occurrence intervals.
 
-The paper proves these equalities, including the feedback-number calculation
-for the join. Lean currently checks the upper bounds and palette-padding lemma;
-the minor and matching lower bounds remain prose proofs.
+Lean checks the branch-set minor, minor monotonicity of all three parameters,
+and the matching lower bounds. The exact-transfer theorem explicitly assumes
+that every list omits coordinate `n-1`; the generic upper bounds need no such
+assumption. See [ListExact.lean](TreewidthHom/ListExact.lean).
 
 For `m=|V(F)|`, `e=|E(F)|` and `f=Σ_v(n-|L(v)|)`,
 

@@ -46,8 +46,9 @@ treewidth and feedback vertex number increase by exactly two when the input
 graph contains an edge. The same classifications hold for recognising graphs
 whose core is an odd cycle, with no target supplied. Hardness holds on connected,
 2-degenerate sources of arbitrarily large prescribed constant girth.
-The reduction's decision equivalence, parameter upper bounds, polynomial size,
-and source sparsity and girth properties are checked in Lean~4.
+The reduction's decision equivalence, structural bounds, target capping and
+odd-cycle-core reduction, together with its size and sparsity properties,
+are checked in Lean~4.
 \end{abstract}
 
 \noindent\textbf{AI assistance.}
@@ -153,6 +154,11 @@ constant $c$ gives an algorithm with running time
 $c^{\operatorname{ctw}(G)}|V(G)|^{O(1)}$ for every fixed odd cycle target,
 where $\operatorname{ctw}$ denotes cutwidth~\cite{pr2021}. Our statements concern
 uniform parameterised hardness and completeness as the target length varies.
+Carbonnel gives single-exponential-time, polynomial-space algorithms measured
+in the number of source vertices for target families excluding a topological
+minor, together with improved randomised bounds for fixed odd-cycle
+targets~\cite[Theorems~1 and~2]{carbonnel2026}. These bounds concern source
+order rather than the structural parameters studied here.
 
 Disequality and list gadgets for projective cores are developed by Okrasa and
 Rz\k{a}\.{z}ewski~\cite[preprint version, Lemma~17 and Proposition~19]{or2021}; their fixed-target
@@ -750,8 +756,11 @@ algorithm for $G\to C_g$. Bipartite graphs cannot have odd-cycle cores.
 \paragraph{Artifact availability.}
 The Lean development is in the public repository
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-The verified reduction and executable checks are available at commit
+An earlier verified snapshot of the finite reduction and executable checks is
+available at commit
 \href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/3d0a9d4e7d816ae898ad36ccd8d540cd1db51dcb}{\texttt{3d0a9d4}}~\cite{artifact}.
+The accompanying source revision extends that snapshot with the lower bounds,
+target capping and odd-cycle-core results described below.
 Its \lean{README.md} gives reproduction commands and
 \lean{FORMALIZATION.md} maps the checked statements to declarations.
 
@@ -772,7 +781,10 @@ Using treewidth, pathwidth, and feedback vertex number defined as minima,
 the companion theorem \lean{parameter_reduction} restates the transfer as the
 numerical upper bounds of Theorem~\ref{thm:transfer} and adds 2-degeneracy and
 the girth lower bound. Exact girth for nonempty inputs is proved separately
-by \lean{source_egirth}.
+by \lean{source_egirth}. Under the common omitted-coordinate hypothesis,
+\lean{exact_parameter_transfer} proves the treewidth and feedback-number
+equalities and both pathwidth bounds when $F$ has an edge.
+\lean{source_width_lower} gives the width lower bounds for every nonempty $F$.
 The following names are in the namespace
 \lean{TreewidthHom.OddCycle.ListReduction}.
 
@@ -793,6 +805,9 @@ Girth exactly $n$ for nonempty $F$ & \lean{source_egirth} \\
 Connectedness when every list omits a residue & \lean{source_connected} \\
 At most $2|V(G)|$ edges & \lean{source_edges_le} \\
 Bounds on the parameters themselves & \lean{parameter_reduction} \\
+Join minor with a common forbidden coordinate & \lean{join_minor} \\
+Exact parameter transfer & \lean{exact_parameter_transfer} \\
+Target-free decision equivalence & \lean{source_hasOddCycleCore_iff} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -808,12 +823,21 @@ used for W[P] membership: a guess on a feedback vertex set extends to a
 homomorphism exactly when it preserves the edges inside the set and every
 root of the remaining forest has a feasible pair.
 
-The sharper treewidth upper bound and the odd-closed-walk length bound are
-checked. The minor-based matching lower bounds, the binary-length equivalence
-and its transducer, and the odd-cycle-core and circular-colouring corollary remain
-mathematical arguments in the text. The formal statements do not encode Turing
-machines or complexity classes: the published hardness of List Colouring,
-machine resource bounds, and complexity conclusions are proved or cited here.
+The minor model consists of disjoint, nonempty connected branch sets and
+edge witnesses. Generic lemmas prove minor monotonicity of all three parameters;
+a finite Helly theorem for subtrees gives the join's exact width increases.
+In the namespace \lean{TreewidthHom.OddCycle}, \lean{hom_iff_capped} proves
+Lemma~\ref{lem:cap}'s decision equivalence. The development also proves that
+odd cycles are cores, that odd closed walks contain odd cycles, and that finite
+odd girth is attained. The theorem \lean{hasOddCycleCore_iff_of_oddGirth}
+identifies homomorphic equivalence to an odd cycle with mapping to a shortest
+odd cycle, including when shorter even cycles are present.
+
+The circular-chromatic-number interpretation remains a mathematical argument
+in the text. The formal statements do not encode Turing machines or complexity
+classes: the published hardness of List Colouring, the binary-to-unary
+transducer, machine resource bounds, and complexity conclusions are proved or
+cited here.
 Noncomputable choices used to select bags or roots in structural proofs
 do not stand in for a verified implementation of the logspace transducer.
 
@@ -877,6 +901,11 @@ Hans L. Bodlaender, Carla Groenland and Micha{\l} Pilipczuk.
 Parameterized complexity of Binary CSP: vertex cover, treedepth, and
 related parameters.
 Full version, \href{https://arxiv.org/abs/2208.12543v5}{arXiv:2208.12543v5}, 2023.
+
+\bibitem{carbonnel2026}
+Cl\'ement Carbonnel.
+Faster algorithms for graph homomorphism via tractable constraint satisfaction.
+\href{https://arxiv.org/abs/2602.23000v2}{arXiv:2602.23000v2}, 2026.
 
 \bibitem{cygan2015}
 Marek Cygan, Fedor V. Fomin, {\L}ukasz Kowalik, Daniel Lokshtanov,

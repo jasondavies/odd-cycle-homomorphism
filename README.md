@@ -57,9 +57,13 @@ and adds that the source is 2-degenerate, has girth at least `n`, and is
 connected when every list omits a colour. Lean also checks the correctness
 arguments behind the three membership algorithms, but not their resource bounds.
 
-The matching minor-based lower bounds, binary-length equivalence, and
-odd-cycle-core corollary are proved in the paper, outside Lean, as are the
-complexity classifications and machine resource bounds.
+[`ListReduction.exact_parameter_transfer`](TreewidthHom/ListExact.lean) checks
+the matching treewidth and feedback-number lower bounds under palette padding
+and an input edge. The pathwidth lower bound also holds for nonempty edgeless
+inputs. Lean checks target capping and the target-free odd-cycle-core reduction,
+including the general equivalence with mapping to a shortest odd cycle.
+The circular-chromatic-number interpretation, complexity classifications, and
+machine resource bounds remain outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
 explains the verification boundary.
 
@@ -76,7 +80,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 63 declarations. The finite suite
+The Lean audit builds the library and checks 92 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not
