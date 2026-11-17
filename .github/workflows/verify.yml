@@ -1,0 +1,64 @@
+name: Verification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verification-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  executable:
+    name: Python regressions and finite certificates
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Regression tests, including optimised execution
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_*.py'
+          python3 -O -m unittest discover -s scripts -p 'test_*.py'
+          python3 -OO -m unittest discover -s scripts -p 'test_*.py'
+      - name: Reproduce all finite checks
+        run: |
+          python3 scripts/run_list_cycle_checks.py
+          git diff --exit-code -- reports/list-cycle-results.json
+
+  formalisation:
+    name: Lean audit and Palomar Comparator
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Install the pinned Lean toolchain and fetch mathlib cache
+        uses: leanprover/lean-action@ba3fdfe5c4476c925da13bf11a005ddb47e47aee
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: true
+          use-github-cache: true
+      - name: Build and audit all proved declarations
+        run: python3 scripts/check_formalization.py
+      - name: Install Comparator sandbox support
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+      - name: Compare the statement and proof with the independent kernels
+        run: ./scripts/check_palomar.sh
+      - name: Retain the audit for this checkout
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: lean-verification-${{ github.sha }}
+          path: reports/lean-verification.json
+          if-no-files-found: error

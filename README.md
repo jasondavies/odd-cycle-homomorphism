@@ -82,6 +82,11 @@ Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not
 replace the proofs.
 
+[GitHub Actions](.github/workflows/verify.yml) runs the Lean audit and Palomar
+Comparator, the finite suite, and regression tests in normal and optimised Python
+on pushes and pull requests. The generated Lean audit is retained as a workflow
+artifact tied to the checked commit.
+
 To rebuild the PDF, run `make -C paper`; see [paper/README.md](paper/README.md)
 for LaTeX requirements.
 

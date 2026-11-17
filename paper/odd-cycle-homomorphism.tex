@@ -390,6 +390,7 @@ If $F$ contains an edge, then
 \[
  \tw(G)=\tw(F)+2,\qquad \fvs(G)=\fvs(F)+2.
 \]
+For every nonempty $F$, also $\pw(F)+2\leq\pw(G)\leq\pw(F)+6$.
 \end{proposition}
 \begin{proof}
 Since $q<n$, residue $n-1$ is forbidden at every hub. For each $v$, take
@@ -420,6 +421,14 @@ cover, leaving a star and isolated vertices after deleting the others.
 Also $k\leq m-2$, by retaining the endpoints of an edge. Thus the displayed
 minimum is $k+2$. Feedback vertex number is minor-monotone, so the existing
 upper bound $\fvs(G)\leq k+2$ is exact.
+
+Finally, $\pw(K_2\vee F)=\pw(F)+2$ for nonempty $F$.
+Indeed, restricting any path decomposition of the join to $F$ gives a bag
+with at least $\pw(F)+1$ input vertices. Their occurrence intervals and
+those of the two universal vertices pairwise intersect. By the Helly
+property for intervals, some bag contains all these vertices, giving the
+lower bound. Adding the universal vertices to every input bag gives equality.
+Minor monotonicity and Section~\ref{sec:pathwidth} now give the bounds for $G$.
 \end{proof}
 The minor argument uses a common missing colour, supplied by palette padding.
 The upper bounds also cover edgeless and empty inputs.

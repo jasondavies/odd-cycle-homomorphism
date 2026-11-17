@@ -77,7 +77,7 @@ The following are not formalised as machine-level theorems:
 - the logspace transducer and the polynomial number of output bags;
 - time and space analysis of the XNLP, XALP and W[P] membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
-- the join minor and matching treewidth and feedback-number lower bounds;
+- the join minor and the treewidth, pathwidth, and feedback-number lower bounds;
 - the binary target-length equivalence and its logspace transducer (the
   underlying odd-closed-walk length inequality is checked);
 - the odd-cycle-core and circular-colouring corollary.

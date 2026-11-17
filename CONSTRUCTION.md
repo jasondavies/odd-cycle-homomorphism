@@ -62,6 +62,10 @@ minor monotonicity gives matching lower bounds:
 tw(G) = tw(F)+2,     fvs(G) = fvs(F)+2.
 ```
 
+For every nonempty `F`, the same minor also gives
+`pw(F)+2 ≤ pw(G) ≤ pw(F)+6`: joining two adjacent universal vertices raises
+pathwidth by exactly two, by the Helly property for vertex-occurrence intervals.
+
 The paper proves these equalities, including the feedback-number calculation
 for the join. Lean currently checks the upper bounds and palette-padding lemma;
 the minor and matching lower bounds remain prose proofs.
@@ -100,5 +104,6 @@ homomorphism from `G` exactly when `G` is bipartite. Thus replacing `n` by
 For nonempty input, the constructed graph contains `C_n` and has odd girth `n`.
 It therefore has an odd-cycle core exactly when it maps to `C_n`. Discarding
 the target gives the same complexity classifications for recognising graphs
-whose core is an odd cycle. The paper handles the empty case by a forced-edge
-preprocessing step and proves membership separately.
+whose core is an odd cycle. The paper ensures nonemptiness by adjoining an
+isolated vertex with a singleton list prescribing a fresh colour. This preserves
+all three input parameters. Membership is proved separately.

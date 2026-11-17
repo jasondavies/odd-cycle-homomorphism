@@ -101,6 +101,38 @@ print(json.dumps(hom))
         with self.assertRaises(VerificationError):
             check_tree_decomposition(2, set(), [{0}, {1}, {0}], [(0, 1), (1, 2)], 0)
 
+    def test_decomposition_indices_all_optimization_modes(self):
+        code = """
+from list_cycle_hom import check_path_decomposition, check_tree_decomposition
+from verification import VerificationError
+
+def rejects(check, *args):
+    try:
+        check(*args)
+    except VerificationError:
+        return
+    raise RuntimeError(f"Accepted invalid decomposition: {args!r}")
+
+for vertex in (-1, 1, 0.0):
+    rejects(check_path_decomposition, 1, set(), [{vertex}], 0)
+    rejects(check_tree_decomposition, 1, set(), [{vertex}], [], 0)
+for edge in ((0, -1), (-1, 0), (0, 2), (2, 0), (0, 1.0)):
+    rejects(check_tree_decomposition, 2, set(), [{0}, {1}], [edge], 0)
+rejects(check_path_decomposition, 0, set(), [{-1}], 0)
+rejects(check_tree_decomposition, 0, set(), [{-1}], [], 0)
+rejects(check_path_decomposition, 0, set(), [], 0)
+rejects(check_tree_decomposition, 0, set(), [], [], 0)
+# The valid boundary identifiers and one empty bag remain accepted.
+check_path_decomposition(2, set(), [{0}, {1}], 0)
+check_tree_decomposition(2, set(), [{0}, {1}], [(0, 1)], 0)
+check_path_decomposition(0, set(), [set()], 0)
+check_tree_decomposition(0, set(), [set()], [], 0)
+"""
+        for flags in ([], ["-O"], ["-OO"]):
+            with self.subTest(flags=flags):
+                subprocess.run([sys.executable, *flags, "-c", code], cwd=SCRIPTS,
+                               capture_output=True, text=True, check=True)
+
     def test_audit_accepts_exact_standard_output(self):
         result = audit_output("'test' depends on axioms: [propext, Classical.choice, Quot.sound]",
                               ["test"], [])

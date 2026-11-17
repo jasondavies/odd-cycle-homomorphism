@@ -130,12 +130,17 @@ class Reduction:
 
 
 def check_tree_decomposition(count, edges, bags, tree, width):
+    require(bool(bags), "A tree decomposition must have at least one bag")
+    require(all(isinstance(i, int) and 0 <= i < len(bags)
+                for edge in tree for i in edge), "Invalid decomposition-tree endpoint")
     require(is_forest_without(len(bags), tree, ()))
     require(len(tree) == len(bags) - 1)
     occurrences, common = [0]*count, [0]*count
     covered = set()
     for bag in bags:
         require(len(bag) <= width + 1)
+        require(all(isinstance(v, int) and 0 <= v < count for v in bag),
+                "Invalid bag vertex")
         for v in bag:
             occurrences[v] += 1
         covered.update(itertools.combinations(sorted(bag), 2))
@@ -254,10 +259,13 @@ def is_forest_without(count, adj, removed):
 
 def check_path_decomposition(count, adj, bags, width):
     """Vertex coverage, edge coverage, interval occurrences and the width bound."""
+    require(bool(bags), "A path decomposition must have at least one bag")
     first, last, seen = [None] * count, [None] * count, [0] * count
     covered = set()
     for i, bag in enumerate(bags):
         require(len(bag) <= width + 1, (len(bag), width))
+        require(all(isinstance(x, int) and 0 <= x < count for x in bag),
+                "Invalid bag vertex")
         for x in bag:
             if first[x] is None:
                 first[x] = i
