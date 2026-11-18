@@ -124,9 +124,13 @@ the maximum of the two treewidths even on these targets.
 \paragraph{Prior work and attribution.}
 In May 2025 Amarilli reported workshop reductions indicating
 W[1]-hardness for the parameter $\max\{\tw(G),\tw(H)\}$~\cite{amarilli2016}.
-The public comment leaves the target family and the effect on the source
-feedback vertex number unspecified. The overlap with the odd-cycle
-construction remains unresolved.
+Amarilli later clarified (personal communication) that the reduction from
+$k$-Clique produces a homomorphism instance $G\to H$ with source pathwidth
+$\pw(G)=k$ and target pathwidth $\pw(H)=2$. Thus the workshop reduction
+already gives W[1]-hardness for source pathwidth with a target of pathwidth
+two. Our reduction from List Colouring takes $H$ to be an odd cycle and
+yields the completeness results for supplied decompositions in
+Theorem~\ref{thm:main}.
 
 We use the XNLP-completeness of List Colouring for
 pathwidth~\cite[Theorem~15]{bgns2024} and its XALP-completeness for

@@ -141,8 +141,12 @@ for LaTeX requirements.
 The original question appears on [Amarilli's research-question list](https://a3nm.net/work/research/questions/#complexity-of-query-evaluation-parameterized-by-treewidth)
 and in the graph-homomorphism formulation linked above.
 [Amarilli's May 2025 comment](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth#comment124806_34877)
-already announced W[1]-hardness reductions. Their relationship to this
-construction remains unresolved; this repository makes no priority claim.
+reported workshop reductions indicating W[1]-hardness. Amarilli later clarified
+in personal communication that the reduction from $k$-Clique has source
+pathwidth $k$ and target pathwidth two. This already gives W[1]-hardness
+parameterised by source pathwidth for targets of pathwidth two. Our List
+Colouring reduction gives XNLP-completeness for supplied path decompositions
+and XALP-completeness for supplied tree decompositions with odd-cycle targets.
 The paper cites the published List Colouring results used in the reduction.
 Development and drafting used AI assistance; the paper describes the scope
 and review status.

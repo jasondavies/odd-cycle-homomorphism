@@ -56,8 +56,10 @@ sources:
     relationship: background
     note: >-
       Motivating question and prior announcement of W[1]-hardness reductions.
-      Their relationship to this construction remains unresolved. Neither novelty
-      nor priority is established by the formalisation or by the reviews so far.
+      In a subsequent personal communication, Amarilli identified k-Clique as
+      the starting problem for the workshop reduction and specified source
+      pathwidth k and target pathwidth two. The present reduction starts from
+      List Colouring and produces an odd-cycle target.
   - title: "Parameterized problems complete for nondeterministic FPT time and logarithmic space"
     authors:
       - Hans L. Bodlaender
