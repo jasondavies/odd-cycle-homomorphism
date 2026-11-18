@@ -37,9 +37,16 @@ it maps to its own shortest odd cycle; the paper gives the equivalent
 circular-colouring formulation.
 
 Both problems admit an algorithm taking `2^O(r)` time up to polynomial factors,
-where `r` is the feedback edge number. This gives fixed-parameter tractability
+where `r` is the feedback edge number. The same algorithm tests circular-clique
+thresholds given in binary and computes the exact circular chromatic number.
+This gives fixed-parameter tractability
 for feedback vertex number plus maximum degree and for the ratio of order to
 girth. Both problems are polynomial-time decidable at girth `Ω(N log log N / log N)`.
+
+The [companion note on long odd cycles](paper/long-odd-cycles.pdf) gives a
+deterministic algorithm with running time $2^{O(N/\ell)}$ up to polynomial
+factors for a target of length $\ell$. Core recognition is therefore polynomial
+at odd girth $\Omega(N/\log N)$, even when short even cycles are present.
 
 This answers the [treewidth question](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth):
 homomorphism parameterised by the maximum of the two input treewidths is
@@ -80,7 +87,8 @@ order at most `n`, Lean also proves exact girth `n` and at most `4*n^3` output v
 
 Lean also checks the [subdivision projection](TreewidthHom/OddSubdivision.lean) and
 the [walk interval](TreewidthHom/CycleWalkInterval.lean) used by the feedback-edge
-algorithm. The graph-level amplification and algorithm are proved in the manuscript.
+algorithm. The graph-level amplification and the general circular-clique algorithm are
+proved in the main manuscript. The long-target algorithm is proved in the companion note.
 
 The circular-chromatic-number interpretation, complexity classifications, and
 machine resource bounds remain outside Lean.
@@ -111,14 +119,14 @@ Comparator, the finite suite, and regression tests in normal and optimised Pytho
 on pushes and pull requests. The generated Lean audit is retained as a workflow
 artifact tied to the checked commit.
 
-To rebuild the PDF, run `make -C paper`; see [paper/README.md](paper/README.md)
+To rebuild both PDFs, run `make -C paper`; see [paper/README.md](paper/README.md)
 for LaTeX requirements.
 
 ## Repository guide
 
 | Path | Purpose |
 | --- | --- |
-| [paper/](paper/) | Manuscript source, vector diagram, and compiled PDF |
+| [paper/](paper/) | Both manuscript sources, vector diagram, and compiled PDFs |
 | [CONSTRUCTION.md](CONSTRUCTION.md) | Short mathematical overview |
 | [FORMALIZATION.md](FORMALIZATION.md) | Lean theorem map, scope, and audit details |
 | [TreewidthHom/](TreewidthHom/) | Lean proofs; [TreewidthHom.lean](TreewidthHom.lean) is the library entry point |

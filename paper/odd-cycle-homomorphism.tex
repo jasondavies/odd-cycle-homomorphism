@@ -36,37 +36,34 @@
 \maketitle
 
 \begin{abstract}
-Does a nonbipartite graph map to its own shortest odd cycle?
-Recognising graphs whose core is an odd cycle is XNLP-complete for the width
-of a supplied path decomposition and XALP-complete for the width of a supplied
-tree decomposition. For feedback vertex number it is W[SAT]-hard and in W[P].
-The same bounds hold for homomorphism to an input odd cycle.
-Hardness persists on connected, 2-degenerate graphs of girth
-$\Omega(N^{1-\varepsilon})$ for every fixed $0<\varepsilon<1$, where
-$N=|V(G)|$. Both problems admit a $2^{O(r)}$-time algorithm up to polynomial
-factors for feedback edge number $r$. This gives polynomial time at girth
-$\Omega(N\log\log N/\log N)$, including linear girth.
-Our reduction from List Colouring increases treewidth
-and feedback vertex number by exactly two on inputs with an edge.
-We also reduce weighted antimonotone formula satisfiability to List Colouring
-with a supplied feedback vertex set. Lean~4 checks the decision
-equivalences from a weighted formula through to both graph problems,
-the feedback-set witness, the subdivision projection and the walk criterion
-used by the algorithm.
+A nonbipartite graph has an odd-cycle core precisely when it maps to its
+shortest odd cycle. Core recognition and homomorphism to an input odd
+cycle are both XNLP-complete
+for the width of a supplied path decomposition, XALP-complete for the
+width of a supplied tree decomposition, and W[SAT]-hard and in W[P] for
+feedback vertex number. Hardness persists on connected, 2-degenerate
+$N$-vertex sources of girth $\Omega(N^{1-\varepsilon})$ for any fixed
+$0<\varepsilon<1$.
+Our reduction encodes lists by cycles sharing an edge. On inputs with an
+edge it increases treewidth and feedback vertex number by exactly two.
+Lean~4 checks this structural transfer.
+For feedback \emph{edge} number $r$, we compute the exact circular
+chromatic number in $2^{O(r)}$ time up to polynomial factors, which gives
+the same upper bound for both decision problems.
 \end{abstract}
 
-\noindent\textbf{AI assistance.}
-Mathematical development, formalisation and drafting used AI assistance
-under human direction. Appendix~\ref{app:lean} describes the verification scope.
-
 \section{Introduction}
-A shortest odd cycle $C_g$ of a nonbipartite graph $G$ maps to $G$ by inclusion.
-Gerards studied when there is a homomorphism in the reverse direction~\cite{gerards1988}.
-Such a map preserves adjacency and, after a rotation or reflection of $C_g$,
-fixes the entire cycle. Deciding whether it exists amounts to recognising
-graphs whose core is an odd cycle. We study the complexity of this question
-when the source graph admits a narrow decomposition or becomes a forest
-after deleting a few vertices or edges.
+Does a nonbipartite graph $G$ map to its shortest odd cycle $C_h$?
+Gerards studied this question for graph homomorphisms~\cite{gerards1988}.
+It is also a recognition problem. The \emph{core} of a finite graph is its
+smallest homomorphically equivalent subgraph, unique up to isomorphism.
+If $G\to C_h$, the inclusion $C_h\to G$ gives equivalence, and $C_h$ is
+a core because every endomorphism of an odd cycle is an automorphism
+(Lemma~\ref{lem:rigid}). Conversely, if the core is $C_\ell$ for some
+odd $\ell$, then $C_\ell\to G$ gives an odd closed walk containing an
+odd cycle, so $h\leq\ell$. Composing $C_h\to G\to C_\ell$ gives
+$\ell\leq h$ by the same argument in $C_\ell$. Thus $\ell=h$.
+Bipartite graphs have no odd-cycle core.
 
 \begin{theorem}\label{thm:main}
 Consider two decision problems on a finite simple undirected graph $G$.
@@ -81,39 +78,25 @@ on connected, 2-degenerate graphs of girth $\Omega(|V(G)|^{1-\varepsilon})$
 for every fixed $0<\varepsilon<1$.
 \end{theorem}
 
-Forgetting the supplied decomposition also gives hardness for the
-corresponding minimum width. In the version with an input target, its
-length varies and its treewidth and pathwidth are both exactly two.
-A width-$w$ source tree decomposition
-gives a dynamic programme with running time $|V(H)|^{O(w+1)}$ times
-a polynomial in the input size for an explicit target $H$. Amarilli asked
-whether also bounding the target treewidth gives fixed-parameter
-tractability~\cite{amarilli2016}.
-Theorem~\ref{thm:main} gives XALP-hardness parameterised by the maximum of the two
-input treewidths, and XNLP-hardness for the analogous pathwidth parameter.
-XNLP-hardness implies W[$t$]-hardness for every fixed $t\geq1$~\cite[Lemma~2]{bgns2024}.
-Since $\tw(G)\leq\pw(G)$, this gives, in particular, W[1]-hardness
-parameterised by $\max\{\tw(G),\tw(H)\}$, even when $H$ is an odd cycle.
-The distinction between the two completeness classifications reflects
-whether the algorithm retains successive bag assignments or additionally
-uses a stack of saved parent assignments. Section~\ref{sec:complexity}
-gives the machine definitions and membership arguments.
+Deleting edges leads to a different algorithm. If deleting $r$ edges
+leaves a forest, both problems are solvable in $2^{O(r)}$ time up to
+polynomial factors. In fact we can compute the exact circular chromatic
+number $\chi_c(G)$ within this bound (Theorem~\ref{thm:edge-alg}).
+For odd $h\geq3$, the test $G\to C_h$ is the circular-colouring threshold
+$\chi_c(G)\leq 2h/(h-1)$~\cite{zhu2001}. If $h$ is the odd girth of
+$G$, inclusion of $C_h$ gives the reverse inequality. Core recognition
+therefore tests equality in this lower bound. Corollary~\ref{cor:relative-girth}
+also gives polynomial time for both problems at girth
+$\Omega(N\log\log N/\log N)$.
 
-The problem has an equivalent formulation as circular colouring. A graph has
-a homomorphism to $C_{2k+1}$ exactly when its circular chromatic number is
-at most $2+1/k$~\cite{zhu2001}. Theorem~\ref{thm:main} therefore classifies
-the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in binary,
-under the same three parameters. Section~\ref{sec:core} relates the
-target-free problem to equality in the odd-girth lower bound for $\chi_c$.
-
-The difference between deleting vertices and deleting edges is substantial
-for odd-cycle targets. Theorem~\ref{thm:edge-alg} gives a single-exponential
-algorithm in the number of edges whose deletion leaves a forest.
-It also gives fixed-parameter tractability for $N/g$, where $N$ is the
-source order and $g$ its girth. In particular, both problems are tractable
-at linear girth (Corollary~\ref{cor:relative-girth}).
-
-The hardness proofs start from an additive structural transfer.
+The hardness proofs encode List Colouring in the geometry of an odd cycle.
+All reference cycles share an ordered edge $AB$. Its image determines
+the coordinates in every copy. A path from an input vertex to a forbidden
+coordinate then excludes exactly that colour. Each forbidden occurrence
+gets its own copy and path. Deleting $A,B$ exposes a subdivision of the
+input graph with trees attached. Contracting selected paths instead gives
+the input graph joined to the edge $AB$. These two views of the same graph
+give matching upper and lower bounds.
 
 \begin{theorem}\label{thm:transfer}
 There is a polynomial-size, logspace reduction from List Colouring on a
@@ -130,20 +113,13 @@ feedback vertex number bounds are exact:
 $\tw(G)=\tw(F)+2$ and $\fvs(G)=\fvs(F)+2$.
 \end{theorem}
 
-The construction removes lists by giving each forbidden occurrence $(v,d)$
-its own reference cycle and a single domain link. All reference cycles
-share an ordered edge $AB$, whose endpoints serve as anchors fixing
-a common coordinate system in every homomorphism. A path of length $n-2$
-then excludes one coordinate from the image of a chosen vertex. After
-deleting $A,B$, each reference cycle becomes a path joined to the rest
-of the graph through at most one link, so it cannot create a new cycle.
-This single-link property is the reason for keeping the copies separate.
-
-Deleting the anchors exposes a subdivision of $F$ with attached trees and
-separate tree components; contracting selected reference gadgets instead
-produces $F$ with two adjacent vertices each joined to every vertex of $F$.
-These two descriptions give the matching upper and lower bounds on treewidth
-and feedback vertex number when $F$ contains an edge.
+Theorem~\ref{thm:main} also gives hardness for minimum width by forgetting
+the supplied decomposition. Amarilli asked whether bounding the treewidths
+of both input graphs makes homomorphism fixed-parameter
+tractable~\cite{amarilli2016}. Here the target always has treewidth and
+pathwidth two. Since XNLP-hardness implies W[$t$]-hardness for every fixed
+$t\geq1$~\cite[Lemma~2]{bgns2024}, the reduction gives W[1]-hardness for
+the maximum of the two treewidths even on these targets.
 
 \paragraph{Prior work and attribution.}
 In May 2025 Amarilli reported workshop reductions indicating
@@ -169,7 +145,7 @@ list homomorphism. Their conditional cutwidth bounds also apply to ordinary
 homomorphism for odd-cycle targets~\cite{pr2021}. For each fixed odd cycle
 our reduction transfers algorithms in the opposite direction, from ordinary
 homomorphism to List Colouring with a fixed palette
-(Proposition~\ref{thm:fixed}).
+(Remark~\ref{thm:fixed}).
 Carbonnel gives single-exponential-time, polynomial-space algorithms measured
 in the number of source vertices for target families excluding a topological
 minor, together with improved randomised bounds for fixed odd-cycle
@@ -200,7 +176,7 @@ empty bag. A feedback vertex set is a set whose
 deletion leaves a forest, and $\fvs$ denotes its minimum cardinality.
 
 We identify $V(C_n)$ with $\Z/n\Z$, with consecutive residues adjacent.
-Throughout this section $n\geq5$ is odd.
+Throughout this section $n\geq3$ is odd.
 
 \begin{lemma}[Rigidity]\label{lem:rigid}
 Every homomorphism $f:C_n\to C_n$ has the form
@@ -305,20 +281,11 @@ to differ. The remaining reference copies and domain links are omitted.}
 \label{fig:construction}
 \end{figure}
 
-\paragraph{Example.}
-Let $F$ consist of an edge $uv$, with $L(v)=\{0,1\}$ and
-$L(u)=\{1,2\}$. The palette has size three, so we take $n=5$.
-At $h_v$ the construction excludes $2,3,4$ using three separate reference
-copies; Figure~\ref{fig:construction} shows the first two. For example,
-the link from coordinate $2$ admits endpoint image $0$ via the walk
-$2,3,4,0$, but it cannot have endpoint image $2$: there is no closed
-walk of length three in $C_5$.
-Together the three domain links leave exactly $\{0,1\}$ available at
-$h_v$. Similarly, the links at $h_u$ leave exactly $\{1,2\}$.
-The colouring $c(v)=0$, $c(u)=1$ extends across the original-edge link
-by the walk $0,1,0,1$. Choosing image $1$ at both hubs would satisfy
-their lists but fail this edge link. Repeated images along these walks
-are allowed because homomorphisms need not be injective.
+In Figure~\ref{fig:construction}, take $L(v)=\{0,1\}$ and $L(u)=\{1,2\}$.
+The link from coordinate $2$ allows image $0$ at $h_v$ via the walk
+$2,3,4,0$. It excludes image $2$ because $C_5$ has no closed walk of length
+three. The other domain links enforce the remaining exclusions, and the
+link between the hubs requires different colours.
 
 \par\medskip\noindent\begin{minipage}{\linewidth}
 \begin{lemma}\label{lem:equivalence}
@@ -469,61 +436,13 @@ replace each by its rank. Repeated scans compute these ranks in logarithmic
 space, so $q$ is bounded by the input length even if the original labels
 are large binary integers.
 
-\paragraph{Emitting the graph.}
-Let $N$ denote the length of the explicitly encoded input, including any
-supplied decomposition. Give output vertices identifiers consisting of a
-type tag and a constant number of indices: an original vertex, a residue,
-a reference position, or an original edge and a link position. All indices
-are polynomially bounded in $N$, so an identifier occupies $O(\log N)$
-bits. Nested counters enumerate the vertices and edges. List membership
-and original adjacency are decided by rescanning the input; original
-edges are emitted once, in increasing endpoint order. If consecutive
-integer identifiers are required, the rank of a tuple can be recomputed
-by enumerating its predecessors. Output $n$ in binary; the corresponding
-cycle can also be enumerated explicitly.
-Neither an adjacency table nor a list of output vertices is stored.
-
-\paragraph{Emitting a tree decomposition.}
-Fix an order on the input bags. A reference gadget belongs to the first
-bag containing $v$; an original-edge link belongs to the first bag
-containing both endpoints. Such an owning bag exists by vertex or edge
-coverage and can be found by scans.
-
-The reference-path root has coordinate $r=\max\{2,d\}$. Its bag has
-parent the owning input bag; the bag at any other private coordinate $j$
-has parent $j+1$ if $j<r$, and $j-1$ if $j>r$, within the same copy.
-Its vertex parent follows the same rule, except that the root's vertex
-parent is $h_v$. Emit the input bags with $A,B$ added, and the reference
-bags $\{A,B,x,\operatorname{parent}(x)\}$. These formulas require only
-coordinate comparisons and give the decomposition of $J$ directly.
-
-A required direct domain edge belongs to its copy's root bag when $d\geq2$,
-and to its owning input bag when $d=0$ or $d=1$. An original edge belongs
-to its owning input bag. Emit each subdivision chain of size-three bags
-from Section~\ref{sec:treewidth} at that bag. Parents within a chain are
-consecutive indices, so both bags and decomposition edges can be emitted
-without a general forest traversal.
-
-\paragraph{Emitting a path decomposition.}
-Implement the two stages of Section~\ref{sec:pathwidth} in order.
-For each input bag, emit its enlargement by $A,B$, followed by the
-reference windows for vertices whose first occurrence is that bag.
-Order these windows by vertex, residue, and reference position. This
-is an explicit stream of bags for $J$. For each required link, find
-the first bag of this stream containing its endpoints by regenerating
-the stream. At that bag insert the link's consecutive internal-vertex
-windows, retaining the whole bag of $J$. Order links with the same
-owning bag by their identifiers. The intermediate stream need not be
-stored: its bags and their contents can be recomputed by counters and
-input scans.
-
-If the input decomposition has $b$ bags, either construction uses
-$O(b+mn^2+(e+f)n)$ output bags. Every bag is emitted one vertex at a
-time, and each owning-bag query stores only indices and membership flags.
-The enumerations have a fixed number of nested loops over polynomially
-bounded ranges. Consequently the transducer uses $O(\log N)$ workspace,
-polynomial time, and polynomial output length, independently of the
-input width. This completes the proof of Theorem~\ref{thm:transfer}.
+Vertices and bags are named by a constant number of polynomially bounded
+indices. Each gadget is processed at the first input bag covering its
+attachment, found by rescanning the input. In the path construction the
+intermediate bag stream can likewise be regenerated on demand.
+Appendix~\ref{app:cert} gives the enumeration and its bag counts. The
+transducer uses logarithmic workspace and polynomial time, completing
+the proof of Theorem~\ref{thm:transfer}.
 
 \subsection{Sparse sources and large girth}\label{sec:sparse}
 \begin{proposition}\label{prop:sparse}
@@ -694,7 +613,11 @@ a supplied feedback set of size $k+2$.
 We may adjoin a single isolated vertex with a singleton list to ensure a
 nonempty input, extending a supplied decomposition by a singleton bag.
 Proposition~\ref{prop:amplify} gives the asserted girth restriction
-with the same feedback set and at most two more vertices per path bag. Section~\ref{sec:core} shows how to discard the target.
+with the same feedback set and at most two more vertices per path bag.
+The resulting graph has a shortest cycle of odd length equal to the target
+length. By the equivalence in the introduction, discarding the target
+proves the same hardness for core recognition. These graphs have chromatic
+number three, by 2-degeneracy and the presence of an odd cycle.
 
 \subsection{Membership}
 We first bound the target length so that binary encoding does not increase
@@ -744,64 +667,17 @@ image for $v$, independent of the chosen occurrence. Vertex coverage
 defines this map on all of $G$, and edge coverage makes it a homomorphism.
 \end{proof}
 
-\paragraph{Paths: two assignments.}
-Process the supplied bags in order. Guess an image in
-$\{0,\ldots,n-1\}$ for each vertex of the next bag. Check its internal
-edges against adjacency in $C_n$, and compare images for every vertex
-shared with the preceding bag. Reject on any failure; otherwise discard
-the preceding assignment and continue. Lemma~\ref{lem:bags} proves
-correctness, including when the source is disconnected.
-
-There are at most $2(w+1)$ vertex-image records on the work tape at once.
-Both vertex identifiers and images occupy $O(\log N)$ bits, since the
-graph is explicit and $n$ has been capped by Lemma~\ref{lem:cap}. Scans of the input and of the two
-records suffice for all tests. There are at most $N$ bags and each has
-at most $N$ entries, so even repeated pairwise comparisons take polynomial
-time with an exponent independent of $w$. The working space is
-$O((w+1)\log N)$, proving XNLP membership.
-
-\paragraph{Trees: saved parent assignments.}
-Root the supplied decomposition tree and order children by their input
-indices. Guess and check the root assignment. Keep the current bag index,
-its assignment, and the next-child
-position on the work tape. Before visiting a child, guess and check the
-child assignment and its agreement with the current assignment. Then
-push a frame containing the parent index, the \emph{unchanged} parent
-assignment, and the position of the next child to be visited. Continue
-with the child. On completing its subtree, pop the frame and restore
-the parent state before considering another child. At a leaf, return
-immediately; completion at the root accepts.
-
-This procedure uses only pushes and pops at the top of the auxiliary
-stack. In particular, the parent assignment is restored rather than
-guessed again, so different child subtrees must respect the same choices
-on the parent bag. Every bag receives one assignment and every tree edge
-is checked once, giving correctness by Lemma~\ref{lem:bags}. At most two
-bag assignments and a constant number of counters occupy the work tape;
-each stack frame has $O((w+1)\log N)$ bits. The total stack size need
-not satisfy this working-space bound. Each frame is pushed and popped
-once, and children can be located by input scans, so the total running
-time is polynomial. This proves XALP membership.
-Both bag-assignment algorithms apply to arbitrary explicitly given targets
-$H$, using adjacency in $H$ in place of adjacency in $C_n$.
-
-\paragraph{Checking the certificate.}
-The algorithms do not assume valid decompositions as a promise.
-We encode a tree by a designated root and one parent
-pointer for every other bag. Reject out-of-range pointers and require
-every bag to reach the root within $b$ steps, where $b$ is the number of
-bags. This checks that the index graph is a tree using counters and
-rescans.
-
-For each graph vertex $v$, count its occurrence bags, say $a_v$, and
-the tree edges with both endpoints among those bags, say $e_v$.
-The induced index subgraph is a forest, so it is nonempty and connected
-exactly when $a_v>0$ and $e_v=a_v-1$. Thus these counts check vertex
-coverage and connected occurrences. Bag entries, duplicate entries,
-bag sizes, and coverage of each graph edge are checked by scans.
-For a path, check that every occurrence set is a nonempty interval.
-These preliminary checks take logarithmic workspace and polynomial time.
-No decomposition-finding algorithm is assumed.
+\paragraph{Supplied width.}
+On a path, guess one bag assignment at a time and check its internal edges
+and agreement with the preceding bag. On a rooted tree, visit children in
+depth-first order. Save the parent assignment, bag index and next-child
+index on the auxiliary stack before descending, then restore them on return.
+Every sibling thus sees the same parent assignment. Lemma~\ref{lem:bags}
+proves correctness in both cases. At most two assignments occupy the work
+tape, using $O((w+1)\log N)$ bits for width $w$ and input length $N$.
+Each bag and tree edge requires only polynomially many input scans.
+This gives XNLP membership on paths and XALP membership on trees.
+Appendix~\ref{app:cert} gives the preliminary logspace certificate check.
 
 \paragraph{Feedback vertex number.}
 A parameterised problem is in W[P] if a nondeterministic Turing machine
@@ -824,148 +700,103 @@ bound~\cite[Theorem~2]{bgp2023}, since the standard encoding preserves the
 constraint graph. For both List Colouring and the input-cycle problem, the
 remaining feedback-number gap is between W[SAT]-hardness and W[P]-membership.
 
-\subsection{Running-time transfer for a fixed target}
-Write $O^*(\cdot)$ to suppress polynomial factors in the input length.
-\begin{proposition}\label{thm:fixed}
-Fix an odd $q\geq5$. Given a feedback vertex set of size $s$, deciding
-$G\to C_q$ takes $O^*(q^s)$ time. For any fixed $b>1$, an $O^*(b^s)$
-algorithm for this problem yields an $O^*(b^s)$ algorithm for
-List Colouring with lists from $q$ colours and a supplied feedback set.
-\end{proposition}
-\begin{proof}
-Enumerate all $q^s$ assignments to the supplied set and run the polynomial
-forest extension test above. For the transfer, set $n=q$ in the construction
-of Section~\ref{sec:reduction} and use the whole palette $\Z/q\Z$.
-Lemma~\ref{lem:equivalence} works for arbitrary lists on this palette.
-By Section~\ref{sec:feedback}, the input feedback set yields an output
-feedback set of size $s+2$, even when some lists contain all $q$ colours.
-The output has polynomial size for fixed $q$, and $b^{s+2}=b^2 b^s$.
-\end{proof}
-Lokshtanov, Marx and Saurabh relate improved exponential bases for
-fixed-palette List Colouring to faster SAT algorithms~\cite{lms2018}.
-The October 2026 algorithm for counting satisfying assignments of $k$-CNF
-runs in deterministic $2^{o(N)}$ time up to polynomial input factors for
-every fixed clause width $k$, where $N$ counts variables~\cite{eth2026}.
-This refutes the bounded-width Strong Exponential Time Hypothesis (SETH) and
-removes that basis for claiming optimality of $q$ here.
-The parameterised hardness proofs of Theorem~\ref{thm:main} use unconditional
-reductions.
+\paragraph{Core recognition.}
+For the width algorithms, guess an odd $3\leq\ell\leq|V(G)|$ and verify
+$C_\ell\to G$ by guessing a closed walk of length $\ell$ in logarithmic
+space. Then check $G\to C_\ell$ with the corresponding bag algorithm.
+For W[P], reject bipartite graphs and compute the odd girth deterministically
+in polynomial time before guessing the feedback-set images. The odd girth
+is the minimum distance between the two copies of any one vertex in the
+bipartite double cover, since this is the minimum length of an odd closed
+walk. This completes the proof of Theorem~\ref{thm:main}.
 
-\subsection{Targets of width one}
-Homomorphism to targets of treewidth at most one is polynomial-time decidable.
-If a target forest has an edge, a source maps to it exactly when the source is bipartite:
-a bipartition maps to that edge, and a homomorphism into a bipartite graph
-implies a bipartition of the source. Nonempty edgeless targets accept
-exactly edgeless sources, and an empty target accepts exactly the empty
-source. These cases are polynomial-time decidable. On the other hand,
-fixing the target cycle itself would make the source-width problem FPT
-by the usual dynamic programme; variability of $n$ is essential.
+\begin{remark}[Fixed target]\label{thm:fixed}
+For fixed odd $q\geq5$, enumerating all assignments on a supplied feedback
+set of size $s$ takes $O^*(q^s)$ time, where $O^*$ suppresses polynomial
+factors. Conversely, an $O^*(b^s)$ algorithm for $C_q$ yields the same
+bound for List Colouring on $q$ colours. At $n=q$
+the decision equivalence holds for arbitrary lists, and the supplied set
+grows by two, costing a factor $b^2$ for fixed $b>1$. This transfer is
+unconditional.
+\end{remark}
 
-\subsection{Recognising odd-cycle cores}\label{sec:core}
-A finite graph's \emph{core} is its smallest homomorphically equivalent
-subgraph, unique up to isomorphism. Every odd cycle is a core by rigidity
-(the same proof applies to $C_3$). Mapping a graph to its own shortest odd
-cycle is a classical question studied by Gerards~\cite{gerards1988}.
-Write $g$ for the length of a shortest odd cycle in a nonbipartite graph $G$
-(its \emph{odd girth}). Recognition asks whether $G$ attains the corresponding
-lower bound on its circular chromatic number:
-\[
- \operatorname{core}(G)\cong C_g
- \quad\Longleftrightarrow\quad G\to C_g
- \quad\Longleftrightarrow\quad \chi_c(G)=\frac{2g}{g-1}.
-\]
-\begin{proof}[Proof of Theorem~\ref{thm:main}, target-free case]
-If $G$ is homomorphically equivalent to $C_\ell$, then $C_\ell\to G$
-gives an odd closed walk of length $\ell$, containing an odd cycle;
-hence $g\leq\ell$. A shortest odd cycle also gives
-$C_g\to G\to C_\ell$, so $\ell\leq g$ by the odd-walk argument in
-Lemma~\ref{lem:cap}. Thus $\ell=g$. Conversely, $G\to C_g$ and the
-inclusion of a shortest odd cycle give homomorphisms in both directions.
-Circular chromatic number is monotone under homomorphisms, and
-$\chi_c(C_g)=2g/(g-1)$. Together with the circular-colouring characterisation
-of $G\to C_g$, this proves the displayed equivalences.
+\begin{remark}[Forest targets]
+If a target forest has an edge, its sources are exactly the bipartite
+graphs. A nonempty edgeless target accepts precisely edgeless sources,
+and an empty target accepts only the empty source. Thus at target
+treewidth one the problem is polynomial-time decidable.
+\end{remark}
 
-For hardness, the output of Proposition~\ref{prop:amplify} has a shortest
-cycle of length $tn$, which is odd. Its core is an odd cycle exactly when it
-maps to $C_{tn}$. The reduction can therefore discard the target. All source restrictions
-are inherited; in particular these hard instances have chromatic number
-exactly three, since they are 2-degenerate and contain an odd cycle.
-
-For XNLP and XALP membership, guess an odd $3\leq\ell\leq|V(G)|$ and
-verify $C_\ell\to G$ by guessing a closed walk of length $\ell$, using
-logarithmic workspace. Then run the corresponding bag-assignment algorithm
-for $G\to C_\ell$, including the case $\ell=3$. These two phases fit the
-same time and space bounds. For W[P], compute the odd girth in deterministic
-polynomial time, rejecting bipartite graphs, and use the feedback vertex
-algorithm for $G\to C_g$. Bipartite graphs cannot have odd-cycle cores.
-\end{proof}
-
-\section{Algorithms from feedback edge number and girth}\label{sec:edge-alg}
-For a graph with $c$ connected components, write
-$r=|E(G)|-|V(G)|+c$. This is its \emph{feedback edge number}, the
-number of edges outside a spanning forest. We use $I$ for the input
-and $N$ for the number of source vertices.
+\section{Circular colouring by feedback edge number}\label{sec:edge-alg}
+For $p\geq2q\geq2$, the circular clique $K_{p/q}$ has vertex set
+$\Z/p\Z$. Two colours are adjacent when their difference lies in the
+integer interval $[q,p-q]$ modulo $p$. Thus $K_{(2k+1)/k}$ is
+isomorphic to $C_{2k+1}$, since its two steps are $\pm k$ and $k$ is
+coprime to $2k+1$. Write $N=|V(G)|$ and $r=|E(G)|-N+c$, where $c$
+is the number of connected components. This \emph{feedback edge number}
+counts the edges outside a spanning forest.
 
 \begin{theorem}\label{thm:edge-alg}
-Homomorphism to an odd cycle given in binary and recognition of odd-cycle
-cores are decidable in $2^{O(r)}|I|^{O(1)}$ time and polynomial space.
+For positive $p,q$ given in binary with $p\geq2q$, deciding
+$G\to K_{p/q}$ takes $2^{O(r)}|I|^{O(1)}$ time and polynomial space,
+where $|I|$ is the input length. The exact circular chromatic number of
+$G$ can be computed within the same bounds.
 \end{theorem}
 \begin{proof}
-Fix an odd target length $n\geq3$. An isolated vertex or a vertex of
-degree one can be deleted, since any colouring of the remainder extends.
-Repeat until the remaining graph has minimum degree two or is empty.
-A component consisting of a cycle of length $L$ maps to $C_n$ precisely
-when $L$ is even or $L\geq n$. For even $L$ alternate along one edge.
-For odd $L$ a closed walk must travel at least $n$ steps, and once
-$L\geq n$ a tour of the target can be padded with backtracking pairs.
-
-In each remaining component suppress the degree-two vertices, replacing
-each maximal chain by an edge labelled with its length $L$. Keep loops
-and parallel edges, and count a loop twice in the degree. The resulting
-multigraph has minimum degree three and the same feedback edge number
-$r_i$ as its component. If it has $b$ vertices and $e$ edges, then
-$3b\leq2e$ and $e=b+r_i-1$, so $e\leq3(r_i-1)$. There are at most
-$3r$ labelled edges in total. Their interiors in the original graph are
-disjoint, so feasibility depends only on simultaneous choices of colours
-at their endpoints.
-
-Write $h=(n+1)/2$ and use coordinates $z_v=h x_v\bmod n$ for the
-original colours $x_v$. This is a bijection since $2h\equiv1\bmod n$.
-A chain oriented from $u$ to $v$ admits precisely the displacements
-$x_v-x_u=-L+2j\bmod n$, $0\leq j\leq L$, by choosing $j$ forward steps.
-Consequently $z_v-z_u$ ranges over the cyclic interval starting at
-$-hL$ and containing $L+1$ successive residues. If $L\geq n-1$, the
-edge imposes no restriction. Otherwise let $a$ represent $-hL\bmod n$
-in $[0,n-1]$. With representatives $0\leq z_v<n$, the allowed integer
-differences are exactly the nonempty intersections
+On an oriented chain of $L$ edges, every step contributes an arbitrary
+integer in $[q,p-q]$. The possible sums are all integers in
 \[
- [1-n,n-1]\ \cap\ [a+kn,a+L+kn],\qquad k\in\{-2,-1,0\}.
+                 [Lq,L(p-q)].
 \]
-This description includes loops, whose endpoint difference is zero.
+Indeed, start each step at $q$ and distribute any desired excess of at most
+$L(p-2q)$ among the steps. Reduction modulo $p$ gives exactly the feasible
+endpoint differences. In particular a component that is a cycle of length
+$L$ is feasible if and only if this interval contains a multiple of $p$.
 
-Enumerate one such interval per constrained edge. A choice $[A,B]$
-imposes $z_v-z_u\leq B$ and $z_u-z_v\leq-A$. Express the coordinate
-bounds relative to one extra variable and translate it to zero after
-solving. The system of difference constraints is feasible precisely when
-its constraint digraph has no negative cycle. Shortest distances from an
-added source of zero-weight arcs give an integral solution. Thus every
-accepted branch yields endpoint colours, and the chosen walks extend
-them independently along the chains. Conversely, any homomorphism gives
-a feasible branch. There are at most $3^{3r}$ branches and each uses
-polynomial time in the bit length of $I$, including $\log n$.
-Enumerating the choices sequentially takes polynomial space.
+Repeatedly remove vertices of degree at most one. Any colouring extends
+back across these deletions, since every target colour has a neighbour.
+Test pure cycle components as above. In each other remaining component,
+suppress the maximal degree-two chains, retaining their lengths and any
+resulting loops or parallel edges. The multigraph has minimum degree
+three and its original feedback edge number $r_i$. With $b$ vertices
+and $e$ edges it satisfies $3b\leq2e$ and $e=b+r_i-1$, hence
+$e\leq3(r_i-1)$. Altogether there are at most $3r$ chains.
 
-For core recognition, reject bipartite graphs and compute the shortest
-odd cycle length $g_{\rm odd}$ in polynomial time. For example, use the
-bipartite double cover and minimise the distance between the two copies
-of the same vertex. The minimum is the shortest odd closed walk length,
-which equals $g_{\rm odd}$. Apply the algorithm with $n=g_{\rm odd}$ by
-Section~\ref{sec:core}.
+For a chain directed from $u$ to $v$, put $w=L(p-2q)$ and let
+$a\in[0,p-1]$ represent $Lq\bmod p$. If $w\geq p-1$ every residue is
+possible. Otherwise, using representatives $0\leq x_v<p$, the permitted
+integer differences $x_v-x_u$ form the nonempty intersections
+\[
+ [1-p,p-1]\ \cap\ [a+jp,a+w+jp],\qquad j\in\{-2,-1,0\}.
+\]
+For a loop the difference is zero. Enumerate one interval per constrained
+chain. Each chosen interval $[A,B]$ gives two difference constraints
+$x_v-x_u\leq B$ and $x_u-x_v\leq-A$. Express the coordinate bounds relative
+to a common variable, which may be translated to zero. A branch is feasible
+exactly when the constraint digraph has no negative cycle. In that case
+shortest distances from a new source of zero-weight arcs give integral
+coordinates. The chain criterion extends the endpoint colours independently
+across their private interiors. Conversely any colouring selects a feasible
+branch. The $3^{3r}$ branches can be processed sequentially. All weights,
+including $L(p-q)$, have polynomial bit length.
+
+For a graph with an edge, $\chi_c(G)$ is the least feasible ratio $p/q$.
+Vince's finite-attainment theorem gives a minimiser with $p\leq N$
+for connected graphs~\cite[Theorem~2]{vince1988}. For a disjoint union
+take the maximum over components, since circular colourability is
+monotone in the ratio~\cite{zhu2001}. Test the $O(N^2)$ pairs with
+$1\leq q\leq p/2$ and $p\leq N$ and return the least feasible ratio by
+integer comparison. We use the usual chromatic conventions $1$ for a
+nonempty edgeless graph and $0$ for the empty graph.
 \end{proof}
 
+The theorem includes homomorphism to an input odd cycle. For recognition,
+reject bipartite graphs and apply the threshold test at
+$p=h,\ q=(h-1)/2$, where $h$ is the odd girth.
+
 \begin{corollary}\label{cor:degree}
-Both problems are fixed-parameter tractable for feedback vertex number
-plus maximum degree.
+Computing $\chi_c(G)$ and deciding both problems of Theorem~\ref{thm:main}
+are fixed-parameter tractable for feedback vertex number plus maximum degree.
 \end{corollary}
 \begin{proof}
 Deleting all edges incident with a minimum feedback vertex set leaves a
@@ -974,8 +805,9 @@ needs only the graph as input.
 \end{proof}
 
 \begin{corollary}\label{cor:relative-girth}
-On cyclic graphs of order $N$ and girth $g$, both problems are decidable
-in $2^{O((N/g)^2)}|I|^{O(1)}$ time. The running time is polynomial whenever
+On graphs of order $N$ and finite girth $g$, computing $\chi_c(G)$ and
+solving both problems of Theorem~\ref{thm:main} take
+$2^{O((N/g)^2)}|I|^{O(1)}$ time. The running time is polynomial whenever
 $g=\Omega(N\log\log N/\log N)$.
 \end{corollary}
 \begin{proof}
@@ -1006,155 +838,108 @@ $r=O(D\log r)=O(\log N)$. Theorem~\ref{thm:edge-alg} now takes polynomial
 time, as it also does for $r<3$.
 \end{proof}
 
-The girth in Corollary~\ref{cor:relative-girth} counts even cycles as
-well as odd ones. Proposition~\ref{prop:amplify} retains hardness at
-every fixed power $N^{1-\varepsilon}$. These results leave open the case of girth $\Omega(N/\log N)$.
+The girth bound counts all cycles. For core recognition a companion
+algorithm~\cite{longnote} gives polynomial time already at \emph{odd}
+girth $\Omega(N/\log N)$, by using the odd girth as the target length.
+For an independently supplied target, its length can be much smaller
+than the source girth. The case of girth $\Omega(N/\log N)$ and unrestricted
+odd target length remains open in these bounds.
 
 \appendix
+\section{Encoding and checking decompositions}\label{app:cert}
+\paragraph{Emitting the graph.}
+Let $N$ denote the length of the explicitly encoded input, including any
+supplied decomposition. Give output vertices identifiers consisting of a
+type tag and a constant number of indices: an original vertex, a residue,
+a reference position, or an original edge and a link position. All indices
+are polynomially bounded in $N$, so an identifier occupies $O(\log N)$
+bits. Nested counters enumerate the vertices and edges. List membership
+and original adjacency are decided by rescanning the input; original
+edges are emitted once, in increasing endpoint order. If consecutive
+integer identifiers are required, the rank of a tuple can be recomputed
+by enumerating its predecessors. Output $n$ in binary; the corresponding
+cycle can also be enumerated explicitly.
+Neither an adjacency table nor a list of output vertices is stored.
+
+\paragraph{Emitting a tree decomposition.}
+Fix an order on the input bags. A reference gadget belongs to the first
+bag containing $v$; an original-edge link belongs to the first bag
+containing both endpoints. Such an owning bag exists by vertex or edge
+coverage and can be found by scans.
+
+The reference-path root has coordinate $r=\max\{2,d\}$. Its bag has
+parent the owning input bag; the bag at any other private coordinate $j$
+has parent $j+1$ if $j<r$, and $j-1$ if $j>r$, within the same copy.
+Its vertex parent follows the same rule, except that the root's vertex
+parent is $h_v$. Emit the input bags with $A,B$ added, and the reference
+bags $\{A,B,x,\operatorname{parent}(x)\}$. These formulas require only
+coordinate comparisons and give the decomposition of $J$ directly.
+
+A required direct domain edge belongs to its copy's root bag when $d\geq2$,
+and to its owning input bag when $d=0$ or $d=1$. An original edge belongs
+to its owning input bag. Emit each subdivision chain of size-three bags
+from Section~\ref{sec:treewidth} at that bag. Parents within a chain are
+consecutive indices, so both bags and decomposition edges can be emitted
+without a general forest traversal.
+
+\paragraph{Emitting a path decomposition.}
+Implement the two stages of Section~\ref{sec:pathwidth} in order.
+For each input bag, emit its enlargement by $A,B$, followed by the
+reference windows for vertices whose first occurrence is that bag.
+Order these windows by vertex, residue, and reference position. This
+is an explicit stream of bags for $J$. For each required link, find
+the first bag of this stream containing its endpoints by regenerating
+the stream. At that bag insert the link's consecutive internal-vertex
+windows, retaining the whole bag of $J$. Order links with the same
+owning bag by their identifiers. The intermediate stream need not be
+stored: its bags and their contents can be recomputed by counters and
+input scans.
+
+If the input decomposition has $b$ bags, either construction uses
+$O(b+mn^2+(e+f)n)$ output bags. Every bag is emitted one vertex at a
+time, and each owning-bag query stores only indices and membership flags.
+The enumerations have a fixed number of nested loops over polynomially
+bounded ranges. Consequently the transducer uses $O(\log N)$ workspace,
+polynomial time, and polynomial output length, independently of the
+input width.
+
+\paragraph{Checking the certificate.}
+The algorithms do not assume valid decompositions as a promise.
+We encode a tree by a designated root and one parent
+pointer for every other bag. Reject out-of-range pointers and require
+every bag to reach the root within $b$ steps, where $b$ is the number of
+bags. This checks that the index graph is a tree using counters and
+rescans.
+
+For each graph vertex $v$, count its occurrence bags, say $a_v$, and
+the tree edges with both endpoints among those bags, say $e_v$.
+The induced index subgraph is a forest, so it is nonempty and connected
+exactly when $a_v>0$ and $e_v=a_v-1$. Thus these counts check vertex
+coverage and connected occurrences. Bag entries, duplicate entries,
+bag sizes, and coverage of each graph edge are checked by scans.
+For a path, check that every occurrence set is a nonempty interval.
+These preliminary checks take logarithmic workspace and polynomial time.
+No decomposition-finding algorithm is assumed.
+
+
 \section{Lean verification}\label{app:lean}
-\paragraph{Artifact availability.}
-The Lean development is in the public repository
-\url{https://github.com/jasondavies/odd-cycle-homomorphism}.
-A verified baseline of the Lean development and executable checks is
-available at commit
-\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/01e8c39f9c0c85ee7685494a7d936bd666e75355}{\texttt{01e8c39}}~\cite{artifact}.
-Its \lean{README.md} gives reproduction commands and
-\lean{FORMALIZATION.md} maps the checked statements to declarations.
-The accompanying source tree additionally checks finite tree-certificate
-representation and the output bag-count bounds described below.
+The artifact uses Lean~4.35.0~\cite{deMouraUllrich2021} and
+mathlib v4.35.0~\cite{mathlib2020}. It checks the weighted-formula and
+List Colouring decision reductions, the supplied decomposition and
+feedback-set transfers, their numerical bounds and matching lower bounds,
+and the connection with odd-cycle cores. It also checks the original
+source girth and size bounds, the endpoint projection for odd subdivision,
+and the walk interval for an odd-cycle target. The circular-clique
+generalisation, graph-level girth amplification, encodings and running
+times are proved in the manuscript.
 
-The development uses Lean~4.35.0~\cite{deMouraUllrich2021} and the pinned
-mathlib release v4.35.0~\cite{mathlib2020}. A graph is a mathlib
-\lean{SimpleGraph}. The target \lean{OddCycle.cyc n} is mathlib's circulant
-graph on \lean{ZMod n} with jump set $\{1\}$; the library also proves its
-identification with \lean{cycleGraph} for successor lengths.
-
-The construction is parameterised by a graph on \lean{Fin m}, lists in
-\lean{Finset (ZMod n)}, and proofs that $n$ is odd and at least five.
-The central theorem is
-\lean{TreewidthHom.OddCycle.ListReduction.reduction}.
-It combines decision equivalence, transfer of tree and path decomposition
-certificates, target pathwidth two, feedback vertex set transfer with
-exact cardinality $|S|+2$, and the polynomial bound in~\eqref{eq:size}.
-Using treewidth, pathwidth, and feedback vertex number defined as minima,
-the companion theorem \lean{parameter_reduction} restates the transfer as the
-numerical upper bounds of Theorem~\ref{thm:transfer} and adds 2-degeneracy and
-the girth lower bound. Exact girth for nonempty inputs is proved separately
-by \lean{source_egirth}. Under the common omitted-coordinate hypothesis,
-\lean{exact_parameter_transfer} proves the treewidth and feedback-number
-equalities and both pathwidth bounds when $F$ has an edge.
-\lean{source_width_lower} gives the width lower bounds for every nonempty $F$.
-The following names are in the namespace
-\lean{TreewidthHom.OddCycle.ListReduction}.
-
-\begin{center}
-\begin{tabular}{@{}p{0.48\textwidth}p{0.46\textwidth}@{}}
-\toprule
-Statement & Principal declaration \\
-\midrule
-Decision equivalence & \lean{source_hom_iff_colorable} \\
-Treewidth $\max\{w+2,3\}$ & \lean{source_width} \\
-Pathwidth $p+6$ & \lean{source_pathWidth} \\
-Deleting the transferred set leaves a forest & \lean{source_feedback} \\
-Transferred set has size $|S|+2$ & \lean{removed_card} \\
-Polynomial source size & \lean{source_card_le} \\
-Combined reduction certificate & \lean{reduction} \\
-2-degeneracy & \lean{source_degenerate} \\
-Girth exactly $n$ for nonempty $F$ & \lean{source_egirth} \\
-Connectedness when every list omits a residue & \lean{source_connected} \\
-At most $2|V(G)|$ edges & \lean{source_edges_le} \\
-Bounds on the parameters themselves & \lean{parameter_reduction} \\
-Join minor with a common forbidden coordinate & \lean{join_minor} \\
-Exact parameter transfer & \lean{exact_parameter_transfer} \\
-Target-free decision equivalence & \lean{source_hasOddCycleCore_iff} \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-The feedback proof first obtains a rooted orientation of an arbitrary
-forest. It then supplies decreasing parent pointers for every remaining
-reference or link vertex. The decomposition infrastructure checks vertex
-coverage, edge coverage, connected occurrence sets, and bag cardinalities.
-The generic \lean{BagHomomorphism} module proves the local-to-global
-consistency argument of Lemma~\ref{lem:bags}, including its path
-specialisation. The \lean{FeedbackHomomorphism} module proves the criterion
-used for W[P] membership: a guess on a feedback vertex set extends to a
-homomorphism exactly when it preserves the edges inside the set and every
-root of the remaining forest has a feasible pair.
-
-For finite graphs, \lean{hasFiniteWidth_iff_hasWidth} proves that finite-index
-tree decompositions give the same width as arbitrary-index ones, including
-for the empty graph. Separately, \lean{source_tree_bag_bound} and
-\lean{source_path_certificate} bound the output bag counts, from an input
-certificate with at most $N$ bags, by
-\[
-N+mn^2+(mn+m^2)n
-\quad\text{and}\quad
-2N(mn^2+2)(mn+m^2+1)n,
-\]
-respectively. These bounds concern finite certificates and numeric parameters;
-palette compaction and bit-level input/output encodings remain textual.
-
-The minor model consists of disjoint, nonempty connected branch sets and
-edge witnesses. Generic lemmas prove minor monotonicity of all three parameters;
-a finite Helly theorem for subtrees gives the join's exact width increases.
-In the namespace \lean{TreewidthHom.OddCycle}, \lean{hom_iff_capped} proves
-Lemma~\ref{lem:cap}'s decision equivalence. The development also proves that
-odd cycles are cores, that odd closed walks contain odd cycles, and that finite
-odd girth is attained. The theorem \lean{hasOddCycleCore_iff_of_oddGirth}
-identifies homomorphic equivalence to an odd cycle with mapping to a shortest
-odd cycle, including when shorter even cycles are present.
-
-The accompanying modules \lean{WeightedFormula} and \lean{WeightedCycle}
-formalise the formula in Theorem~\ref{thm:list-feedback} as a finite rooted
-tree of gate and literal occurrences. For each injective selector assignment,
-\lean{extends_iff} identifies its extensions with truth under precisely
-its image. The theorem \lean{selectors_tree} proves that deleting the
-selectors leaves a tree. Finite vertex numbering and an injective map from
-gate and variable colours into the residues connect the two reductions.
-Writing $C$ for the finite colour type and $m$ for the number of vertices
-of the list instance, this composition uses $n=2(|C|+m)+5$. This choice
-satisfies the palette and order bounds used in the paper.
-The theorem \lean{WeightedFormula.Formula.cycle_reduction} gives one concrete
-output graph for both decision equivalences, a feedback set of size $k+2$,
-girth $n$ and at most $4n^3$ vertices. The integer girth bound for arbitrary
-nonempty list inputs with $m\leq n$ is \lean{ListReduction.source_girth_and_card}.
-
-The theorem \lean{OddCycle.subdivisionProjection_walk} checks that the
-projection in Lemma~\ref{lem:subdivision} sends the endpoints of every
-$t$-step walk to adjacent colours. The theorem \lean{OddCycle.walk_iff_interval}
-checks the cyclic interval of permitted endpoint differences in
-Theorem~\ref{thm:edge-alg}. The graph subdivision, its size and width
-bounds, the difference-constraints algorithm and its girth corollary
-are proved in the text.
-
-The circular-colouring interpretation, bit encodings, machine resource
-bounds and external complexity results remain arguments in the text.
-Noncomputable choices used to select bags or roots in structural proofs
-do not stand in for a verified implementation of the logspace transducer.
-
-Running \texttt{python3 scripts/check\_formalization.py} builds the library,
-checks for proof admissions, and audits the principal declarations for
-axioms. The permitted foundational axioms are \lean{propext},
-\lean{Classical.choice}, and \lean{Quot.sound}.
-The executable constructor is separately checked on 841 finite instances,
-including 446 negative instances and target lengths $5,7,9$.
-The checks compare direct list-colouring search with graph-only homomorphism
-search, validate returned homomorphisms, tree and path decompositions,
-feedback vertex sets, the size bound, and 2-degeneracy. Targeted cases
-include positive cyclic inputs with feedback vertex number one and two,
-a branching decomposition, and an independent breadth-first-search girth
-check. These executable checks corroborate
-but do not replace the universal proofs. The direct executable path sweep
-satisfies a slightly sharper $p+5$ bound; the formal theorem and the main
-statements use $p+6$.
-
-\paragraph{AI assistance and review status.}
-AI assistance was used for mathematical exploration, proof development,
-Lean code, executable checks, and manuscript drafting. The development is
-kernel-checked to the extent specified above. This does not establish
-novelty, certify the external complexity results, or constitute independent
-human review of the complete argument.
+To reproduce the audit at revision \texttt{848545a}, run
+\texttt{python3 scripts/check\_formalization.py} from the repository
+root~\cite{artifact}. It builds the library, checks for proof admissions
+and audits the principal declarations. \texttt{FORMALIZATION.md} indexes
+the statements and the README gives commands for the finite checks.
+Mathematical development, formalisation and drafting used AI assistance
+under human direction.
 
 \begin{thebibliography}{10}
 \raggedright
@@ -1217,7 +1002,7 @@ D\'aniel Marx, Marcin Pilipczuk, Micha{\l} Pilipczuk and Saket Saurabh.
 Jason Davies.
 Odd-cycle homomorphism: Lean formalisation and executable checks.
 Software repository, 2026. Version
-\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/01e8c39f9c0c85ee7685494a7d936bd666e75355}{\texttt{01e8c39}}.
+\href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/848545ac03da8691fdd511e29b3e247e446fb523}{\texttt{848545a}}.
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
 
 \bibitem{bs2002}
@@ -1233,11 +1018,7 @@ In \emph{Automated Deduction -- CADE~28}, LNCS, vol.~12699,
 pp.~625--635. Springer, 2021.
 \href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
 
-\bibitem{eth2026}
-OpenAI.
-The Exponential Time Hypothesis is false.
-Preprint, October 17, 2026, revised October 25, 2026.
-\href{https://github.com/openai/math/tree/main/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026}{Manuscript and accompanying materials}.
+
 
 \bibitem{flumgrohe2006}
 J\"org Flum and Martin Grohe.
@@ -1263,12 +1044,10 @@ Colorings and homomorphisms of degenerate and bounded degree graphs.
 \emph{Discrete Mathematics} 233:257--276, 2001.
 \href{https://doi.org/10.1016/S0012-365X(00)00245-4}{doi:10.1016/S0012-365X(00)00245-4}.
 
-\bibitem{lms2018}
-Daniel Lokshtanov, D\'aniel Marx and Saket Saurabh.
-Known algorithms on graphs of bounded treewidth are probably optimal.
-\emph{ACM Transactions on Algorithms} 14(2), 2018.
-\href{https://doi.org/10.1145/3170442}{doi:10.1145/3170442}.
-Preprint: \href{https://arxiv.org/abs/1007.5450}{arXiv:1007.5450}.
+\bibitem{longnote}
+Jason Davies. Homomorphisms to long odd cycles in time exponential in the
+order-to-length ratio. Companion manuscript, 2026.
+Distributed alongside this paper as \texttt{long-odd-cycles.pdf}.
 
 \bibitem{mathlib2020}
 The mathlib Community.
@@ -1291,6 +1070,11 @@ In \emph{38th International Symposium on Theoretical Aspects of Computer
 Science (STACS 2021)}, LIPIcs, vol.~187, pp.~56:1--56:17.
 Schloss Dagstuhl, 2021.
 \href{https://doi.org/10.4230/LIPIcs.STACS.2021.56}{doi:10.4230/LIPIcs.STACS.2021.56}.
+
+\bibitem{vince1988}
+Andrew Vince. Star chromatic number.
+\emph{Journal of Graph Theory} 12(4):551--559, 1988.
+\href{https://doi.org/10.1002/jgt.3190120411}{doi:10.1002/jgt.3190120411}.
 
 \bibitem{zhu2001}
 Xuding Zhu.

@@ -1,0 +1,182 @@
+\pdfoutput=1
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={Homomorphisms to long odd cycles in time exponential in the order-to-length ratio},pdfauthor={Jason Davies}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\Z}{\mathbb Z}
+\title{Homomorphisms to long odd cycles in time exponential in the order-to-length ratio}
+\author{Jason Davies}
+\date{November 18, 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Given an $N$-vertex graph $G$ and an odd integer $\ell\geq3$ in binary,
+we decide $G\to C_\ell$ deterministically in $2^{O(N/\ell)}$ time up to
+polynomial factors and in polynomial space. A homomorphism lifts along
+a spanning tree to integer heights that change by one at every step.
+Sampling these heights along a tree tour determines how many times each
+edge difference crosses the modulus. Shortest paths then recover a
+colouring. As a consequence, recognising an odd-cycle core takes
+polynomial time on graphs of odd girth $\Omega(N/\log N)$, with no
+restriction on even cycles.
+\end{abstract}
+
+\section{The target length as a parameter}
+A homomorphism $G\to C_\ell$ labels each vertex by a residue modulo $\ell$
+so that adjacent labels differ by $1$ or $-1$. How much does a long
+target help? Fomin, Heggernes and Kratsch~\cite{fhk} enumerate the
+preimage of a least-used colour and solve the remaining problem in
+polynomial time. For odd $\ell\geq5$ their deterministic bound includes
+the factor $\binom{N}{\lfloor N/\ell\rfloor}$. Carbonnel~\cite[Theorem~2]{carbonnel}
+gives a randomised algorithm with exponential factor
+\[
+ \left[(\ell/2)^{1/\ell}
+       \bigl(\ell/(\ell-1)\bigr)^{(\ell-1)/\ell}\right]^N .
+\]
+Both expressions give an exponent of order $(N/\ell)\log\ell$ when
+$\ell$ grows and $N/\ell$ grows. We obtain an exponent linear in
+$N/\ell$. For example, at $\ell=\Theta(N/\log N)$ the binomial bound is
+quasipolynomial and our algorithm takes polynomial time.
+
+\begin{theorem}\label{thm:long}
+For any finite simple graph $G$ on $N$ vertices and odd $\ell\geq3$
+given in binary, one can decide $G\to C_\ell$ and return a homomorphism
+on a yes instance in $2^{O(N/\ell)}|I|^{O(1)}$ deterministic time and
+polynomial space, where $|I|$ is the bit length of the input.
+\end{theorem}
+
+\section{Lifting a colouring along a tree}
+Consider a connected graph with a rooted spanning tree $T$. Write $d_v$
+for the depth of $v$. Rotate any homomorphism so the root has colour
+zero. Lift it to integer heights $H_v$ by setting the root height to
+zero and following the colour increments $\pm1$ along tree edges. Then
+$H_v$ represents the colour of $v$ and $H_v\equiv d_v\bmod 2$.
+Orient each graph edge arbitrarily. For every $uv$ there is an integer
+$k_{uv}$ such that
+\begin{equation}\label{eq:winding}
+       H_v-H_u=k_{uv}\ell\pm1,\qquad
+       k_{uv}\equiv d_v-d_u-1\pmod 2 .
+\end{equation}
+The parity follows because $\ell$ is odd. On tree edges $k_{uv}=0$.
+The integers on the other edges record the multiple of $\ell$ traversed
+by the lifted tree path between their endpoints, up to the final unit step.
+For example, lift the identity map of $C_\ell$ along the path
+$0,1,\ldots,\ell-1$. On the closing edge oriented from $0$ to $\ell-1$,
+the height difference is $\ell-1$ and $k_{0,\ell-1}=1$.
+
+\begin{lemma}\label{lem:solve}
+Given one integer $k_{uv}$ of the prescribed parity for every oriented
+edge, the existence of heights satisfying~\eqref{eq:winding} can be
+tested in polynomial time in the input bit length. Feasible heights give
+a homomorphism.
+\end{lemma}
+\begin{proof}
+Use the inequalities $H_v-H_u\leq k_{uv}\ell+1$ and
+$H_u-H_v\leq 1-k_{uv}\ell$. Represent each as a directed arc from the
+subtracted variable to the other, with its right-hand side as weight.
+A negative cycle makes the inequalities inconsistent. Otherwise let
+$H_v$ be the shortest distance from the root in this digraph. Every
+vertex is reachable because each graph edge supplies both arcs.
+The distances satisfy both inequalities. Each arc weight has the parity
+of the depth difference of its endpoints, so every root-to-$v$ walk has
+weight congruent to $d_v$ modulo two. Thus $H_v-H_u$ cannot equal the
+midpoint $k_{uv}\ell$, and the only remaining values are the two in
+\eqref{eq:winding}. Reducing the distances modulo $\ell$ gives the
+colouring. Bellman--Ford computes the distances or detects a negative cycle.
+\end{proof}
+
+\section{Sampling a tree tour}
+\begin{proof}[Proof of Theorem~\ref{thm:long}]
+First consider a connected component of order $m$. Bipartite components
+map to an edge. If $\ell>m$, a nonbipartite component cannot map to
+$C_\ell$, since its odd cycle would give an odd closed walk shorter than
+$\ell$ in $C_\ell$. For $\ell=3$ one may enumerate the two signs on each
+tree edge and check the remaining edges in time $2^{m-1}|I|^{O(1)}$.
+Hence assume $5\leq\ell\leq m$.
+
+Put $s=\lfloor(\ell-1)/3\rfloor$. Start at the root and tour $T$ by
+traversing each edge once in each direction. Write $v_t$ for the vertex
+at time $t$, where $0\leq t\leq2(m-1)$. Sample times $0,s,2s,\ldots$
+and, for a putative lift, write
+\[
+ b_i=\left\lfloor H_{v_{is}}/s\right\rfloor .
+\]
+We know $b_0=0$. Consecutive sampled heights are at distance at most $s$,
+so $b_{i+1}-b_i\in\{-1,0,1\}$, also for negative heights.
+Enumerate all such sequences. For each vertex $v$ fix its first occurrence
+at time $t$ and let $i=\lfloor t/s\rfloor$. At most $s$ steps separate
+it from the preceding sample. Thus the true lift belongs to the interval
+\[
+             J_v=[s b_i-s,\ s b_i+2s-1].
+\]
+Fixing a single occurrence per vertex suffices even when the tour
+revisits it. The last incomplete block uses its preceding sample as well.
+
+For an oriented edge $uv$ with $J_u=[a,b]$ and $J_v=[c,d]$, equation
+\eqref{eq:winding} requires $k_{uv}\ell\in[c-b-1,d-a+1]$. This interval
+has width $6s<2\ell$. Multiples $k\ell$ of the prescribed parity of $k$
+are spaced $2\ell$ apart. There is consequently at most one candidate,
+which integer division locates. Reject the sequence if an edge has no
+candidate. Otherwise apply Lemma~\ref{lem:solve} to the candidates for
+all edges. The intervals have served their purpose once the integers
+are determined.
+
+Any homomorphism has a lift whose sampled sequence is enumerated.
+On that branch the unique candidates are its own $k_{uv}$, so the
+inequalities are feasible. In the other direction every successful branch
+returns a homomorphism by the lemma. There are at most
+$3^{\lfloor2(m-1)/s\rfloor}$ branches. Each sequence and its constraint
+digraph have polynomial size, and the heights and arc weights require
+only polynomially many bits. Processing branches in turn proves the time
+and space bounds for a component. Solve components independently and
+combine their colourings. Summing their times gives the asserted overall
+bound, also for isolated vertices and the empty graph.
+\end{proof}
+
+\section{Recognising odd-cycle cores}
+\begin{corollary}
+Let $G$ have $N$ vertices and finite odd girth $h$. Odd-cycle core
+recognition takes $2^{O(N/h)}|I|^{O(1)}$ time. In particular, it takes
+polynomial time for
+$h=\Omega(N/\log N)$.
+\end{corollary}
+\begin{proof}
+Compute $h$ as the minimum distance from $(v,0)$ to $(v,1)$ over all
+vertices $v$ in the bipartite double cover. This minimises the length
+of an odd closed walk, which contains an odd cycle. The graph maps to
+$C_h$ exactly when its core is an odd cycle. Indeed $C_h$ embeds in the
+graph, every odd cycle is a core, and homomorphisms cannot increase odd
+girth. Apply Theorem~\ref{thm:long} with $\ell=h$. Bipartite inputs can
+be rejected separately.
+\end{proof}
+
+The corollary permits arbitrarily short even cycles. For homomorphism to
+an independently supplied target it is the length of that target which
+enters Theorem~\ref{thm:long}. A companion paper~\cite{structural} gives
+hardness for source pathwidth, treewidth and feedback vertex number at
+ordinary girth $\Omega(N^{1-\varepsilon})$ for every fixed
+$0<\varepsilon<1$.
+
+\paragraph{Acknowledgement.}
+Mathematical development, checking and drafting used AI assistance under
+human direction.
+\begin{thebibliography}{9}
+\bibitem{carbonnel}
+Cl\'ement Carbonnel. Faster algorithms for graph homomorphism via tractable
+constraint satisfaction. \href{https://arxiv.org/abs/2602.23000v2}{arXiv:2602.23000v2}, 2026.
+\bibitem{structural}
+Jason Davies. Parameterised complexity of graph homomorphism to odd cycles.
+Companion manuscript, 2026. Distributed as \texttt{odd-cycle-homomorphism.pdf}.
+\bibitem{fhk}
+Fedor V. Fomin, Pinar Heggernes and Dieter Kratsch.
+Exact algorithms for graph homomorphisms.
+\emph{Theory of Computing Systems} 41:381--393, 2007.
+\href{https://doi.org/10.1007/s00224-007-2007-x}{doi:10.1007/s00224-007-2007-x}.
+\end{thebibliography}
+\end{document}

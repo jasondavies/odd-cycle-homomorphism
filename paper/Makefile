@@ -1,11 +1,11 @@
 LATEXMK ?= latexmk
-MANUSCRIPT := odd-cycle-homomorphism
+MANUSCRIPTS := odd-cycle-homomorphism long-odd-cycles
 
 .PHONY: all clean
-all: $(MANUSCRIPT).pdf
+all: $(addsuffix .pdf,$(MANUSCRIPTS))
 
-$(MANUSCRIPT).pdf: $(MANUSCRIPT).tex
+%.pdf: %.tex
 	$(LATEXMK) -pdf -interaction=nonstopmode -halt-on-error $<
 
 clean:
-	$(LATEXMK) -c $(MANUSCRIPT).tex
+	$(LATEXMK) -c $(addsuffix .tex,$(MANUSCRIPTS))

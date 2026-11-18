@@ -127,11 +127,15 @@ The following also remain outside the formalisation:
 - the resulting complexity-class hardness and completeness statements;
 - the implementation and resource bound of the binary-to-unary transducer
   (its target-capping equivalence is checked);
+- the algorithm for circular-clique thresholds and the exact circular chromatic
+  number, including chain compression and difference constraints;
+- the sampled tree-tour algorithm for long target cycles and its odd-girth
+  corollary in the [companion note](paper/long-odd-cycles.pdf);
 - the circular-chromatic-number interpretation, and the complexity
   classifications for odd-cycle-core recognition (its graph-theoretic equivalence
   and finite reduction are checked).
 
-The paper provides proofs or primary citations for these claims. Noncomputable
+The manuscripts provide proofs or primary citations for these claims. Noncomputable
 choices of roots and owning bags in structural proofs are not verified code for
 the logspace transducer. The Python construction is independently tested; no
 universal refinement theorem connects its output to the Lean graph. The XNLP
