@@ -8,3 +8,5 @@ public import TreewidthHom.ListExact
 public import TreewidthHom.OddCycleCore
 public import TreewidthHom.ListCertificates
 public import TreewidthHom.WeightedCycle
+public import TreewidthHom.OddSubdivision
+public import TreewidthHom.CycleWalkInterval

@@ -42,12 +42,17 @@ of a supplied path decomposition and XALP-complete for the width of a supplied
 tree decomposition. For feedback vertex number it is W[SAT]-hard and in W[P].
 The same bounds hold for homomorphism to an input odd cycle.
 Hardness persists on connected, 2-degenerate graphs of girth
-$\Omega(|V(G)|^{1/3})$. Our reduction from List Colouring increases treewidth
+$\Omega(N^{1-\varepsilon})$ for every fixed $0<\varepsilon<1$, where
+$N=|V(G)|$. Both problems admit a $2^{O(r)}$-time algorithm up to polynomial
+factors for feedback edge number $r$. This gives polynomial time at girth
+$\Omega(N\log\log N/\log N)$, including linear girth.
+Our reduction from List Colouring increases treewidth
 and feedback vertex number by exactly two on inputs with an edge.
 We also reduce weighted antimonotone formula satisfiability to List Colouring
 with a supplied feedback vertex set. Lean~4 checks the decision
 equivalences from a weighted formula through to both graph problems,
-the feedback-set witness and the quantitative girth bound.
+the feedback-set witness, the subdivision projection and the walk criterion
+used by the algorithm.
 \end{abstract}
 
 \noindent\textbf{AI assistance.}
@@ -61,7 +66,7 @@ Such a map preserves adjacency and, after a rotation or reflection of $C_g$,
 fixes the entire cycle. Deciding whether it exists amounts to recognising
 graphs whose core is an odd cycle. We study the complexity of this question
 when the source graph admits a narrow decomposition or becomes a forest
-after deleting a few vertices.
+after deleting a few vertices or edges.
 
 \begin{theorem}\label{thm:main}
 Consider two decision problems on a finite simple undirected graph $G$.
@@ -72,7 +77,8 @@ Consider two decision problems on a finite simple undirected graph $G$.
 Each problem is XNLP-complete for the width of a supplied path decomposition,
 XALP-complete for the width of a supplied tree decomposition, and
 W[SAT]-hard and in W[P] for $\fvs(G)$. All three hardness bounds hold
-on connected, 2-degenerate graphs of girth at least $(|V(G)|/4)^{1/3}$.
+on connected, 2-degenerate graphs of girth $\Omega(|V(G)|^{1-\varepsilon})$
+for every fixed $0<\varepsilon<1$.
 \end{theorem}
 
 Forgetting the supplied decomposition also gives hardness for the
@@ -100,7 +106,14 @@ the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in binary,
 under the same three parameters. Section~\ref{sec:core} relates the
 target-free problem to equality in the odd-girth lower bound for $\chi_c$.
 
-The main technical statement is an additive structural transfer.
+The difference between deleting vertices and deleting edges is substantial
+for odd-cycle targets. Theorem~\ref{thm:edge-alg} gives a single-exponential
+algorithm in the number of edges whose deletion leaves a forest.
+It also gives fixed-parameter tractability for $N/g$, where $N$ is the
+source order and $g$ its girth. In particular, both problems are tractable
+at linear girth (Corollary~\ref{cor:relative-girth}).
+
+The hardness proofs start from an additive structural transfer.
 
 \begin{theorem}\label{thm:transfer}
 There is a polynomial-size, logspace reduction from List Colouring on a
@@ -543,6 +556,74 @@ component containing $AB$. Every remaining vertex lies in a reference
 copy or a link. For empty $F$, the output is simply $AB$. This explains
 the strict palette padding in the choice of $n$.
 
+\subsection{Amplifying the girth by odd subdivision}\label{sec:amplify}
+Write $S_t(G)$ for the graph obtained by replacing each edge of $G$ by a
+path of $t$ edges with private internal vertices. The following equivalence
+also follows from the circular-colouring theory of odd
+subdivisions~\cite{ht2014}. We give an explicit projection because the
+reduction changes both the source and the target.
+
+\begin{lemma}\label{lem:subdivision}
+For odd $n\geq3$ and positive odd $t$,
+\[
+  S_t(G)\to C_{tn}\quad\Longleftrightarrow\quad G\to C_n .
+\]
+\end{lemma}
+\begin{proof}
+Given $G\to C_n$, send an original vertex of colour $i$ to $ti$ in
+$C_{tn}$. Consecutive colours in $C_n$ give endpoints of a $t$-edge arc
+in $C_{tn}$. Map each replacement path along this arc.
+
+Conversely, define a map from the residues modulo $tn$ to those modulo $n$
+by writing an integer lift as $qt+r$, $0\leq r<t$, and putting
+\[
+  \pi(qt+r)=q+(r\bmod 2)\pmod n .
+\]
+Changing the lift by $tn$ changes $q$ by $n$. The endpoints of a $t$-step
+walk have lifts at odd distance $d\leq t$. Order these lifts increasingly.
+If they are in the same block of length $t$, their remainders have
+opposite parities and their images differ by one. If they lie in successive
+blocks, their remainders differ by $d-t$, which is even. Now the block
+indices differ by one, so again the images are adjacent. Applying $\pi$ to
+the images of the original vertices of $G$ proves the reverse implication.
+\end{proof}
+
+\begin{proposition}\label{prop:amplify}
+For every fixed $0<\varepsilon<1$, the reduction on nonempty inputs
+can output a connected, 2-degenerate graph of order $N$ and girth
+$\Omega(N^{1-\varepsilon})$. Its shortest cycle has odd length equal to
+the new target length. Subdivision preserves the feedback vertex number
+and treewidth of the reduction graph and adds at most two to the width
+of its supplied path decomposition.
+\end{proposition}
+\begin{proof}
+Let $M=|V(G)|$ before subdivision. Fix an integer $a\geq1$ with
+$a/(a+1)\geq1-\varepsilon$, and set $t=2M^a+1$.
+Each cycle traverses its replacement paths in full, so subdivision
+multiplies every cycle length by $t$. Proposition~\ref{prop:sparse} thus
+gives girth $tn$, witnessed by an odd cycle. A 2-degenerate graph has
+at most $2M$ edges, whence
+\[
+ N=M+(t-1)|E(G)|\leq 2tM=O(M^{a+1}),\qquad
+ tn\geq t=\Omega(N^{a/(a+1)}).
+\]
+The new graph is connected. Remove the new degree-two vertices first, then the original vertices,
+which are now isolated. This gives a 2-degeneracy ordering.
+
+Every original feedback vertex set still hits every cycle. Conversely,
+replace each selected internal vertex by an endpoint of its original
+edge. Every original cycle lifts to a cycle and is hit by the resulting
+set. Contracting the replacement paths recovers $G$ as a minor.
+For the treewidth upper bound, attach a chain of bags of size three for
+each subdivided edge as in Section~\ref{sec:treewidth}. Here $G$ contains
+a cycle and hence has treewidth at least two. For pathwidth, retain the
+first bag containing the two endpoints and sweep the replacement paths
+assigned to that bag one at a time, keeping at most two internal vertices
+at once. For fixed $a$, counters for edges, bags and positions along a
+path all use logarithmic space, and the output has polynomial length.
+Lemma~\ref{lem:subdivision} transfers the decision equivalence.
+\end{proof}
+
 \section{Complexity consequences}\label{sec:complexity}
 XNLP consists of problems decidable nondeterministically in time
 $f(k)N^{O(1)}$ and space $f(k)\log N$, where $N$ is the input length.
@@ -612,8 +693,8 @@ have the claimed widths. The $k$ selector hubs and the two anchors give
 a supplied feedback set of size $k+2$.
 We may adjoin a single isolated vertex with a singleton list to ensure a
 nonempty input, extending a supplied decomposition by a singleton bag.
-Section~\ref{sec:sparse} then gives the connectedness, degeneracy and
-girth restrictions. Section~\ref{sec:core} shows how to discard the target.
+Proposition~\ref{prop:amplify} gives the asserted girth restriction
+with the same feedback set and at most two more vertices per path bag. Section~\ref{sec:core} shows how to discard the target.
 
 \subsection{Membership}
 We first bound the target length so that binary encoding does not increase
@@ -804,10 +885,9 @@ Circular chromatic number is monotone under homomorphisms, and
 $\chi_c(C_g)=2g/(g-1)$. Together with the circular-colouring characterisation
 of $G\to C_g$, this proves the displayed equivalences.
 
-For hardness, take the nonempty List Colouring inputs used above. A reference
-cycle in the output has length $n$, and Proposition~\ref{prop:sparse}
-gives girth $n$, so its odd girth is also $n$. The output has an odd-cycle core exactly when
-$G\to C_n$. The reduction can discard the target. All source restrictions
+For hardness, the output of Proposition~\ref{prop:amplify} has a shortest
+cycle of length $tn$, which is odd. Its core is an odd cycle exactly when it
+maps to $C_{tn}$. The reduction can therefore discard the target. All source restrictions
 are inherited; in particular these hard instances have chromatic number
 exactly three, since they are 2-degenerate and contain an odd cycle.
 
@@ -819,6 +899,116 @@ same time and space bounds. For W[P], compute the odd girth in deterministic
 polynomial time, rejecting bipartite graphs, and use the feedback vertex
 algorithm for $G\to C_g$. Bipartite graphs cannot have odd-cycle cores.
 \end{proof}
+
+\section{Algorithms from feedback edge number and girth}\label{sec:edge-alg}
+For a graph with $c$ connected components, write
+$r=|E(G)|-|V(G)|+c$. This is its \emph{feedback edge number}, the
+number of edges outside a spanning forest. We use $I$ for the input
+and $N$ for the number of source vertices.
+
+\begin{theorem}\label{thm:edge-alg}
+Homomorphism to an odd cycle given in binary and recognition of odd-cycle
+cores are decidable in $2^{O(r)}|I|^{O(1)}$ time and polynomial space.
+\end{theorem}
+\begin{proof}
+Fix an odd target length $n\geq3$. An isolated vertex or a vertex of
+degree one can be deleted, since any colouring of the remainder extends.
+Repeat until the remaining graph has minimum degree two or is empty.
+A component consisting of a cycle of length $L$ maps to $C_n$ precisely
+when $L$ is even or $L\geq n$. For even $L$ alternate along one edge.
+For odd $L$ a closed walk must travel at least $n$ steps, and once
+$L\geq n$ a tour of the target can be padded with backtracking pairs.
+
+In each remaining component suppress the degree-two vertices, replacing
+each maximal chain by an edge labelled with its length $L$. Keep loops
+and parallel edges, and count a loop twice in the degree. The resulting
+multigraph has minimum degree three and the same feedback edge number
+$r_i$ as its component. If it has $b$ vertices and $e$ edges, then
+$3b\leq2e$ and $e=b+r_i-1$, so $e\leq3(r_i-1)$. There are at most
+$3r$ labelled edges in total. Their interiors in the original graph are
+disjoint, so feasibility depends only on simultaneous choices of colours
+at their endpoints.
+
+Write $h=(n+1)/2$ and use coordinates $z_v=h x_v\bmod n$ for the
+original colours $x_v$. This is a bijection since $2h\equiv1\bmod n$.
+A chain oriented from $u$ to $v$ admits precisely the displacements
+$x_v-x_u=-L+2j\bmod n$, $0\leq j\leq L$, by choosing $j$ forward steps.
+Consequently $z_v-z_u$ ranges over the cyclic interval starting at
+$-hL$ and containing $L+1$ successive residues. If $L\geq n-1$, the
+edge imposes no restriction. Otherwise let $a$ represent $-hL\bmod n$
+in $[0,n-1]$. With representatives $0\leq z_v<n$, the allowed integer
+differences are exactly the nonempty intersections
+\[
+ [1-n,n-1]\ \cap\ [a+kn,a+L+kn],\qquad k\in\{-2,-1,0\}.
+\]
+This description includes loops, whose endpoint difference is zero.
+
+Enumerate one such interval per constrained edge. A choice $[A,B]$
+imposes $z_v-z_u\leq B$ and $z_u-z_v\leq-A$. Express the coordinate
+bounds relative to one extra variable and translate it to zero after
+solving. The system of difference constraints is feasible precisely when
+its constraint digraph has no negative cycle. Shortest distances from an
+added source of zero-weight arcs give an integral solution. Thus every
+accepted branch yields endpoint colours, and the chosen walks extend
+them independently along the chains. Conversely, any homomorphism gives
+a feasible branch. There are at most $3^{3r}$ branches and each uses
+polynomial time in the bit length of $I$, including $\log n$.
+Enumerating the choices sequentially takes polynomial space.
+
+For core recognition, reject bipartite graphs and compute the shortest
+odd cycle length $g_{\rm odd}$ in polynomial time. For example, use the
+bipartite double cover and minimise the distance between the two copies
+of the same vertex. The minimum is the shortest odd closed walk length,
+which equals $g_{\rm odd}$. Apply the algorithm with $n=g_{\rm odd}$ by
+Section~\ref{sec:core}.
+\end{proof}
+
+\begin{corollary}\label{cor:degree}
+Both problems are fixed-parameter tractable for feedback vertex number
+plus maximum degree.
+\end{corollary}
+\begin{proof}
+Deleting all edges incident with a minimum feedback vertex set leaves a
+forest. Thus $r\leq\Delta(G)\fvs(G)$, and Theorem~\ref{thm:edge-alg}
+needs only the graph as input.
+\end{proof}
+
+\begin{corollary}\label{cor:relative-girth}
+On cyclic graphs of order $N$ and girth $g$, both problems are decidable
+in $2^{O((N/g)^2)}|I|^{O(1)}$ time. The running time is polynomial whenever
+$g=\Omega(N\log\log N/\log N)$.
+\end{corollary}
+\begin{proof}
+Write $D=N/g$. We first bound $r$ for every $D$.
+Discard tree components, which contribute zero to $r$. Put
+$s=\lfloor(g-3)/8\rfloor$. In each remaining component take a maximal
+set of centres pairwise at distance greater than $2s$. The radius-$s$
+balls about all centres are disjoint. Each contains at least $s+1$
+vertices, since the component is connected and has at least $g$ vertices.
+Thus the total number of centres is at most $N/(s+1)=O(N/g)$.
+
+Maximality puts every vertex within distance $2s$ of a centre.
+Simultaneous breadth-first search from the centres partitions the graph
+into rooted trees of radius at most $2s$. Contract the tree edges.
+An extra edge internal to a tree would close a cycle of length at most
+$4s+1$. Two edges joining the same pair of trees would, with the paths
+in the two trees, form a cycle of length at most $8s+2$. Both lengths
+are less than $g$. Hence the contraction gives a simple graph on
+$O(N/g)$ vertices. Each tree-edge contraction preserves $r$, so
+$r=O(D^2)$. Theorem~\ref{thm:edge-alg} gives the first time bound.
+
+To obtain the polynomial range, suppose $D=O(\log N/\log\log N)$.
+Then $r=O(D^2)=O(\log^2 N)$. Connect the original components by bridges,
+giving a simple graph of the same girth with $N+r-1$ edges. For $r\geq3$,
+the girth bound of Bollob\'as and Szemer\'edi~\cite{bs2002} gives
+$g=O((N+r)\log r/r)$. Since $N+r=O(N)$, we obtain
+$r=O(D\log r)=O(\log N)$. Theorem~\ref{thm:edge-alg} now takes polynomial
+time, as it also does for $r<3$.
+\end{proof}
+
+The girth in Corollary~\ref{cor:relative-girth} counts even cycles as
+well as odd ones. Proposition~\ref{prop:amplify} retains hardness at
+every fixed power $N^{1-\varepsilon}$. These results leave open the case of girth $\Omega(N/\log N)$.
 
 \appendix
 \section{Lean verification}\label{app:lean}
@@ -930,6 +1120,14 @@ output graph for both decision equivalences, a feedback set of size $k+2$,
 girth $n$ and at most $4n^3$ vertices. The integer girth bound for arbitrary
 nonempty list inputs with $m\leq n$ is \lean{ListReduction.source_girth_and_card}.
 
+The theorem \lean{OddCycle.subdivisionProjection_walk} checks that the
+projection in Lemma~\ref{lem:subdivision} sends the endpoints of every
+$t$-step walk to adjacent colours. The theorem \lean{OddCycle.walk_iff_interval}
+checks the cyclic interval of permitted endpoint differences in
+Theorem~\ref{thm:edge-alg}. The graph subdivision, its size and width
+bounds, the difference-constraints algorithm and its girth corollary
+are proved in the text.
+
 The circular-colouring interpretation, bit encodings, machine resource
 bounds and external complexity results remain arguments in the text.
 Noncomputable choices used to select bags or roots in structural proofs
@@ -1022,6 +1220,12 @@ Software repository, 2026. Version
 \href{https://github.com/jasondavies/odd-cycle-homomorphism/tree/01e8c39f9c0c85ee7685494a7d936bd666e75355}{\texttt{01e8c39}}.
 \url{https://github.com/jasondavies/odd-cycle-homomorphism}.
 
+\bibitem{bs2002}
+B\'ela Bollob\'as and Endre Szemer\'edi.
+Girth of sparse graphs.
+\emph{Journal of Graph Theory} 39(3):194--200, 2002.
+\href{https://doi.org/10.1002/jgt.10023}{doi:10.1002/jgt.10023}.
+
 \bibitem{deMouraUllrich2021}
 Leonardo de Moura and Sebastian Ullrich.
 The Lean~4 theorem prover and programming language.
@@ -1046,6 +1250,12 @@ A. M. H. Gerards.
 Homomorphisms of graphs into odd cycles.
 \emph{Journal of Graph Theory} 12(1):73--83, 1988.
 \href{https://doi.org/10.1002/jgt.3190120108}{doi:10.1002/jgt.3190120108}.
+
+\bibitem{ht2014}
+Hossein Hajiabolhassan and Ali Taherkhani.
+On the circular chromatic number of graph powers.
+\emph{Journal of Graph Theory} 75(1):48--58, 2014.
+\href{https://doi.org/10.1002/jgt.21722}{doi:10.1002/jgt.21722}.
 
 \bibitem{kns2001}
 A. Kostochka, J. Ne\v{s}et\v{r}il and P. Smol\'ikov\'a.

@@ -19,6 +19,8 @@ successor lengths. No source or target lists remain in the output problem.
 | Length-`n-2` links enforce distinct images | `OddCycle.walk_iff_ne`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Odd closed walks in `C_n` have length at least `n` | `OddCycle.odd_closed_walk_length`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Odd-cycle homomorphisms cannot increase length; equivalence forces equal lengths | `OddCycle.length_le_of_hom`, `OddCycle.length_eq_of_homs`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
+| Endpoints of every odd-length subdivision walk project to adjacent colours | `OddCycle.subdivisionProjection_walk`, [OddSubdivision](TreewidthHom/OddSubdivision.lean) |
+| Reachable endpoint differences form a cyclic interval after multiplication by the inverse of two | `OddCycle.walk_iff_interval`, [CycleWalkInterval](TreewidthHom/CycleWalkInterval.lean) |
 | Lists contained in a smaller palette omit coordinate `n-1` | `ListReduction.palette_missing_last`, [ListReduction](TreewidthHom/ListReduction.lean) |
 | Fixed selector images extend to a colouring iff the formula is true on those variables | `WeightedFormula.Formula.extends_iff`, [WeightedFormula](TreewidthHom/WeightedFormula.lean) |
 | Removing the selectors leaves a tree; exact-weight satisfiability reduces to both graph problems with a feedback set of size `k+2` | `selectors_tree`, `satisfiable_iff_colorable`, `cycle_reduction`, [WeightedCycle](TreewidthHom/WeightedCycle.lean) |
@@ -153,7 +155,7 @@ precise scope and reproduction commands.
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 115 declarations
+`scripts/check_formalization.py` builds the library and audits the 117 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report

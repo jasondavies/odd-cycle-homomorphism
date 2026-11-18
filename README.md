@@ -28,13 +28,18 @@ statements require supplied decompositions; the W[P] upper bound does not.
 The hardness results also hold without supplied decompositions. Every target
 has treewidth and pathwidth two; the source width varies with the parameter.
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
-The hard sources can be connected and 2-degenerate with girth at least
-`(|V(G)|/4)^(1/3)`.
+For each fixed `0 < ε < 1`, the hard sources can be connected and 2-degenerate
+with girth `Ω(N^(1−ε))` on `N` vertices.
 
 The same three classifications hold for recognising graphs whose core is an
 odd cycle, with no target supplied. For a nonbipartite graph this asks whether
 it maps to its own shortest odd cycle; the paper gives the equivalent
 circular-colouring formulation.
+
+Both problems admit an algorithm taking `2^O(r)` time up to polynomial factors,
+where `r` is the feedback edge number. This gives fixed-parameter tractability
+for feedback vertex number plus maximum degree and for the ratio of order to
+girth. Both problems are polynomial-time decidable at girth `Ω(N log log N / log N)`.
 
 This answers the [treewidth question](https://cstheory.stackexchange.com/questions/34877/complexity-of-the-homomorphism-problem-parameterized-by-treewidth):
 homomorphism parameterised by the maximum of the two input treewidths is
@@ -73,6 +78,10 @@ with the cycle construction, proves both decision equivalences for one graph,
 and exhibits a feedback vertex set of size `k+2`. For nonempty list inputs of
 order at most `n`, Lean also proves exact girth `n` and at most `4*n^3` output vertices.
 
+Lean also checks the [subdivision projection](TreewidthHom/OddSubdivision.lean) and
+the [walk interval](TreewidthHom/CycleWalkInterval.lean) used by the feedback-edge
+algorithm. The graph-level amplification and algorithm are proved in the manuscript.
+
 The circular-chromatic-number interpretation, complexity classifications, and
 machine resource bounds remain outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
@@ -91,7 +100,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 115 declarations. The finite suite
+The Lean audit builds the library and checks 117 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not

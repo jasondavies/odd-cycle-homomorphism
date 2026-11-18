@@ -120,3 +120,5 @@ import Solution
 #print axioms TreewidthHom.WeightedFormula.Formula.selectors_tree
 #print axioms TreewidthHom.WeightedFormula.Formula.satisfiable_iff_colorable
 #print axioms TreewidthHom.WeightedFormula.Formula.cycle_reduction
+#print axioms TreewidthHom.OddCycle.subdivisionProjection_walk
+#print axioms TreewidthHom.OddCycle.walk_iff_interval
