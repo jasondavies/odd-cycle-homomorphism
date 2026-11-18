@@ -105,6 +105,18 @@ theorem fvs_source_le (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
   have h2 := fvs_le S' h1
   omega
 
+/-- Integer form of the cube-root girth bound when the padded target is at
+least as large as the nonempty input graph. -/
+theorem source_girth_and_card (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n))
+    (hn : 5 ≤ n) (hm : 0 < m) (hmn : m ≤ n) :
+    (source F L).egirth = n ∧ Nat.card (SourceVertex F L) ≤ 4 * n^3 := by
+  refine ⟨source_egirth F L hn hm, (source_card_le F L).trans ?_⟩
+  calc
+    2+m+m*n*n+(m*n+m*m)*n ≤ 2+n+n*n*n+(n*n+n*n)*n := by gcongr
+    _ ≤ 4*n^3 := by
+      have h := Nat.mul_le_mul_right n (Nat.mul_self_le_mul_self (show 2 ≤ n by omega))
+      nlinarith only [h, hn]
+
 /-- The source has at most twice as many edges as vertices. -/
 theorem source_edges_le (F : SimpleGraph (Fin m)) (L : Fin m → Finset (ZMod n)) :
     Nat.card (source F L).edgeSet ≤ 2*Nat.card (SourceVertex F L) := by

@@ -59,7 +59,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 The ordinary build and axiom audit include Solution but exclude the deliberately
 incomplete Challenge. Comparator builds Challenge separately; its one proof-hole
-warning is expected. The audit checks 109 proved declarations and scans Solution
+warning is expected. The audit checks 115 proved declarations and scans Solution
 for admissions along with the library.
 
 The Comparator script preserves sandboxing and uses the toolchain's bundled

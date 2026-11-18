@@ -113,3 +113,10 @@ import Solution
 #print axioms TreewidthHom.OddCycle.ListReduction.source_tree_certificate
 #print axioms TreewidthHom.OddCycle.ListReduction.source_tree_bag_bound
 #print axioms TreewidthHom.OddCycle.ListReduction.source_path_certificate
+
+#print axioms TreewidthHom.OddCycle.ListReduction.source_girth_and_card
+#print axioms TreewidthHom.WeightedFormula.Formula.extends_iff
+#print axioms TreewidthHom.WeightedFormula.Formula.satisfiable_iff_proper
+#print axioms TreewidthHom.WeightedFormula.Formula.selectors_tree
+#print axioms TreewidthHom.WeightedFormula.Formula.satisfiable_iff_colorable
+#print axioms TreewidthHom.WeightedFormula.Formula.cycle_reduction

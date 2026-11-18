@@ -31,64 +31,59 @@
 \emergencystretch=2em
 \title{Parameterised complexity of graph homomorphism to odd cycles}
 \author{Jason Davies\thanks{\href{mailto:jason@jasondavies.com}{\nolinkurl{jason@jasondavies.com}}}}
-\date{November 16, 2026}
+\date{November 18, 2026}
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Deciding whether a graph admits a homomorphism to an odd cycle given in the
-input is XNLP-complete parameterised by the width of a supplied path
-decomposition, and XALP-complete parameterised by the width of a supplied
-tree decomposition. It is also W[3]-hard and in W[P] parameterised by the
-feedback vertex number of the source. One reduction from List Colouring proves
-all three hardness statements, increasing the three parameters by constants;
-treewidth and feedback vertex number increase by exactly two when the input
-graph contains an edge. The same classifications hold for recognising graphs
-whose core is an odd cycle, with no target supplied. Hardness holds on connected,
-2-degenerate sources of arbitrarily large prescribed constant girth.
-The reduction's decision equivalence, structural bounds, target capping and
-odd-cycle-core reduction, together with its size and sparsity properties,
-are checked in Lean~4.
+Does a nonbipartite graph map to its own shortest odd cycle?
+Recognising graphs whose core is an odd cycle is XNLP-complete for the width
+of a supplied path decomposition and XALP-complete for the width of a supplied
+tree decomposition. For feedback vertex number it is W[SAT]-hard and in W[P].
+The same bounds hold for homomorphism to an input odd cycle.
+Hardness persists on connected, 2-degenerate graphs of girth
+$\Omega(|V(G)|^{1/3})$. Our reduction from List Colouring increases treewidth
+and feedback vertex number by exactly two on inputs with an edge.
+We also reduce weighted antimonotone formula satisfiability to List Colouring
+with a supplied feedback vertex set. Lean~4 checks the decision
+equivalences from a weighted formula through to both graph problems,
+the feedback-set witness and the quantitative girth bound.
 \end{abstract}
 
 \noindent\textbf{AI assistance.}
-Mathematical development, formalisation, and drafting used AI assistance
-under human direction. Appendix~\ref{app:lean} describes its scope, the
-verification boundary, and the review status.
+Mathematical development, formalisation and drafting used AI assistance
+under human direction. Appendix~\ref{app:lean} describes the verification scope.
 
 \section{Introduction}
-A homomorphism from a finite simple undirected graph $G$ to another such
-graph $H$ is a map of vertices preserving adjacency. Given a tree decomposition
-of $G$ of width $w$, the usual dynamic programme takes
-$|V(H)|^{O(w+1)}$ times a polynomial in the input size. This is polynomial
-for each fixed $w$, but the exponent depends on $w$.
-Amarilli asked whether additionally bounding the target treewidth makes
-homomorphism fixed-parameter tractable with parameter
-$\max\{\tw(G),\tw(H)\}$~\cite{amarilli2016}.
-A W[1]-hardness answer was announced in 2025; the relationship between
-those reductions and the construction below remains to be determined.
-
-Here the target is a single odd cycle $C_n$, whose length is part of the
-input and is not included in the parameter. We obtain the following
-classification from one direct reduction.
+A shortest odd cycle $C_g$ of a nonbipartite graph $G$ maps to $G$ by inclusion.
+Gerards studied when there is a homomorphism in the reverse direction~\cite{gerards1988}.
+Such a map preserves adjacency and, after a rotation or reflection of $C_g$,
+fixes the entire cycle. Deciding whether it exists amounts to recognising
+graphs whose core is an odd cycle. We study the complexity of this question
+when the source graph admits a narrow decomposition or becomes a forest
+after deleting a few vertices.
 
 \begin{theorem}\label{thm:main}
-Consider the problem of deciding $G\to C_n$, where $G$ is a finite simple
-undirected graph and $n\geq5$ is odd and given in binary.
-\begin{enumerate}
-\item Given a path decomposition, it is XNLP-complete parameterised by its width.
-\item Given a tree decomposition, it is XALP-complete parameterised by its width.
-\item Parameterised by $\fvs(G)$, it is W[3]-hard and belongs to W[P].
-\end{enumerate}
-The hardness statements remain valid on connected, 2-degenerate source graphs of
-girth at least any prescribed constant.
+Consider two decision problems on a finite simple undirected graph $G$.
+\begin{itemize}
+\item Does $G$ have an odd cycle as its core?
+\item Given also an odd $n\geq5$ in binary, does $G\to C_n$?
+\end{itemize}
+Each problem is XNLP-complete for the width of a supplied path decomposition,
+XALP-complete for the width of a supplied tree decomposition, and
+W[SAT]-hard and in W[P] for $\fvs(G)$. All three hardness bounds hold
+on connected, 2-degenerate graphs of girth at least $(|V(G)|/4)^{1/3}$.
 \end{theorem}
 
-The supplied-decomposition convention is part of the first two problem
-statements. We prove hardness for the corresponding structural parameters
-without a supplied decomposition as well, but make no membership claim for
-those variants. All targets have treewidth and pathwidth exactly two.
-Thus the result gives XALP-hardness parameterised by the maximum of the two
+Forgetting the supplied decomposition also gives hardness for the
+corresponding minimum width. In the version with an input target, its
+length varies and its treewidth and pathwidth are both exactly two.
+A width-$w$ source tree decomposition
+gives a dynamic programme with running time $|V(H)|^{O(w+1)}$ times
+a polynomial in the input size for an explicit target $H$. Amarilli asked
+whether also bounding the target treewidth gives fixed-parameter
+tractability~\cite{amarilli2016}.
+Theorem~\ref{thm:main} gives XALP-hardness parameterised by the maximum of the two
 input treewidths, and XNLP-hardness for the analogous pathwidth parameter.
 XNLP-hardness implies W[$t$]-hardness for every fixed $t\geq1$~\cite[Lemma~2]{bgns2024}.
 Since $\tw(G)\leq\pw(G)$, this gives, in particular, W[1]-hardness
@@ -102,9 +97,8 @@ The problem has an equivalent formulation as circular colouring. A graph has
 a homomorphism to $C_{2k+1}$ exactly when its circular chromatic number is
 at most $2+1/k$~\cite{zhu2001}. Theorem~\ref{thm:main} therefore classifies
 the problem of deciding $\chi_c(G)\leq 2+1/k$, with $k\geq2$ given in binary,
-under the same three parameters. Corollary~\ref{cor:core} gives the same
-classifications for recognising graphs whose core is an odd cycle, without
-supplying a target.
+under the same three parameters. Section~\ref{sec:core} relates the
+target-free problem to equality in the odd-girth lower bound for $\chi_c$.
 
 The main technical statement is an additive structural transfer.
 
@@ -139,21 +133,30 @@ These two descriptions give the matching upper and lower bounds on treewidth
 and feedback vertex number when $F$ contains an edge.
 
 \paragraph{Prior work and attribution.}
-Amarilli's comment of May~30, 2025 already announced W[1]-hardness reductions
-from workshop participants~\cite{amarilli2016}. The relationship between
-those reductions and this construction has not been established; this paper
-makes no priority claim for the original hardness question.
-Our starting results are the XNLP-completeness of List Colouring for
-pathwidth~\cite[Theorem~15]{bgns2024}, its XALP-completeness for
-treewidth~\cite[Theorem~8]{bggpp2022}, and its W[3]-hardness for feedback
-vertex number, which is listed in~\cite[Table~1]{bgp2023} and proved in the
-full version~\cite[Corollary~34]{bgp2023full}.
-Piecyk and Rz\k{a}\.{z}ewski study related fine-grained questions for list
-homomorphism. For ordinary homomorphism they show, assuming the SETH, that no
-constant $c$ gives an algorithm with running time
-$c^{\operatorname{ctw}(G)}|V(G)|^{O(1)}$ for every fixed odd cycle target,
-where $\operatorname{ctw}$ denotes cutwidth~\cite{pr2021}. Our statements concern
-uniform parameterised hardness and completeness as the target length varies.
+In May 2025 Amarilli reported workshop reductions indicating
+W[1]-hardness for the parameter $\max\{\tw(G),\tw(H)\}$~\cite{amarilli2016}.
+The public comment leaves the target family and the effect on the source
+feedback vertex number unspecified. The overlap with the odd-cycle
+construction remains unresolved.
+
+We use the XNLP-completeness of List Colouring for
+pathwidth~\cite[Theorem~15]{bgns2024} and its XALP-completeness for
+treewidth~\cite[Theorem~8]{bggpp2022}.
+For feedback vertex number, Bodlaender, Groenland and Pilipczuk obtained
+W[3]-hardness for List Colouring and W[SAT]-hardness for Binary
+CSP~\cite[Table~1]{bgp2023}. Their Binary CSP reduction certifies the truth
+of subformulas by propagating choices down a formula tree
+\cite[Lemmas~11 and~14]{bgp2023full}. In
+Theorem~\ref{thm:list-feedback} we express that propagation with colour
+lists and ordinary edges, strengthening the W[3] lower bound for List
+Colouring in~\cite[Corollary~34]{bgp2023full}.
+
+Piecyk and Rz\k{a}\.{z}ewski studied cutwidth and feedback vertex number for
+list homomorphism. Their conditional cutwidth bounds also apply to ordinary
+homomorphism for odd-cycle targets~\cite{pr2021}. For each fixed odd cycle
+our reduction transfers algorithms in the opposite direction, from ordinary
+homomorphism to List Colouring with a fixed palette
+(Proposition~\ref{thm:fixed}).
 Carbonnel gives single-exponential-time, polynomial-space algorithms measured
 in the number of source vertices for target families excluding a topological
 minor, together with improved randomised bounds for fixed odd-cycle
@@ -223,7 +226,7 @@ An instance of List Colouring consists of a graph $F$ and lists
 $L(v)\subseteq\{0,\ldots,q-1\}$. It asks for a map $c$ with
 $c(v)\in L(v)$ for every vertex and $c(u)\ne c(v)$ for every edge $uv$.
 Relabelling the palette is harmless. Choose the least odd integer
-$n\geq\max\{5,q+1\}$, and regard the lists as subsets of $\Z/n\Z$.
+$n\geq\max\{5,q+1,|V(F)|\}$, and regard the lists as subsets of $\Z/n\Z$.
 
 \Needspace{5\baselineskip}
 Construct $G$ as follows.
@@ -375,7 +378,7 @@ and original edges into links. Vertex intervals and edge coverage are
 preserved, giving $\pw(G)\leq p+6$. This conservative bound is the one
 formalised in Lean.
 
-\subsection{Feedback vertex sets}
+\subsection{Feedback vertex sets}\label{sec:feedback}
 Let $S$ be a feedback vertex set of $F$. Delete
 \[
  S'=\{h_v:v\in S\}\cup\{A,B\}
@@ -446,7 +449,7 @@ $f=\sum_v(n-|L(v)|)$. The exact source size is
  |V(G)|=m+2+mn(n-2)+(e+f)(n-3)
  \leq 2+m+mn^2+(mn+m^2)n.
 \end{equation}
-Since $n=O(q+1)$, the output size is polynomial in the explicit input size.
+Since $n=O(q+m+1)$, the output size is polynomial in the explicit input size.
 Here the palette may be taken to contain only colours occurring in the
 lists: order the distinct labels by first occurrence in the input and
 replace each by its rank. Repeated scans compute these ranks in logarithmic
@@ -509,7 +512,7 @@ bounded ranges. Consequently the transducer uses $O(\log N)$ workspace,
 polynomial time, and polynomial output length, independently of the
 input width. This completes the proof of Theorem~\ref{thm:transfer}.
 
-\subsection{Sparse sources and large girth}
+\subsection{Sparse sources and large girth}\label{sec:sparse}
 \begin{proposition}\label{prop:sparse}
 The source $G$ is 2-degenerate. If $F$ is nonempty, its girth is exactly $n$.
 \end{proposition}
@@ -526,9 +529,13 @@ use at least two links. Their private interiors force it to traverse
 each link in full, giving length at least $2(n-2)\geq n$. A reference
 cycle of length $n$ exists whenever $F$ has a vertex.
 \end{proof}
-Choosing $n$ also to exceed any fixed girth threshold preserves all bounds.
-The target length still varies with the input. These observations do not
-bound the maximum degree of the source.
+The choice $m\leq n$ gives a quantitative girth bound.
+By~\eqref{eq:size},
+$|V(G)|\leq 2+n+n^3+2n^3\leq4n^3$ for $n\geq5$.
+Thus for every nonempty input the girth is at least $(|V(G)|/4)^{1/3}$.
+To impose any additional fixed lower bound on the girth, include it in the
+maximum defining $n$. The target length remains polynomial in the input size,
+and all width and feedback bounds continue to hold.
 
 The output is also connected. Since $n\geq q+1$, residue $q$ is outside
 every input list. Each hub therefore has a domain link to the reference
@@ -544,14 +551,69 @@ it has an equivalent characterisation by alternation with bounded total
 computation-tree size~\cite{bgns2024,bggpp2022}. We use parameterised
 logspace reductions, with workspace $f(k)+O(\log N)$.
 
-\paragraph{Hardness.}
-Apply Theorem~\ref{thm:transfer} to the published List Colouring results
-cited in the introduction. Additive parameter bounds and logarithmic-space
-construction give XNLP-hardness for pathwidth, XALP-hardness for treewidth,
-and W[3]-hardness for feedback vertex number. Output decompositions are
-available for the supplied-decomposition problems. Proposition~\ref{prop:sparse}
-gives the additional source restrictions. This establishes all hardness
-parts of Theorem~\ref{thm:main}.
+\subsection{List Colouring with a feedback vertex set}
+\begin{theorem}\label{thm:list-feedback}
+List Colouring is W[SAT]-hard parameterised by feedback vertex number,
+even when the input includes a set of $k$ vertices whose deletion leaves a tree
+and the parameter is $k$.
+\end{theorem}
+\begin{proof}
+Weighted Antimonotone Satisfiability asks whether an AND/OR formula
+with leaves $\neg x$, for $x$ in a set $X$ of variables, is satisfied by
+setting exactly $k$ variables true. It is W[SAT]-complete
+\cite[Theorem~4.1(ii)]{adf1995}. Use its formula tree, with a separate
+vertex for every literal occurrence, including repeated occurrences of the
+same variable. For $k>|X|$, output one vertex with an empty list and
+an empty deletion set. Henceforth assume $k\leq |X|$.
+
+Take the tree edges and add a clique $S$ of $k$ selectors, each with list
+$X$. Join every literal vertex to every selector. A colouring of the clique
+chooses a set $U\subseteq X$ of exactly $k$ true variables. Assign the
+following \emph{active} colours to the tree vertices.
+\begin{itemize}
+\item an AND gate $u$ has one colour $a_u$;
+\item an OR gate $u$ has a colour $a_{u,v}$ for each child $v$;
+\item a leaf $\neg x$ has colour $x$.
+\end{itemize}
+All gate colours are distinct and disjoint from $X$. The list at the root
+contains only its active colours. At every other vertex $v$ add one
+\emph{inactive} colour, namely $a_u$ when its parent $u$ is an AND gate
+and $a_{u,v}$ when its parent is an OR gate.
+
+Fix the selector colours. At a leaf $\neg x$, the active choice is
+available precisely when $x\notin U$. On a tree edge $uv$ from parent to
+child, the only colour shared by the two lists is the child's inactive
+colour. Hence an active AND gate forces every child to be active, and an
+OR gate coloured $a_{u,v}$ forces child $v$ to be active. Induction from
+the leaves shows that every active vertex represents a true subformula.
+The root must be active, including when the formula consists of one literal.
+
+Conversely, start at the root of a true formula. At a required AND gate
+use its active colour and require every child. At a required OR gate choose
+a true child, use its corresponding colour, and require that child alone.
+Colour each required leaf $\neg x$ with $x$ and all unrequired vertices
+with their inactive colours. The required leaves avoid all selector colours;
+on each tree edge the parent uses the child's inactive colour exactly when
+it requires that child. This gives a proper list colouring.
+
+Deleting the selectors leaves the original formula tree. For a tree of $t$
+nodes with $\ell$ leaves, the graph has $t+k$ vertices and
+$t-1+\binom{k}{2}+k\ell$ edges. Gate colours can be named by their node
+and child indices. Given the formula as a node table with parent pointers,
+counters and input scans enumerate the lists and edges in logarithmic space.
+The supplied deletion set has size $k$, so the minimum feedback vertex
+number is also bounded by the input weight.
+\end{proof}
+
+\paragraph{Transferring hardness to cycles.}
+Apply Theorem~\ref{thm:transfer} to the two published width lower bounds
+and to Theorem~\ref{thm:list-feedback}. The transformed decompositions
+have the claimed widths. The $k$ selector hubs and the two anchors give
+a supplied feedback set of size $k+2$.
+We may adjoin a single isolated vertex with a singleton list to ensure a
+nonempty input, extending a supplied decomposition by a singleton bag.
+Section~\ref{sec:sparse} then gives the connectedness, degeneracy and
+girth restrictions. Section~\ref{sec:core} shows how to discard the target.
 
 \subsection{Membership}
 We first bound the target length so that binary encoding does not increase
@@ -678,15 +740,37 @@ membership in W[P].
 
 This membership result also follows from the Binary CSP upper
 bound~\cite[Theorem~2]{bgp2023}, since the standard encoding preserves the
-constraint graph. Together with the reduction, this proves the third part
-of Theorem~\ref{thm:main}.
+constraint graph. For both List Colouring and the input-cycle problem, the
+remaining feedback-number gap is between W[SAT]-hardness and W[P]-membership.
 
-\subsection{Scope and targets of width one}
-For feedback vertex number, the present arguments establish W[3]-hardness
-and W[P]-membership, leaving a gap between the lower and upper bounds.
-For comparison, Binary CSP is W[SAT]-hard for feedback vertex
-number~\cite[Theorem~2]{bgp2023}.
+\subsection{Running-time transfer for a fixed target}
+Write $O^*(\cdot)$ to suppress polynomial factors in the input length.
+\begin{proposition}\label{thm:fixed}
+Fix an odd $q\geq5$. Given a feedback vertex set of size $s$, deciding
+$G\to C_q$ takes $O^*(q^s)$ time. For any fixed $b>1$, an $O^*(b^s)$
+algorithm for this problem yields an $O^*(b^s)$ algorithm for
+List Colouring with lists from $q$ colours and a supplied feedback set.
+\end{proposition}
+\begin{proof}
+Enumerate all $q^s$ assignments to the supplied set and run the polynomial
+forest extension test above. For the transfer, set $n=q$ in the construction
+of Section~\ref{sec:reduction} and use the whole palette $\Z/q\Z$.
+Lemma~\ref{lem:equivalence} works for arbitrary lists on this palette.
+By Section~\ref{sec:feedback}, the input feedback set yields an output
+feedback set of size $s+2$, even when some lists contain all $q$ colours.
+The output has polynomial size for fixed $q$, and $b^{s+2}=b^2 b^s$.
+\end{proof}
+Lokshtanov, Marx and Saurabh relate improved exponential bases for
+fixed-palette List Colouring to faster SAT algorithms~\cite{lms2018}.
+The October 2026 algorithm for counting satisfying assignments of $k$-CNF
+runs in deterministic $2^{o(N)}$ time up to polynomial input factors for
+every fixed clause width $k$, where $N$ counts variables~\cite{eth2026}.
+This refutes the bounded-width Strong Exponential Time Hypothesis (SETH) and
+removes that basis for claiming optimality of $q$ here.
+The parameterised hardness proofs of Theorem~\ref{thm:main} use unconditional
+reductions.
 
+\subsection{Targets of width one}
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
 If a target forest has an edge, a source maps to it exactly when the source is bipartite:
 a bipartition maps to that edge, and a homomorphism into a bipartite graph
@@ -696,32 +780,20 @@ source. These cases are polynomial-time decidable. On the other hand,
 fixing the target cycle itself would make the source-width problem FPT
 by the usual dynamic programme; variability of $n$ is essential.
 
-\subsection{Recognising odd-cycle cores}
-The same construction gives a classification with no target supplied:
-recognising graphs whose core is an odd cycle.
+\subsection{Recognising odd-cycle cores}\label{sec:core}
 A finite graph's \emph{core} is its smallest homomorphically equivalent
 subgraph, unique up to isomorphism. Every odd cycle is a core by rigidity
 (the same proof applies to $C_3$). Mapping a graph to its own shortest odd
 cycle is a classical question studied by Gerards~\cite{gerards1988}.
-The length of a shortest odd cycle is the graph's \emph{odd girth}.
-For nonbipartite graphs, the recognition problem equivalently asks whether
-the circular chromatic number attains the lower bound imposed by odd girth.
-
-\begin{corollary}\label{cor:core}
-Recognising graphs whose core is an odd cycle is XNLP-complete for the width
-of a supplied path decomposition, XALP-complete for the width of a supplied
-tree decomposition, and W[3]-hard and in W[P] for feedback vertex number.
-Hardness holds on connected, 2-degenerate graphs of arbitrarily large
-prescribed constant girth.
-
-For a nonbipartite graph $G$ of odd girth $g$, the equivalent conditions are
+Write $g$ for the length of a shortest odd cycle in a nonbipartite graph $G$
+(its \emph{odd girth}). Recognition asks whether $G$ attains the corresponding
+lower bound on its circular chromatic number:
 \[
  \operatorname{core}(G)\cong C_g
  \quad\Longleftrightarrow\quad G\to C_g
  \quad\Longleftrightarrow\quad \chi_c(G)=\frac{2g}{g-1}.
 \]
-\end{corollary}
-\begin{proof}
+\begin{proof}[Proof of Theorem~\ref{thm:main}, target-free case]
 If $G$ is homomorphically equivalent to $C_\ell$, then $C_\ell\to G$
 gives an odd closed walk of length $\ell$, containing an odd cycle;
 hence $g\leq\ell$. A shortest odd cycle also gives
@@ -732,12 +804,9 @@ Circular chromatic number is monotone under homomorphisms, and
 $\chi_c(C_g)=2g/(g-1)$. Together with the circular-colouring characterisation
 of $G\to C_g$, this proves the displayed equivalences.
 
-For hardness, ensure that $F$ is nonempty by adjoining an isolated vertex
-with a singleton list prescribing a fresh colour. This preserves list
-colourability and all three parameters; supplied decompositions extend by
-one singleton bag without increasing their width. Nonemptiness guarantees
-a reference cycle in the output, whose girth and odd girth are therefore
-both exactly $n$. Consequently, it has an odd-cycle core exactly when
+For hardness, take the nonempty List Colouring inputs used above. A reference
+cycle in the output has length $n$, and Proposition~\ref{prop:sparse}
+gives girth $n$, so its odd girth is also $n$. The output has an odd-cycle core exactly when
 $G\to C_n$. The reduction can discard the target. All source restrictions
 are inherited; in particular these hard instances have chromatic number
 exactly three, since they are 2-degenerate and contain an odd cycle.
@@ -846,11 +915,23 @@ odd girth is attained. The theorem \lean{hasOddCycleCore_iff_of_oddGirth}
 identifies homomorphic equivalence to an odd cycle with mapping to a shortest
 odd cycle, including when shorter even cycles are present.
 
-The circular-chromatic-number interpretation remains a mathematical argument
-in the text. The formal statements do not encode Turing machines or complexity
-classes: the published hardness of List Colouring, the binary-to-unary
-transducer, machine resource bounds, and complexity conclusions are proved or
-cited here.
+The accompanying modules \lean{WeightedFormula} and \lean{WeightedCycle}
+formalise the formula in Theorem~\ref{thm:list-feedback} as a finite rooted
+tree of gate and literal occurrences. For each injective selector assignment,
+\lean{extends_iff} identifies its extensions with truth under precisely
+its image. The theorem \lean{selectors_tree} proves that deleting the
+selectors leaves a tree. Finite vertex numbering and an injective map from
+gate and variable colours into the residues connect the two reductions.
+Writing $C$ for the finite colour type and $m$ for the number of vertices
+of the list instance, this composition uses $n=2(|C|+m)+5$. This choice
+satisfies the palette and order bounds used in the paper.
+The theorem \lean{WeightedFormula.Formula.cycle_reduction} gives one concrete
+output graph for both decision equivalences, a feedback set of size $k+2$,
+girth $n$ and at most $4n^3$ vertices. The integer girth bound for arbitrary
+nonempty list inputs with $m\leq n$ is \lean{ListReduction.source_girth_and_card}.
+
+The circular-colouring interpretation, bit encodings, machine resource
+bounds and external complexity results remain arguments in the text.
 Noncomputable choices used to select bags or roots in structural proofs
 do not stand in for a verified implementation of the logspace transducer.
 
@@ -879,11 +960,19 @@ human review of the complete argument.
 
 \begin{thebibliography}{10}
 \raggedright
+\bibitem{adf1995}
+K. A. Abrahamson, R. G. Downey and M. R. Fellows.
+Fixed-parameter tractability and completeness IV: On completeness for
+W[P] and PSPACE analogues. \emph{Annals of Pure and Applied Logic}
+73(3):235--276, 1995.
+\href{https://doi.org/10.1016/0168-0072(94)00034-Z}{doi:10.1016/0168-0072(94)00034-Z}.
+
 \bibitem{amarilli2016}
 Antoine Amarilli.
 Complexity of the homomorphism problem parameterized by treewidth.
 \emph{Theoretical Computer Science Stack Exchange}, question~34877,
-June~2, 2016; comment announcing W[1]-hardness, May~30, 2025.
+June~2, 2016, with a
+\href{https://cstheory.stackexchange.com/questions/34877/#comment124806_34877}{comment on workshop reductions, May~30, 2025}.
 \url{https://cstheory.stackexchange.com/q/34877}.
 
 \bibitem{bggpp2022}
@@ -940,6 +1029,12 @@ In \emph{Automated Deduction -- CADE~28}, LNCS, vol.~12699,
 pp.~625--635. Springer, 2021.
 \href{https://doi.org/10.1007/978-3-030-79876-5_37}{doi:10.1007/978-3-030-79876-5\_37}.
 
+\bibitem{eth2026}
+OpenAI.
+The Exponential Time Hypothesis is false.
+Preprint, October 17, 2026, revised October 25, 2026.
+\href{https://github.com/openai/math/tree/main/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026}{Manuscript and accompanying materials}.
+
 \bibitem{flumgrohe2006}
 J\"org Flum and Martin Grohe.
 \emph{Parameterized Complexity Theory}.
@@ -957,6 +1052,13 @@ A. Kostochka, J. Ne\v{s}et\v{r}il and P. Smol\'ikov\'a.
 Colorings and homomorphisms of degenerate and bounded degree graphs.
 \emph{Discrete Mathematics} 233:257--276, 2001.
 \href{https://doi.org/10.1016/S0012-365X(00)00245-4}{doi:10.1016/S0012-365X(00)00245-4}.
+
+\bibitem{lms2018}
+Daniel Lokshtanov, D\'aniel Marx and Saket Saurabh.
+Known algorithms on graphs of bounded treewidth are probably optimal.
+\emph{ACM Transactions on Algorithms} 14(2), 2018.
+\href{https://doi.org/10.1145/3170442}{doi:10.1145/3170442}.
+Preprint: \href{https://arxiv.org/abs/1007.5450}{arXiv:1007.5450}.
 
 \bibitem{mathlib2020}
 The mathlib Community.

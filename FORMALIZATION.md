@@ -20,6 +20,9 @@ successor lengths. No source or target lists remain in the output problem.
 | Odd closed walks in `C_n` have length at least `n` | `OddCycle.odd_closed_walk_length`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Odd-cycle homomorphisms cannot increase length; equivalence forces equal lengths | `OddCycle.length_le_of_hom`, `OddCycle.length_eq_of_homs`, [OddCycleTarget](TreewidthHom/OddCycleTarget.lean) |
 | Lists contained in a smaller palette omit coordinate `n-1` | `ListReduction.palette_missing_last`, [ListReduction](TreewidthHom/ListReduction.lean) |
+| Fixed selector images extend to a colouring iff the formula is true on those variables | `WeightedFormula.Formula.extends_iff`, [WeightedFormula](TreewidthHom/WeightedFormula.lean) |
+| Removing the selectors leaves a tree; exact-weight satisfiability reduces to both graph problems with a feedback set of size `k+2` | `selectors_tree`, `satisfiable_iff_colorable`, `cycle_reduction`, [WeightedCycle](TreewidthHom/WeightedCycle.lean) |
+| Girth `n` and order at most `4*n^3` for nonempty inputs with `m ≤ n` | `ListReduction.source_girth_and_card`, [Parameters](TreewidthHom/Parameters.lean) |
 | Decision equivalence | `ListReduction.source_hom_iff_colorable`, [ListReduction](TreewidthHom/ListReduction.lean) |
 | Rooted-tree attachments give width at most `max(w,1)` | `Graft.hasWidth`, [GraftWidth](TreewidthHom/GraftWidth.lean) |
 | Source treewidth `max(w+2,3)` | `ListReduction.source_width`, [ListWidth](TreewidthHom/ListWidth.lean) |
@@ -116,7 +119,7 @@ parameters, and their connection to encoded input length remains textual.
 
 The following also remain outside the formalisation:
 
-- the published complexity of List Colouring;
+- the published width hardness of List Colouring and the W[SAT]-completeness of Weighted Antimonotone Satisfiability;
 - the logspace transducer and the encoding of its output certificates;
 - time and space analysis of the XNLP, XALP and W[P] membership algorithms;
 - the resulting complexity-class hardness and completeness statements;
@@ -133,7 +136,7 @@ universal refinement theorem connects its output to the Lean graph. The XNLP
 and XALP completeness statements use supplied
 decompositions. For feedback vertex number, the W[P] upper bound needs no
 supplied decomposition; the paper proves it directly and also derives it from
-Binary CSP. No W[3]-membership result is claimed.
+Binary CSP. The formula gadget supplies the combinatorial part of the W[SAT] lower bound.
 
 ## Independent Palomar statement
 
@@ -150,7 +153,7 @@ precise scope and reproduction commands.
 
 See the [README reproduction commands](README.md#reproduce) for setup and execution.
 
-`scripts/check_formalization.py` builds the library and audits the 109 declarations
+`scripts/check_formalization.py` builds the library and audits the 115 declarations
 listed in [AxiomAudit.lean](AxiomAudit.lean). It rejects proof admissions and axioms outside
 `propext`, `Classical.choice`, and `Quot.sound`. Its report is
 [reports/lean-verification.json](reports/lean-verification.json). The report

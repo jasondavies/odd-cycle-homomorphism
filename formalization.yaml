@@ -45,8 +45,8 @@ sources:
       under the author's direction. This source-based entry identifies the mathematical
       account being formalised; it does not claim priority for the original hardness
       question. The cited revision includes the structural, capping and core
-      results; this development additionally checks finite tree-certificate
-      representation and polynomial output bag counts.
+      results. The accompanying library also checks finite tree certificates,
+      bag counts, the weighted-formula reduction and the quantitative girth bound.
   - title: "Complexity of the homomorphism problem parameterized by treewidth"
     authors:
       - Antoine Amarilli
@@ -90,7 +90,7 @@ sources:
     type: paper
     location: "Corollary 34; full version of ICALP 2023, DOI 10.4230/LIPIcs.ICALP.2023.27"
     relationship: background
-    note: "Feedback-vertex-number hardness used outside Lean; no external hardness hypothesis occurs in the formal theorem."
+    note: "Prior feedback-number bounds for List Colouring and Binary CSP. The new formula-gadget proof in the library uses neither lower bound as an assumption."
   - title: "Fine-grained complexity of the graph homomorphism problem for bounded-treewidth graphs"
     authors:
       - Karolina Okrasa
@@ -164,13 +164,23 @@ review:
   notes: >-
     The author supplied several AI-agent reviews of the manuscript, Lean statements,
     and executable checks; revisions addressed their concrete findings. The expanded
-    development passed a 109-declaration axiom audit, all 841 finite cases, and ten
+    development passed a 115-declaration axiom audit, all 841 finite cases, and ten
     Python regression tests. The strengthened standalone Comparator pair passed
     Lean, NanoDa, and con-ron; these checks are documented in PALOMAR.md. No independent
     human subject-expert review of the complete argument is claimed.
 
 alignment:
   statements:
+    - source: "Weighted formula decision equivalences and feedback-set transfer"
+      lean: TreewidthHom.WeightedFormula.Formula.cycle_reduction
+      module: TreewidthHom/WeightedCycle.lean
+      status: proved
+      note: "The concrete graph encodes exact-weight truth for both cycle problems and has a feedback set of size k+2."
+    - source: "Quantitative girth bound"
+      lean: TreewidthHom.OddCycle.ListReduction.source_girth_and_card
+      module: TreewidthHom/Parameters.lean
+      status: proved
+      note: "A nonempty list input with m at most n gives girth n and output order at most 4n^3."
     - source: "Manuscript size and construction resources, finite certificate counts"
       lean: TreewidthHom.Palomar.list_elimination
       module: Solution.lean

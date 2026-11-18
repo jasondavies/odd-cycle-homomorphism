@@ -80,8 +80,8 @@ For `m=|V(F)|`, `e=|E(F)|` and `f=Σ_v(n-|L(v)|)`,
 
 The construction and supplied decompositions can be emitted in logarithmic
 space using counters and input rescans. The paper gives the resource analysis
-and derives the complexity classifications from the published List Colouring
-hardness results and the homomorphism membership algorithms.
+and derives the complexity classifications from the published width bounds for List Colouring, the weighted-formula
+reduction and the homomorphism membership algorithms.
 
 ## Connected, sparse sources
 
@@ -93,8 +93,8 @@ It is also 2-degenerate: remove link interiors, then private reference vertices,
 leaving `AB` and isolated hubs. For nonempty `F`, its girth is exactly `n`.
 The reference cycles have girth `n`; any cycle using links must use at least
 two complete links, giving length at least `2(n-2) ≥ n`.
-Choosing `n` above any fixed threshold gives the large-girth restriction
-without changing the parameter bounds.
+Choosing `n ≥ m` gives at most `4*n^3` output vertices, hence girth at least
+`(|V(G)|/4)^(1/3)` for nonempty inputs.
 
 ## Target encoding and recognition
 

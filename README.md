@@ -16,7 +16,7 @@ Comparator checks, and final snapshot requirements.
 | --- | --- |
 | Width of a supplied path decomposition of `G` | XNLP-complete |
 | Width of a supplied tree decomposition of `G` | XALP-complete |
-| Feedback vertex number of `G` | W[3]-hard; in W[P] |
+| Feedback vertex number of `G` | W[SAT]-hard; in W[P] |
 
 All three hardness statements follow from one reduction from List Colouring,
 which increases treewidth, pathwidth, and feedback vertex number by constants.
@@ -28,8 +28,8 @@ statements require supplied decompositions; the W[P] upper bound does not.
 The hardness results also hold without supplied decompositions. Every target
 has treewidth and pathwidth two; the source width varies with the parameter.
 Homomorphism to targets of treewidth at most one is polynomial-time decidable.
-The hard sources can be connected, 2-degenerate, and of arbitrarily large
-prescribed constant girth.
+The hard sources can be connected and 2-degenerate with girth at least
+`(|V(G)|/4)^(1/3)`.
 
 The same three classifications hold for recognising graphs whose core is an
 odd cycle, with no target supplied. For a nonbipartite graph this asks whether
@@ -66,6 +66,13 @@ Finite graphs admit finite-index tree certificates of the same width.
 [ListCertificates](TreewidthHom/ListCertificates.lean) bounds the output tree
 and path bag counts polynomially in the input bag count, vertex count and
 numeric target length.
+[WeightedFormula](TreewidthHom/WeightedFormula.lean) checks that a formula is true
+under a fixed selector assignment exactly when the assignment extends to a proper
+list colouring. [WeightedCycle](TreewidthHom/WeightedCycle.lean) composes this
+with the cycle construction, proves both decision equivalences for one graph,
+and exhibits a feedback vertex set of size `k+2`. For nonempty list inputs of
+order at most `n`, Lean also proves exact girth `n` and at most `4*n^3` output vertices.
+
 The circular-chromatic-number interpretation, complexity classifications, and
 machine resource bounds remain outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
@@ -84,7 +91,7 @@ python3 scripts/run_list_cycle_checks.py
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The Lean audit builds the library and checks 109 declarations. The finite suite
+The Lean audit builds the library and checks 115 declarations. The finite suite
 checks 841 instances; the regression tests cover validation and optimised
 Python execution. Both verification scripts write JSON reports to
 [reports/](reports/). Finite checks corroborate the construction; they do not
