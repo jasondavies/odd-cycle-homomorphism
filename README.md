@@ -95,6 +95,30 @@ machine resource bounds remain outside Lean.
 [FORMALIZATION.md](FORMALIZATION.md) maps the statements to declarations and
 explains the verification boundary.
 
+## Executable manuscript algorithms
+
+[cycle_algorithms.py](scripts/cycle_algorithms.py) reads one JSON graph from
+standard input. Vertices are numbered from zero through `order - 1`. Each edge
+is an unordered pair of distinct vertex numbers. For example, save this
+five-cycle as `graph.json`:
+
+```json
+{"order": 5, "edges": [[0,1], [1,2], [2,3], [3,4], [4,0]]}
+```
+
+| Command | Result for the example |
+| --- | --- |
+| `python3 scripts/cycle_algorithms.py long-cycle 5 < graph.json` | A list of five colours in vertex order. A no instance returns `null`. |
+| `python3 scripts/cycle_algorithms.py circular-clique 7 3 < graph.json` | `false` for the threshold 7/3 |
+| `python3 scripts/cycle_algorithms.py circular-number < graph.json` | The exact ratio `"5/2"` |
+
+The long-cycle solver samples a spanning-tree tour and reconstructs a witness
+from shortest distances rooted at the original tree root. The circular-clique
+solver suppresses degree-two chains and tests their endpoint constraints using
+integer arithmetic, including when the target parameters are large.
+[Regression tests](scripts/test_cycle_algorithms.py) compare both algorithms
+with direct colour assignment and validate returned witnesses.
+
 ## Reproduce
 
 Run these commands from the repository root. Requires
@@ -117,7 +141,11 @@ replace the proofs.
 [GitHub Actions](.github/workflows/verify.yml) runs the Lean audit and Palomar
 Comparator, the finite suite, and regression tests in normal and optimised Python
 on pushes and pull requests. The generated Lean audit is retained as a workflow
-artifact tied to the checked commit.
+artifact tied to the checked commit. The
+[successful verification run for the reviewed revision `be064ce`](https://github.com/jasondavies/odd-cycle-homomorphism/actions/runs/44436103512)
+records the Lean audit, independent-kernel Comparator and Python checks at that
+revision. The checked-in [Lean report](reports/lean-verification.json) records
+an earlier working-tree snapshot with its own provenance.
 
 To rebuild both PDFs, run `make -C paper`; see [paper/README.md](paper/README.md)
 for LaTeX requirements.
